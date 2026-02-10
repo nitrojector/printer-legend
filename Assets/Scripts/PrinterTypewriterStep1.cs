@@ -30,6 +30,14 @@ public class PrinterTypewriter_Game : MonoBehaviour
     [Range(0f, 0.2f)] public float leftNoPrint01 = 0.03f;
     [Range(0f, 0.2f)] public float rightNoPrint01 = 0.00f;
 
+    [Header("Audio SFX")]
+    public AudioSource sfxSource;
+
+    public AudioClip printLoopClip;     // plays while holding space + printing
+    public AudioClip carriageReturnClip; // plays when space resets head to left
+    public AudioClip revealClip;        // plays when final artwork is revealed
+
+
     private InputAction spaceAction;
 
     // progress through the real page
@@ -181,10 +189,30 @@ public class PrinterTypewriter_Game : MonoBehaviour
         // Move head left -> right
         headX += scanSpeed * Time.deltaTime;
 
-        // printing while scanning
+        // Printing while scanning
         bool shouldPrint = requireHoldSpaceToPrint ? spaceHeld : true;
-        if (shouldPrint)
+
+        if (shouldPrint && state == State.Scanning)
+        {
             StampInkAtPrintLine();
+
+            // --- PRINT LOOP SOUND ---
+            if (printLoopClip != null && sfxSource != null && !sfxSource.isPlaying)
+            {
+                sfxSource.clip = printLoopClip;
+                sfxSource.loop = true;
+                sfxSource.Play();
+            }
+        }
+        else
+        {
+            // Stop loop when not printing
+            if (sfxSource != null && sfxSource.loop)
+            {
+                sfxSource.Stop();
+                sfxSource.loop = false;
+            }
+        }
 
         // if at the right edge stop and wait for player to reset
         if (headX >= 1f)
