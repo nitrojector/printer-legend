@@ -480,6 +480,8 @@ MonoBehaviour:
   startBlankLeadInWindows: 1
   scanSpeed: 0.5
   lineStep: 0.03
+  moveTime: 0.1
+  moveStep: 0.03
   brushRadius: 4
   requireHoldSpaceToPrint: 1
   revealFadeSeconds: 0.6

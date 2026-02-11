@@ -17,6 +17,8 @@ public class PrinterTypewriter_Game : MonoBehaviour
     [Header("Printing Motion")]
     public float scanSpeed = 0.6f;  // printer head speed
     public float lineStep = 0.03f;  // distance increase per carriage return
+    public float moveTime = 0.1f; // time between each head step movement
+    public float moveStep = 0.03f; // how much the head moves each step
 
     [Header("Ink")]
     public int brushRadius = 2;
@@ -79,6 +81,8 @@ public class PrinterTypewriter_Game : MonoBehaviour
 
     // reveal fade
     private float finishedTime = -1f;
+
+    private float moveTimer = 0.0f;
 
     void OnEnable()
     {
@@ -209,7 +213,16 @@ public class PrinterTypewriter_Game : MonoBehaviour
 
         // --- state == Scanning ---
         // Move head left -> right
-        headX += scanSpeed * Time.deltaTime;
+        
+        // headX += scanSpeed * Time.deltaTime;
+
+        // NOTE: changed to fixed step movement to make drawing more "deterministic"?
+        moveTimer += Time.deltaTime;
+        if (moveTimer >= moveTime)
+        {
+            moveTimer = 0.0f;
+            headX += 0.02f;
+        }
 
         bool shouldPrint = requireHoldSpaceToPrint ? spaceHeld : true;
 
