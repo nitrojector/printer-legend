@@ -31,12 +31,14 @@ public class PrinterTypewriter_Game : MonoBehaviour
     [Range(0f, 0.2f)] public float rightNoPrint01 = 0.00f;
 
     [Header("Audio SFX")]
-    public AudioSource sfxSource;
+    public AudioSource moveLoopSource;
+    public AudioSource printLoopSource;
+    public AudioSource oneShotSource; 
 
-    public AudioClip printLoopClip;     // plays while holding space + printing
-    public AudioClip carriageReturnClip; // plays when space resets head to left
-    public AudioClip revealClip;        // plays when final artwork is revealed
-
+    public AudioClip moveLoopClip;
+    public AudioClip printLoopClip; 
+    public AudioClip carriageReturnClip;
+    public AudioClip revealClip;
 
     private InputAction spaceAction;
 
@@ -152,6 +154,22 @@ public class PrinterTypewriter_Game : MonoBehaviour
         bool spaceJustPressed = spaceHeld && !prevSpaceHeld;
         prevSpaceHeld = spaceHeld;
 
+        // SFX
+        if (state == State.Scanning)
+        {
+            if (moveLoopSource != null && moveLoopClip != null && !moveLoopSource.isPlaying)
+            {
+                moveLoopSource.clip = moveLoopClip;
+                moveLoopSource.loop = true;
+                moveLoopSource.Play();
+            }
+        }
+        else
+        {
+            if (moveLoopSource != null && moveLoopSource.isPlaying)
+                moveLoopSource.Stop();
+        }
+
         if (state == State.Finished)
         {
             if (spaceJustPressed)
@@ -165,6 +183,10 @@ public class PrinterTypewriter_Game : MonoBehaviour
             if (spaceJustPressed)
             {
                 headX = 0f;
+
+                // --- CARRIAGE RETURN ONE-SHOT ---
+                if (oneShotSource != null && carriageReturnClip != null)
+                    oneShotSource.PlayOneShot(carriageReturnClip);
 
                 // advance the paper one line
                 progress01 += lineStep;
@@ -189,37 +211,37 @@ public class PrinterTypewriter_Game : MonoBehaviour
         // Move head left -> right
         headX += scanSpeed * Time.deltaTime;
 
-        // Printing while scanning
         bool shouldPrint = requireHoldSpaceToPrint ? spaceHeld : true;
 
-        if (shouldPrint && state == State.Scanning)
+        if (state == State.Scanning && shouldPrint)
         {
             StampInkAtPrintLine();
 
-            // --- PRINT LOOP SOUND ---
-            if (printLoopClip != null && sfxSource != null && !sfxSource.isPlaying)
+            // --- PRINT LOOP (inking) ---
+            if (printLoopSource != null && printLoopClip != null && !printLoopSource.isPlaying)
             {
-                sfxSource.clip = printLoopClip;
-                sfxSource.loop = true;
-                sfxSource.Play();
+                printLoopSource.clip = printLoopClip;
+                printLoopSource.loop = true;
+                printLoopSource.Play();
             }
         }
         else
         {
-            // Stop loop when not printing
-            if (sfxSource != null && sfxSource.loop)
-            {
-                sfxSource.Stop();
-                sfxSource.loop = false;
-            }
+            if (printLoopSource != null && printLoopSource.isPlaying)
+                printLoopSource.Stop();
         }
+
 
         // if at the right edge stop and wait for player to reset
         if (headX >= 1f)
         {
             headX = 1f;
             state = State.AwaitReset;
+
+            // --- IMPORTANT: stop printing audio immediately when carriage stops ---
+            StopPrintLoop();
         }
+
 
         ApplyPaperIfDirty();
     }
@@ -228,7 +250,16 @@ public class PrinterTypewriter_Game : MonoBehaviour
     {
         state = State.Finished;
         finishedTime = Time.time;
+
+        // Stop loops
+        if (moveLoopSource != null && moveLoopSource.isPlaying) moveLoopSource.Stop();
+        if (printLoopSource != null && printLoopSource.isPlaying) printLoopSource.Stop();
+
+        // Reveal sting
+        if (oneShotSource != null && revealClip != null)
+            oneShotSource.PlayOneShot(revealClip);
     }
+
 
     void ApplyPaperIfDirty()
     {
@@ -432,5 +463,11 @@ public class PrinterTypewriter_Game : MonoBehaviour
         }
 
         GUI.EndGroup();
+    }
+
+    void StopPrintLoop()
+    {
+        if (printLoopSource != null && printLoopSource.isPlaying)
+            printLoopSource.Stop();
     }
 }
