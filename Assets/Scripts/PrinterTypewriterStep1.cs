@@ -53,6 +53,7 @@ public class PrinterTypewriter_Game : MonoBehaviour
     private Texture2D red1x1;
     private Texture2D dark1x1;
     private Color paperBase;
+    private Color paperCol;
     private Color lineCol;
 
     private Color[] paperPixels;
@@ -100,14 +101,16 @@ public class PrinterTypewriter_Game : MonoBehaviour
         // create paper texture + grey guide lines so movement is visible
         paperTex = new Texture2D(paperW, paperH, TextureFormat.RGBA32, false);
 
-        paperBase = new Color(0.97f, 0.97f, 0.95f, 1f);
+        //paperBase = new Color(0.97f, 0.97f, 0.95f, 0f);
+        paperCol = new Color(0.97f, 0.97f, 0.95f, 1f);
+        
         lineCol   = new Color(0.90f, 0.90f, 0.88f, 1f);
 
         paperPixels = new Color[paperW * paperH];
         for (int y = 0; y < paperH; y++)
         {
             bool isLine = (y % 16 == 0);
-            Color c = isLine ? lineCol : paperBase;
+            Color c = isLine ? lineCol : paperCol;
             for (int x = 0; x < paperW; x++)
                 paperPixels[y * paperW + x] = c;
         }
@@ -124,9 +127,10 @@ public class PrinterTypewriter_Game : MonoBehaviour
         dark1x1.Apply(false);
 
         // layout of the UI
-        machineRect     = new Rect(40, 110, 640, 560);
+        machineRect     = new Rect(40, 450, 640, 250);
         paperWindowRect = new Rect(100, 210, 520, 260);
         refRect         = new Rect(740, 170, 420, 420);
+        
 
         ResetRun();
     }
@@ -137,7 +141,7 @@ public class PrinterTypewriter_Game : MonoBehaviour
         for (int y = 0; y < paperH; y++)
         {
             bool isLine = (y % 16 == 0);
-            Color c = isLine ? lineCol : paperBase;
+            Color c = isLine ? lineCol : paperCol;
             for (int x = 0; x < paperW; x++)
                 paperPixels[y * paperW + x] = c;
         }
@@ -358,7 +362,7 @@ public class PrinterTypewriter_Game : MonoBehaviour
 
         // Machine
         GUI.DrawTexture(machineRect, dark1x1, ScaleMode.StretchToFill, false);
-        GUI.Label(new Rect(machineRect.x + 20, machineRect.y + 20, 400, 20), "TYPEWRITER");
+        GUI.Label(new Rect(machineRect.x + 50, machineRect.y + 150, 400, 20), "TYPEWRITER");
 
         // Paper slot
         DrawPaperWindow(paperWindowRect);
