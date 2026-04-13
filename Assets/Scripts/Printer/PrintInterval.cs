@@ -11,7 +11,7 @@ namespace Printer
         /// <summary>X coordinate in canvas pixels.</summary>
         public readonly int CanvasX;
 
-        /// <summary>Half-width of the printed mark in pixels.</summary>
+        /// <summary>Total width of the printed mark in pixels.</summary>
         public readonly int PixelWidth;
 
         public readonly Color Color;

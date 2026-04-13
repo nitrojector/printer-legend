@@ -18,25 +18,28 @@ namespace Printer
         [Header("Print Settings")] [SerializeField]
         private int linePixelHeight = 4;
 
+        [SerializeField] private int linePixelWidth = 4;
+
         [SerializeField] private Color inkColor = Color.black;
-        [SerializeField] private int inkPixelWidth = 4;
 
         private int totalLines;
 
-        private PrintLineState _lineState;
+        private PrintLineState lineState;
 
         // ── Lifecycle ──────────────────────────────────────────────────────────
 
         private void Awake()
         {
-            int totalLines = canvas.CanvasHeight / linePixelHeight;
-            _lineState = new PrintLineState(totalLines, linePixelHeight);
+            totalLines = canvas.CanvasHeight / linePixelHeight;
+            lineState = new PrintLineState(totalLines, linePixelHeight);
         }
 
         private void Start()
         {
             // Sync visual to initial line
-            printhead.SetIndicatorLine(_lineState.CurrentLine, totalLines, linePixelHeight);
+            printhead.BindLineState(lineState, totalLines, linePixelHeight);
+            printhead.SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
+            printhead.SetCanvasX(0);
         }
 
         // ── Public API — called by input handlers, game systems ────────────────
@@ -47,36 +50,52 @@ namespace Printer
         /// </summary>
         public void Print()
         {
-            if (_lineState.IsComplete) return;
+            if (lineState.IsComplete) return;
 
             int canvasX = canvas.NormalisedToCanvasX(printhead.NormalisedX);
-            var interval = new PrintInterval(canvasX, inkColor, inkPixelWidth);
-            _lineState.QueueInterval(interval);
+            var interval = new PrintInterval(canvasX, inkColor, linePixelWidth);
+            printhead.CommitInterval(interval);
         }
 
         /// <summary>
-        /// Commits all queued intervals and advances to the next line.
+        /// Advances to the next line after any immediate prints have already been committed.
         /// Typically called by the game's line-advance logic (timer, beat, etc.).
         /// </summary>
         public void AdvanceLine()
         {
-            if (_lineState.IsComplete) return;
+            if (lineState.IsComplete) return;
 
-            _lineState.CommitAndAdvance(canvas);
-            printhead.SetIndicatorLine(_lineState.CurrentLine, totalLines, linePixelHeight);
+            printhead.AdvanceLine();
+        }
+
+        /// <summary>
+        /// Advances the printhead horizontally by one print step and wraps to the next
+        /// line when it reaches the end of the canvas.
+        /// </summary>
+        public void AdvancePrinthead()
+        {
+            if (lineState.IsComplete) return;
+
+            bool wrapped = printhead.AdvanceHorizontal(linePixelWidth);
+            if (wrapped)
+                AdvanceLine();
         }
 
         /// <summary>Moves the printhead. Input systems drive this each frame.</summary>
         public void SetPrintheadPosition(float normalisedX)
         {
-            printhead.SetNormalisedX(normalisedX);
+            printhead.SetPrintheadPosition(normalisedX);
         }
+
+        public void SetPrintheadLine(int lineIndex) => printhead.SetPrintheadLine(lineIndex);
 
         // ── Accessors ──────────────────────────────────────────────────────────
 
-        public float Progress => _lineState.Progress;
-        public bool IsComplete => _lineState.IsComplete;
-        public int CurrentLine => _lineState.CurrentLine;
+        public float Progress => lineState.Progress;
+        public bool IsComplete => lineState.IsComplete;
+        public int CurrentLine => lineState.CurrentLine;
+        public int LinePixelWidth => linePixelWidth;
+        public int LinePixelHeight => linePixelHeight;
 
         public Color InkColor
         {

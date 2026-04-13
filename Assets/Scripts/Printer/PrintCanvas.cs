@@ -7,55 +7,66 @@ namespace Printer
     /// Owns the Texture2D pixel buffer and the RenderTexture displayed via RawImage.
     /// All draw calls go through here. Extensible: add disruption/overlay methods here.
     /// </summary>
-    [RequireComponent(typeof(Image))]
     public class PrintCanvas : MonoBehaviour
     {
         [Header("Canvas Settings")] [SerializeField]
         private int canvasWidth = 512;
+        [SerializeField] private int canvasHeight = 512;
+
+        [Header("Display")] [SerializeField]
+        private Color backgroundColor = Color.white;
         
         private RawImage displayTarget;
 
-        [SerializeField] private int canvasHeight = 512;
-        [SerializeField] private Color backgroundColor = Color.white;
-
         public RectTransform DisplayRect => displayTarget.rectTransform;
 
-        private Texture2D _texture;
-        private RenderTexture _renderTexture;
-        private bool _dirty;
+        private Texture2D texture;
+        private RenderTexture renderTexture;
+        private bool dirty;
 
         // ── Lifecycle ──────────────────────────────────────────────────────────
 
         private void Awake()
         {
-            _texture = new Texture2D(canvasWidth, canvasHeight, TextureFormat.RGBA32, mipChain: false)
+            if (displayTarget == null)
+                displayTarget = GetComponent<RawImage>();
+
+            if (displayTarget == null)
+            {
+                Debug.LogError("PrintCanvas requires a RawImage display target.", this);
+                enabled = false;
+                return;
+            }
+
+            texture = new Texture2D(canvasWidth, canvasHeight, TextureFormat.RGBA32, mipChain: false)
             {
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp
             };
 
-            _renderTexture = new RenderTexture(canvasWidth, canvasHeight, depth: 0)
+            renderTexture = new RenderTexture(canvasWidth, canvasHeight, depth: 0)
             {
                 filterMode = FilterMode.Point
             };
 
-            displayTarget.texture = _renderTexture;
+            displayTarget.texture = renderTexture;
             Clear();
         }
 
         private void LateUpdate()
         {
             // Flush dirty CPU texture → GPU RenderTexture once per frame
-            if (!_dirty) return;
-            Graphics.Blit(_texture, _renderTexture);
-            _dirty = false;
+            if (!dirty) return;
+            texture.Apply(updateMipmaps: false, makeNoLongerReadable: false);
+            Graphics.Blit(texture, renderTexture);
+            dirty = false;
         }
 
         private void OnDestroy()
         {
-            Destroy(_texture);
-            _renderTexture.Release();
-            Destroy(_renderTexture);
+            Destroy(texture);
+            renderTexture.Release();
+            Destroy(renderTexture);
         }
 
         // ── Public Draw API ────────────────────────────────────────────────────
@@ -64,16 +75,17 @@ namespace Printer
         public void DrawPixel(int x, int y, Color color)
         {
             if (x < 0 || x >= canvasWidth || y < 0 || y >= canvasHeight) return;
-            _texture.SetPixel(x, y, color);
-            _dirty = true;
+            texture.SetPixel(x, y, color);
+            dirty = true;
         }
 
         /// <summary>Paints a horizontal run of pixels for one print interval.</summary>
         public void DrawInterval(PrintInterval interval, int lineY)
         {
-            int halfW = interval.PixelWidth / 2;
-            for (int dx = -halfW; dx <= halfW; dx++)
-                DrawPixel(interval.CanvasX + dx, lineY, interval.Color);
+            int width = Mathf.Max(1, interval.PixelWidth);
+            int startX = interval.CanvasX;
+            for (int dx = 0; dx < width; dx++)
+                DrawPixel(startX + dx, lineY, interval.Color);
         }
 
         /// <summary>Clears the entire canvas to the background color.</summary>
@@ -82,8 +94,8 @@ namespace Printer
             Color32[] fill = new Color32[canvasWidth * canvasHeight];
             Color32 bg = backgroundColor;
             for (int i = 0; i < fill.Length; i++) fill[i] = bg;
-            _texture.SetPixels32(fill);
-            _dirty = true;
+            texture.SetPixels32(fill);
+            dirty = true;
         }
 
         // ── Accessors ──────────────────────────────────────────────────────────
