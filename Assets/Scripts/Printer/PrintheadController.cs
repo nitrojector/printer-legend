@@ -2,35 +2,82 @@ using UnityEngine;
 
 namespace Printer
 {
-    [RequireComponent(typeof(PlayerPrinter))]
     public class PrintheadController : MonoBehaviour
     {
-        [Header("Prefab References — assign in Inspector")] [SerializeField]
-        private RectTransform printheadRoot;
-
+        [Header("Prefab References — assign in Inspector")]
+        [SerializeField] private RectTransform printheadRoot;
         [SerializeField] private RectTransform printheadMarker;
         [SerializeField] private PrintCanvas canvas;
 
+        [Header("Print Settings")]
+        [SerializeField] private int linePixelHeight = 4;
+        [SerializeField] private int linePixelWidth = 4;
+        [SerializeField] private Color inkColor = Color.black;
+
         private PrintLineState lineState;
         private int totalLines;
-        private int linePixelHeight = 4;
         private int canvasX;
 
         public float NormalisedX { get; private set; } = 0.5f;
 
         private RectTransform CanvasRect => canvas.DisplayRect;
 
-        // ── Public API ─────────────────────────────────────────────────────────
+        // ── Accessors ──────────────────────────────────────────────────────────
 
-        public void BindLineState(PrintLineState boundLineState, int boundTotalLines, int boundLinePixelHeight)
+        public float Progress => lineState.Progress;
+        public bool IsComplete => lineState.IsComplete;
+        public int CurrentLine => lineState.CurrentLine;
+        public int LinePixelWidth => linePixelWidth;
+        public int LinePixelHeight => linePixelHeight;
+
+        public Color InkColor
         {
-            lineState = boundLineState;
-            totalLines = boundTotalLines;
-            linePixelHeight = boundLinePixelHeight;
+            get => inkColor;
+            set => inkColor = value;
+        }
 
-            if (lineState != null)
+        // ── Lifecycle ──────────────────────────────────────────────────────────
+
+        private void Awake()
+        {
+            totalLines = canvas.CanvasHeight / linePixelHeight;
+            lineState = new PrintLineState(totalLines, linePixelHeight);
+        }
+
+        private void Start()
+        {
+            SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
+            SetCanvasX(0);
+        }
+
+        // ── Print Actions ──────────────────────────────────────────────────────
+
+        public void Print()
+        {
+            if (lineState.IsComplete) return;
+
+            int x = canvas.NormalisedToCanvasX(NormalisedX);
+            CommitInterval(new PrintInterval(x, inkColor, linePixelWidth));
+        }
+
+        public void AdvanceLine()
+        {
+            if (lineState.IsComplete) return;
+
+            bool advanced = lineState.AdvanceLine();
+            if (advanced)
                 SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
         }
+
+        public void AdvancePrinthead()
+        {
+            if (lineState.IsComplete) return;
+
+            bool wrapped = AdvanceHorizontal(linePixelWidth);
+            if (wrapped) AdvanceLine();
+        }
+
+        // ── Printhead Position ─────────────────────────────────────────────────
 
         public void SetNormalisedX(float t)
         {
@@ -78,36 +125,20 @@ namespace Printer
             float localY = ComputeLocalY(lineIndex, totalLineCount, lineHeightPixels);
 
             if (printheadRoot != null)
-            {
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
-            }
 
             SetCanvasX(0);
         }
 
         public void SetPrintheadLine(int lineIndex)
         {
-            if (lineState != null)
-                lineState.SetCurrentLine(lineIndex);
-
+            lineState?.SetCurrentLine(lineIndex);
             SetIndicatorLine(lineIndex, totalLines, linePixelHeight);
-        }
-
-        public bool AdvanceLine()
-        {
-            if (lineState == null) return false;
-
-            bool advanced = lineState.AdvanceLine();
-            if (advanced)
-                SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
-
-            return advanced;
         }
 
         public void CommitInterval(PrintInterval interval)
         {
             if (lineState == null || canvas == null) return;
-
             lineState.CommitInterval(canvas, interval);
         }
 
