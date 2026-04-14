@@ -151,10 +151,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1378958974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 512, y: 5}
+  m_SizeDelta: {x: 0, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &33451174
 MonoBehaviour:
@@ -467,10 +467,10 @@ RectTransform:
   - {fileID: 915043030}
   m_Father: {fileID: 1721072253}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1378958975
 MonoBehaviour:
@@ -484,6 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c85813173d47c38136c0412c0b890d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterPlayerController
+  <PrintStepsPerSecond>k__BackingField: 10
 --- !u!114 &1378958976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -499,8 +500,8 @@ MonoBehaviour:
   canvas: {fileID: 1721072254}
   printhead: {fileID: 1378958977}
   linePixelHeight: 4
+  linePixelWidth: 4
   inkColor: {r: 0, g: 0, b: 0, a: 1}
-  inkPixelWidth: 4
 --- !u!114 &1378958977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -704,8 +705,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4354e3d191744188eb654c0ecacc3d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintCanvas
-  canvasWidth: 512
-  canvasHeight: 512
+  canvasWidth: 128
+  canvasHeight: 128
   backgroundColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!222 &1721072256
 CanvasRenderer:
