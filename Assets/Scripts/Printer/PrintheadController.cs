@@ -9,7 +9,11 @@ namespace Printer
         [Header("Prefab References — assign in Inspector")]
         [SerializeField] private RectTransform printheadRoot;
         [SerializeField] private RectTransform printheadMarker;
-        [SerializeField] private PrintCanvas canvas;
+        
+        /// <summary>
+        /// Reference to the PrintCanvas component where this printhead should draw.
+        /// </summary>
+        private PrintCanvas canvas;
 
         [Header("Print Settings")]
         [SerializeField] private int linePixelHeight = 4;
@@ -51,6 +55,7 @@ namespace Printer
 
         private void Awake()
         {
+            canvas = GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
         }
