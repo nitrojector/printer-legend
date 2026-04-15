@@ -52,6 +52,8 @@ namespace Printer
         {
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState = new PrintLineState(totalLines, linePixelHeight);
+            var pixelWidthLocal = canvas.DisplayRect.sizeDelta.x / canvas.CanvasWidth;
+            printheadMarker.sizeDelta = new Vector2(linePixelWidth * pixelWidthLocal, printheadMarker.sizeDelta.y);
         }
 
         private void Start()
@@ -173,9 +175,9 @@ namespace Printer
             return false;
         }
 
-        public void SetIndicatorLine(int lineIndex, int totalLineCount, int lineHeightPixels)
+        private void SetIndicatorLine(int lineIndex, int totalLineCount, int lineHeightPixels)
         {
-            float localY = ComputeLocalY(lineIndex, totalLineCount, lineHeightPixels);
+            float localY = ComputeLocalY(lineIndex + 1, totalLineCount, lineHeightPixels);
 
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
@@ -209,7 +211,7 @@ namespace Printer
             float normalisedY = totalLineCount > 0
                 ? 1f - (float)(lineIndex * lineHeightPixels) / (totalLineCount * lineHeightPixels)
                 : 1f;
-            return Mathf.Lerp(-canvasH * 0.5f, canvasH * 0.5f, normalisedY);
+            return Mathf.LerpUnclamped(-canvasH * 0.5f, canvasH * 0.5f, normalisedY);
         }
     }
 }
