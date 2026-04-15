@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,6 +13,11 @@ namespace Printer
         [field: Header("Auto Cursor Advance")]
         [field: SerializeField, Min(0.001f)]
         public float PrintStepsPerSecond { get; set; } = 10f;
+        
+        /// <summary>
+        /// Whether the player is currently printing
+        /// </summary>
+        private bool printingStarted = false;
 
         private PrintheadController printhead;
         private PrinterMagic        magic;
@@ -27,12 +33,14 @@ namespace Printer
 
         /// <summary>Speed Adjust Action</summary>
         private InputAction speedAction;
-
+        
         // Color channel actions (one per palette entry)
         private InputAction color1Action;
         private InputAction color2Action;
         private InputAction color3Action;
         private InputAction color4Action;
+
+        private InputAction resetAction;
 
         // Stored delegates so subscribe/unsubscribe are symmetrical
         private readonly Action<InputAction.CallbackContext>[] colorHoldDelegates    = new Action<InputAction.CallbackContext>[4];
@@ -69,9 +77,11 @@ namespace Printer
             color2Action = InputSystem.actions["Printer/Color2"];
             color3Action = InputSystem.actions["Printer/Color3"];
             color4Action = InputSystem.actions["Printer/Color4"];
+            resetAction = InputSystem.actions["UI/Reset"];
 
             lfAction.performed += OnLF;
             crAction.performed += OnCR;
+            resetAction.performed += OnReset;
 
             SubscribeColorActions(true);
         }
@@ -80,6 +90,7 @@ namespace Printer
         {
             lfAction.performed -= OnLF;
             crAction.performed -= OnCR;
+            resetAction.performed -= OnReset;
 
             SubscribeColorActions(false);
 
@@ -90,7 +101,12 @@ namespace Printer
 
         private void Update()
         {
-            if (printhead.IsComplete) return;
+            if (!printingStarted && printAction.IsPressed())
+            {
+                printingStarted = true;
+            }
+            
+            if (!printingStarted || printhead.IsComplete) return;
 
             // ── Auto cursor advance (always on) ───────────────────────────────
             cursorStepTimer += Time.deltaTime;
@@ -153,6 +169,14 @@ namespace Printer
         {
             if (!magic.IsAbilityEnabled(PrinterAbility.CarriageReturn)) return;
             printhead.CarriageReturn();
+        }
+
+        private void OnReset(InputAction.CallbackContext ctx)
+        {
+            printingStarted = false;
+            printhead.Canvas.Clear();
+            printhead.SetPrintheadLine(0);
+            printhead.SetPrintheadPosition(0);
         }
 
         // Color hold/release — wired to color action performed/canceled

@@ -15,6 +15,8 @@ namespace Printer
         /// Reference to the PrintCanvas component where this printhead should draw.
         /// </summary>
         private PrintCanvas canvas;
+        
+        public PrintCanvas Canvas => canvas;
 
         [Header("Print Settings")]
         [SerializeField] private int linePixelHeight = 4;
