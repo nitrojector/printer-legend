@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -95,6 +96,86 @@ namespace Printer
             Color32 bg = backgroundColor;
             for (int i = 0; i < fill.Length; i++) fill[i] = bg;
             texture.SetPixels32(fill);
+            dirty = true;
+        }
+
+        // ── Disruption / Repair ────────────────────────────────────────────────
+
+        /// <summary>
+        /// Erases a contiguous block of lines back to the background color.
+        /// Call before rewinding the printhead so the player can redo clean lines.
+        /// </summary>
+        public void ClearLineRange(int firstLine, int lineCount, int linePixelHeight)
+        {
+            for (int li = 0; li < lineCount; li++)
+            {
+                int topY = LineIndexToCanvasY(firstLine + li, linePixelHeight);
+                for (int dy = 0; dy < linePixelHeight; dy++)
+                {
+                    int y = topY - dy;
+                    if (y < 0 || y >= canvasHeight) continue;
+                    for (int x = 0; x < canvasWidth; x++)
+                        texture.SetPixel(x, y, backgroundColor);
+                }
+            }
+            dirty = true;
+        }
+
+        /// <summary>
+        /// Displaces a random subset of ink pixels within a line band to simulate a
+        /// paper-jam skew. When <paramref name="respectPrintSize"/> is true, horizontal
+        /// displacement is snapped to the print-size grid; otherwise it is free-form.
+        /// </summary>
+        public void ShuffleLinePixels(int lineIndex, int linePixelHeight,
+            int shuffleCount, bool respectPrintSize, int printSize)
+        {
+            int topY    = LineIndexToCanvasY(lineIndex, linePixelHeight);
+            int startY  = Mathf.Max(0, topY - linePixelHeight + 1);
+            int bandH   = topY - startY + 1;
+            if (bandH <= 0) return;
+
+            // Batch-read the band for performance
+            Color[] band = texture.GetPixels(0, startY, canvasWidth, bandH);
+            Color32 bg   = backgroundColor;
+
+            // Collect indices of non-background pixels
+            var inkIdx = new List<int>(band.Length);
+            for (int i = 0; i < band.Length; i++)
+            {
+                Color32 c = band[i];
+                if (c.r != bg.r || c.g != bg.g || c.b != bg.b || c.a != bg.a)
+                    inkIdx.Add(i);
+            }
+            if (inkIdx.Count == 0) return;
+
+            // Partial Fisher-Yates to pick a random subset without repetition
+            int toMove = Mathf.Min(shuffleCount, inkIdx.Count);
+            for (int i = 0; i < toMove; i++)
+            {
+                int j = Random.Range(i, inkIdx.Count);
+                (inkIdx[i], inkIdx[j]) = (inkIdx[j], inkIdx[i]);
+            }
+
+            int spread = Mathf.Max(printSize * 3, canvasWidth / 8);
+            for (int i = 0; i < toMove; i++)
+            {
+                int src  = inkIdx[i];
+                int srcX = src % canvasWidth;
+                int srcY = src / canvasWidth;
+
+                int dx = Random.Range(-spread, spread + 1);
+                if (respectPrintSize && printSize > 1)
+                    dx = Mathf.RoundToInt((float)dx / printSize) * printSize;
+
+                int dstX = Mathf.Clamp(srcX + dx, 0, canvasWidth - 1);
+                int dy   = Random.Range(-(bandH - 1), bandH);
+                int dstY = Mathf.Clamp(srcY + dy, 0, bandH - 1);
+                int dst  = dstY * canvasWidth + dstX;
+
+                (band[src], band[dst]) = (band[dst], band[src]);
+            }
+
+            texture.SetPixels(0, startY, canvasWidth, bandH, band);
             dirty = true;
         }
 
