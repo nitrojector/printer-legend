@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Printer
@@ -51,15 +52,33 @@ namespace Printer
         private void Awake()
         {
             totalLines = canvas.CanvasHeight / linePixelHeight;
-            lineState = new PrintLineState(totalLines, linePixelHeight);
-            var pixelWidthLocal = canvas.DisplayRect.sizeDelta.x / canvas.CanvasWidth;
-            printheadMarker.sizeDelta = new Vector2(linePixelWidth * pixelWidthLocal, printheadMarker.sizeDelta.y);
+            lineState  = new PrintLineState(totalLines, linePixelHeight);
         }
 
-        private void Start()
+        // Coroutine so the Canvas layout pass has run before we read rect dimensions.
+        private IEnumerator Start()
         {
+            yield return null;
+            RefreshLayout();
+        }
+
+        /// <summary>
+        /// Snaps the marker width to one print pixel and repositions the indicator line.
+        /// Call after any runtime canvas resize.
+        /// </summary>
+        public void RefreshLayout()
+        {
+            SetMarkerSize();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
-            SetCanvasX(0);
+            SetCanvasX(canvasX);
+        }
+
+        private void SetMarkerSize()
+        {
+            if (printheadMarker == null || canvas == null) return;
+            float pixelsToUnits = CanvasRect.rect.width / canvas.CanvasWidth * linePixelWidth;
+            var sd = printheadMarker.sizeDelta;
+            printheadMarker.sizeDelta = new Vector2(pixelsToUnits, pixelsToUnits);
         }
 
         // ── Print Actions ──────────────────────────────────────────────────────
