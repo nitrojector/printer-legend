@@ -9,7 +9,8 @@ namespace Printer
         [Header("Prefab References — assign in Inspector")]
         [SerializeField] private RectTransform printheadRoot;
         [SerializeField] public RectTransform printheadMarker;
-        
+        [SerializeField] private PrinterReference printerReference;
+
         /// <summary>
         /// Reference to the PrintCanvas component where this printhead should draw.
         /// </summary>
@@ -55,14 +56,16 @@ namespace Printer
 
         private void Awake()
         {
-            canvas = GetComponentInParent<PrintCanvas>();
+            canvas     = GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
+            printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
         }
 
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
         private IEnumerator Start()
         {
+            printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
             yield return null;
             RefreshLayout();
         }
@@ -74,6 +77,7 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
+            printerReference?.RefreshLayout();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -205,6 +209,8 @@ namespace Printer
 
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
+
+            printerReference?.SetIndicatorLine(lineIndex);
 
             SetCanvasX(0);
         }

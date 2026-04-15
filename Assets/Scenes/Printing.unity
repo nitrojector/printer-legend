@@ -1476,6 +1476,7 @@ GameObject:
   - component: {fileID: 769290403}
   - component: {fileID: 769290405}
   - component: {fileID: 769290404}
+  - component: {fileID: 769290406}
   m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
@@ -1541,6 +1542,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 769290402}
   m_CullTransparentMesh: 1
+--- !u!114 &769290406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769290402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58e5ae759bbbd42c4a844b729f97b3b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterReference
+  indicator: {fileID: 1686615077}
 --- !u!1 &802949888
 GameObject:
   m_ObjectHideFlags: 0
@@ -3681,10 +3695,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3265642307535024743, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3265642307535024743, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5371142939328901953, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
       propertyPath: m_Name
       value: Printhead
       objectReference: {fileID: 0}
+    - target: {fileID: 7016854265345222993, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: printerReference
+      value: 
+      objectReference: {fileID: 769290406}
     - target: {fileID: 7486540233699490662, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -3699,11 +3725,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7486540233699490662, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 150.00592
+      value: 103.731
+      objectReference: {fileID: 0}
+    - target: {fileID: 7486540233699490662, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 137.5574
       objectReference: {fileID: 0}
     - target: {fileID: 7486540233699490662, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 16.781189
+      value: 11.6991
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694524240182470605, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694524240182470605, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694524240182470605, guid: 132a5948c5d3f49a794cd611d74a96f7, type: 3}
+      propertyPath: m_Color.r
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
