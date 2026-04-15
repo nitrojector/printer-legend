@@ -111,7 +111,11 @@ namespace Printer
         private PrintheadController printhead;
         private PrintCanvas         canvas;
         private Coroutine           disconnectCoroutine;
-        private int                 inkColorIndex;
+
+        // Per-color state (index into InkPalette)
+        private readonly HashSet<int> toggledColors = new();
+        private readonly HashSet<int> heldColors    = new();
+        private Color currentInkColor = Color.black;
 
         // ── Events ────────────────────────────────────────────────────────────
 
@@ -120,6 +124,9 @@ namespace Printer
 
         /// <summary>Fired when an obstacle becomes active or ends. Bool = is now active.</summary>
         public event Action<PrinterObstacle, bool> onObstacleChanged;
+
+        /// <summary>Fired whenever the mixed ink color changes.</summary>
+        public event Action<Color> onColorChanged;
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
 
@@ -147,8 +154,13 @@ namespace Printer
 
         public void DisableAbility(PrinterAbility ability)
         {
-            if (enabledAbilities.Remove(ability))
-                onAbilityChanged?.Invoke(ability, false);
+            if (!enabledAbilities.Remove(ability)) return;
+            if (ability == PrinterAbility.ColorAdjustment && heldColors.Count > 0)
+            {
+                heldColors.Clear();
+                RefreshInkColor();
+            }
+            onAbilityChanged?.Invoke(ability, false);
         }
 
         public void SetAbilityEnabled(PrinterAbility ability, bool enabled)
@@ -197,17 +209,80 @@ namespace Printer
         }
 
         // ── Color API (Color Adjustment ability) ──────────────────────────────
+        //
+        // Individual palette channels can be toggled (persistent on/off) or held
+        // (active only while the caller keeps the hold open).  Both modes compose:
+        // a channel contributes to the mix if it is toggled ON *or* held.
+        //
+        // Toggle pattern  →  call ToggleColor / SetColorToggled on press
+        // Hold pattern    →  call HoldColor on press, ReleaseColor on release
+        //
+        // Colors blend additively: R+G = Yellow, R+B = Magenta, G+B = Cyan, etc.
+        // No active channel → black.
 
-        public int   InkColorIndex   => inkColorIndex;
-        public Color CurrentInkColor => InkPalette[inkColorIndex];
+        /// <summary>The current blended ink color (recomputed on every channel change).</summary>
+        public Color CurrentInkColor => currentInkColor;
 
-        public void SetInkColorIndex(int index)
+        /// <summary>True if the channel contributes to the mix (toggled on or currently held).</summary>
+        public bool IsColorContributing(int index) =>
+            toggledColors.Contains(index) || heldColors.Contains(index);
+
+        public bool IsColorToggled(int index) => toggledColors.Contains(index);
+        public bool IsColorHeld(int index)    => heldColors.Contains(index);
+
+        // ── Toggle ────────────────────────────────────────────────────────────
+
+        /// <summary>Flips the persistent toggle state of the palette channel at <paramref name="index"/>.</summary>
+        public void ToggleColor(int index) =>
+            SetColorToggled(index, !toggledColors.Contains(index));
+
+        /// <summary>Explicitly sets the persistent toggle state of a palette channel.</summary>
+        public void SetColorToggled(int index, bool on)
         {
-            inkColorIndex = Mathf.Clamp(index, 0, InkPalette.Length - 1);
+            bool changed = on ? toggledColors.Add(index) : toggledColors.Remove(index);
+            if (changed) RefreshInkColor();
         }
 
-        public void CycleInkColor() =>
-            SetInkColorIndex((inkColorIndex + 1) % InkPalette.Length);
+        // ── Hold ──────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Marks a channel as held — it contributes to the mix until <see cref="ReleaseColor"/>
+        /// is called.  Intended for press→release input bindings.
+        /// </summary>
+        public void HoldColor(int index)
+        {
+            if (heldColors.Add(index)) RefreshInkColor();
+        }
+
+        /// <summary>Removes the hold on a channel.  Toggle state is unaffected.</summary>
+        public void ReleaseColor(int index)
+        {
+            if (heldColors.Remove(index)) RefreshInkColor();
+        }
+
+        // ── Internals ─────────────────────────────────────────────────────────
+
+        private void RefreshInkColor()
+        {
+            currentInkColor = ComputeMixedColor();
+            onColorChanged?.Invoke(currentInkColor);
+        }
+
+        private Color ComputeMixedColor()
+        {
+            float r = 0f, g = 0f, b = 0f;
+            bool any = false;
+            for (int i = 0; i < InkPalette.Length; i++)
+            {
+                if (!IsColorContributing(i)) continue;
+                Color c = InkPalette[i];
+                r += c.r; g += c.g; b += c.b;
+                any = true;
+            }
+            return any
+                ? new Color(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b))
+                : Color.black;
+        }
 
         // ── Line-advance tracking ─────────────────────────────────────────────
 

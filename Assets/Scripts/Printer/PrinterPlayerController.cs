@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,33 +13,29 @@ namespace Printer
         public float PrintStepsPerSecond { get; set; } = 10f;
 
         private PrintheadController printhead;
-        private PrinterMagic magic;
+        private PrinterMagic        magic;
 
-        /// <summary>
-        /// Print Activation Action
-        /// </summary>
+        /// <summary>Print Activation Action</summary>
         private InputAction printAction;
 
-        /// <summary>
-        /// Line Feed Action
-        /// </summary>
+        /// <summary>Line Feed Action</summary>
         private InputAction lfAction;
 
-        /// <summary>
-        /// Carriage Return Action
-        /// </summary>
+        /// <summary>Carriage Return Action</summary>
         private InputAction crAction;
 
-        /// <summary>
-        /// Speed Adjust Action
-        /// </summary>
+        /// <summary>Speed Adjust Action</summary>
         private InputAction speedAction;
 
-        // Color Buttons
+        // Color channel actions (one per palette entry)
         private InputAction color1Action;
         private InputAction color2Action;
         private InputAction color3Action;
         private InputAction color4Action;
+
+        // Stored delegates so subscribe/unsubscribe are symmetrical
+        private readonly Action<InputAction.CallbackContext>[] colorHoldDelegates    = new Action<InputAction.CallbackContext>[4];
+        private readonly Action<InputAction.CallbackContext>[] colorReleaseDelegates = new Action<InputAction.CallbackContext>[4];
 
         private float cursorStepTimer;
 
@@ -46,6 +43,14 @@ namespace Printer
         {
             printhead = GetComponent<PrintheadController>();
             magic     = GetComponent<PrinterMagic>();
+
+            // Build per-index delegates once; lambdas capture the loop variable correctly
+            for (int i = 0; i < 4; i++)
+            {
+                int idx = i;
+                colorHoldDelegates[idx]    = _ => OnColorHold(idx);
+                colorReleaseDelegates[idx] = _ => OnColorRelease(idx);
+            }
 
             // TODO: remove, for testing
             magic.EnableAbility(PrinterAbility.SpeedAdjustment);
@@ -56,9 +61,9 @@ namespace Printer
         private void OnEnable()
         {
             printAction  = InputSystem.actions["Printer/Print"];
-            lfAction = InputSystem.actions["Printer/LF"];
-            crAction = InputSystem.actions["Printer/CR"];
-            speedAction = InputSystem.actions["Printer/Speed"];
+            lfAction     = InputSystem.actions["Printer/LF"];
+            crAction     = InputSystem.actions["Printer/CR"];
+            speedAction  = InputSystem.actions["Printer/Speed"];
             color1Action = InputSystem.actions["Printer/Color1"];
             color2Action = InputSystem.actions["Printer/Color2"];
             color3Action = InputSystem.actions["Printer/Color3"];
@@ -66,12 +71,20 @@ namespace Printer
 
             lfAction.performed += OnLF;
             crAction.performed += OnCR;
+
+            SubscribeColorActions(true);
         }
 
         private void OnDisable()
         {
             lfAction.performed -= OnLF;
             crAction.performed -= OnCR;
+
+            SubscribeColorActions(false);
+
+            // Release any held channels so magic state stays clean
+            for (int i = 0; i < 4; i++)
+                magic.ReleaseColor(i);
         }
 
         private void Update()
@@ -87,7 +100,7 @@ namespace Printer
                 cursorStepTimer -= stepInterval;
             }
 
-            // ── Print: existing action binding + LMB ──────────────────────────
+            // ── Print: action binding + LMB ───────────────────────────────────
             bool isPrinting = (printAction != null && printAction.IsPressed())
                               || Mouse.current.leftButton.isPressed;
             if (isPrinting)
@@ -95,14 +108,14 @@ namespace Printer
 
             // ── Ability-gated input ───────────────────────────────────────────
 
-            // Newline: RMB (the action-based path is handled in OnNewLine below)
+            // Newline: RMB (action-based path handled in OnLF callback)
             if (magic.IsAbilityEnabled(PrinterAbility.Newline)
                 && Mouse.current.rightButton.wasPressedThisFrame)
             {
                 printhead.AdvanceLine();
             }
 
-            // Carriage Return: middle mouse button
+            // Carriage Return: middle mouse button (action-based path in OnCR)
             if (magic.IsAbilityEnabled(PrinterAbility.CarriageReturn)
                 && Mouse.current.middleButton.wasPressedThisFrame)
             {
@@ -122,40 +135,57 @@ namespace Printer
                 }
             }
 
-            // Color selection: number keys 1–4
+            // Color: sync mixed color to printhead each frame
             if (magic.IsAbilityEnabled(PrinterAbility.ColorAdjustment))
-            {
-                var kb = Keyboard.current;
-                if      (kb.digit1Key.wasPressedThisFrame) magic.SetInkColorIndex(0);
-                else if (kb.digit2Key.wasPressedThisFrame) magic.SetInkColorIndex(1);
-                else if (kb.digit3Key.wasPressedThisFrame) magic.SetInkColorIndex(2);
-                else if (kb.digit4Key.wasPressedThisFrame) magic.SetInkColorIndex(3);
-
-                // Sync the chosen color to the printhead every frame
                 printhead.InkColor = magic.CurrentInkColor;
-            }
         }
 
         // ── Action callbacks ──────────────────────────────────────────────────
 
         private void OnLF(InputAction.CallbackContext ctx)
         {
-            if (!magic.IsAbilityEnabled(PrinterAbility.Newline))
-            {
-                return;
-            }
-
+            if (!magic.IsAbilityEnabled(PrinterAbility.Newline)) return;
             printhead.AdvanceLine();
         }
 
         private void OnCR(InputAction.CallbackContext ctx)
         {
-            if (!magic.IsAbilityEnabled(PrinterAbility.CarriageReturn))
-            {
-                return;
-            }
-
+            if (!magic.IsAbilityEnabled(PrinterAbility.CarriageReturn)) return;
             printhead.CarriageReturn();
+        }
+
+        // Color hold/release — wired to color action performed/canceled
+        private void OnColorHold(int index)
+        {
+            if (magic.IsAbilityEnabled(PrinterAbility.ColorAdjustment))
+                magic.HoldColor(index);
+        }
+
+        private void OnColorRelease(int index)
+        {
+            // Always release regardless of ability state to prevent stuck channels
+            magic.ReleaseColor(index);
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+
+        private void SubscribeColorActions(bool subscribe)
+        {
+            InputAction[] actions = { color1Action, color2Action, color3Action, color4Action };
+            for (int i = 0; i < actions.Length; i++)
+            {
+                if (actions[i] == null) continue;
+                if (subscribe)
+                {
+                    actions[i].performed += colorHoldDelegates[i];
+                    actions[i].canceled  += colorReleaseDelegates[i];
+                }
+                else
+                {
+                    actions[i].performed -= colorHoldDelegates[i];
+                    actions[i].canceled  -= colorReleaseDelegates[i];
+                }
+            }
         }
     }
 }
