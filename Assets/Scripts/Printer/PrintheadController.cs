@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Printer
@@ -19,6 +20,15 @@ namespace Printer
         private int canvasX;
 
         public float NormalisedX { get; private set; } = 0.5f;
+
+        /// <summary>
+        /// When true the printhead advances right-to-left instead of left-to-right.
+        /// Set by <see cref="PrinterMagic"/> during a Motor Malfunction obstacle.
+        /// </summary>
+        public bool IsRightToLeft { get; set; }
+
+        /// <summary>Fires after every successful line advance, including wrap-arounds from AdvancePrinthead.</summary>
+        public event Action OnLineAdvanced;
 
         private RectTransform CanvasRect => canvas.DisplayRect;
 
@@ -66,15 +76,43 @@ namespace Printer
 
             bool advanced = lineState.AdvanceLine();
             if (advanced)
+            {
                 SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
+                OnLineAdvanced?.Invoke();
+            }
         }
 
         public void AdvancePrinthead()
         {
             if (lineState.IsComplete) return;
 
-            bool wrapped = AdvanceHorizontal(linePixelWidth);
+            bool wrapped = IsRightToLeft
+                ? RetreatHorizontal(linePixelWidth)
+                : AdvanceHorizontal(linePixelWidth);
             if (wrapped) AdvanceLine();
+        }
+
+        /// <summary>Moves the printhead to the start of the current line without advancing it (Carriage Return).</summary>
+        public void CarriageReturn()
+        {
+            SetCanvasX(0);
+        }
+
+        /// <summary>
+        /// Moves the printhead back by <paramref name="lineCount"/> lines and clears those
+        /// lines on the canvas so the player can reprint them cleanly.
+        /// Returns false if already at the first line.
+        /// </summary>
+        public bool RewindLines(int lineCount)
+        {
+            int targetLine  = Mathf.Max(0, lineState.CurrentLine - lineCount);
+            int rewindCount = lineState.CurrentLine - targetLine;
+            if (rewindCount == 0) return false;
+
+            canvas.ClearLineRange(targetLine, rewindCount, linePixelHeight);
+            lineState.SetCurrentLine(targetLine);
+            SetIndicatorLine(targetLine, totalLines, linePixelHeight);
+            return true;
         }
 
         // ── Printhead Position ─────────────────────────────────────────────────
@@ -113,6 +151,21 @@ namespace Printer
             if (nextCanvasX >= canvas.CanvasWidth)
             {
                 SetCanvasX(0);
+                return true;
+            }
+
+            SetCanvasX(nextCanvasX);
+            return false;
+        }
+
+        private bool RetreatHorizontal(int stepPixels)
+        {
+            if (canvas == null) return false;
+
+            int nextCanvasX = canvasX - Mathf.Max(0, stepPixels);
+            if (nextCanvasX < 0)
+            {
+                SetCanvasX(canvas.CanvasWidth - 1);
                 return true;
             }
 
