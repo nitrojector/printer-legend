@@ -8,7 +8,7 @@ namespace Printer
     {
         [Header("Prefab References — assign in Inspector")]
         [SerializeField] private RectTransform printheadRoot;
-        [SerializeField] private RectTransform printheadMarker;
+        [SerializeField] public RectTransform printheadMarker;
         
         /// <summary>
         /// Reference to the PrintCanvas component where this printhead should draw.

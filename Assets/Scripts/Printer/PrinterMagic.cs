@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Printer
 {
@@ -109,6 +110,7 @@ namespace Printer
         private readonly Dictionary<PrinterObstacle, int>       activeObstacles  = new();
 
         private PrintheadController printhead;
+        private Image               printheadImage;  
         private PrintCanvas         canvas;
         private Coroutine           disconnectCoroutine;
 
@@ -134,6 +136,7 @@ namespace Printer
         {
             printhead = GetComponent<PrintheadController>();
             canvas    = GetComponent<PrintCanvas>();
+            printheadImage = printhead.printheadMarker.GetComponent<Image>();
 
             // Newline is always available out of the box
             enabledAbilities.Add(PrinterAbility.Newline);
@@ -265,6 +268,7 @@ namespace Printer
         private void RefreshInkColor()
         {
             currentInkColor = ComputeMixedColor();
+            printheadImage.color = currentInkColor;
             onColorChanged?.Invoke(currentInkColor);
         }
 
