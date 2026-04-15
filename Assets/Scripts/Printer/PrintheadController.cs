@@ -39,6 +39,12 @@ namespace Printer
         public event Action OnLineAdvanced;
 
         private RectTransform CanvasRect => canvas.DisplayRect;
+        
+        // ── Audio ──────────────────────────────────────────────────────────────
+
+        private AudioClip sfxInking;
+        private AudioClip sfxLine;
+        private AudioClip sfxNewLine;
 
         // ── Accessors ──────────────────────────────────────────────────────────
 
@@ -58,6 +64,9 @@ namespace Printer
 
         private void Awake()
         {
+            sfxInking = Resources.Load<AudioClip>("Audio/print_ink");
+            sfxLine = Resources.Load<AudioClip>("Audio/print_line");
+            sfxNewLine = Resources.Load<AudioClip>("Audio/print_cr");
             canvas     = GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
