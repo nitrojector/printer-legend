@@ -1,0 +1,127 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+
+namespace Utility.GameMaster
+{
+    public class GameMaster : MonoBehaviour
+    {
+        public static GameMaster Instance { get; private set; }
+
+        private string _consoleOutput;
+        
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        public string GetGameStateStr()
+        {
+            string s = "";
+
+            {
+            }
+
+            return s;
+        }
+
+        public string GetConsoleOutput()
+        {
+            return _consoleOutput;
+        }
+
+        public void Evaluate(string input)
+        {
+            List<string> tokens = new(input.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+            _consoleOutput = "";
+            
+            if (tokens.Count < 1) return;
+            
+            string cmd = tokens[0].ToLower();
+            
+            if (string.IsNullOrEmpty(cmd))
+                cmd = "help";
+
+            try
+            {
+                switch (cmd)
+                {
+                    case "help": {
+                        InfoLn("Available commands:");
+                        InfoLn("help - <u>Show this help message</u>");
+                        InfoLn("timescale - <u>Set the game timescale</u>");
+                        break;
+                    }
+
+                    case "timescale":
+                    {
+                        if (tokens.Count < 2 || !float.TryParse(tokens[1], out float scale))
+                        {
+                            InfoLn("Usage: timescale [scale]");
+                            break;
+                        }
+                        
+                        Time.timeScale = scale;
+                        InfoLn($"Time scale set to {scale}");
+                        break;
+                    }
+
+                    default:
+                    {
+                        ErrLn($"Unknown command: {cmd}");
+                        break;
+                    }
+                }
+            } catch (Exception e)
+            {
+                ErrLn($"Error evaluating command: {e.Message}");
+                ErrLn(e.StackTrace);
+            }
+        }
+        
+        private void InfoLn(string output)
+        {
+            _consoleOutput += $"<#0F0>{output}</color>\n";
+        }
+
+        private void ErrLn(string output)
+        {
+            _consoleOutput += $"<#F00>{output}</color>\n";
+        }
+
+        public static bool Instantiate()
+        {
+            if (Instance != null) return false;
+            
+            GameObject go = new GameObject("GameMaster");
+            var ui = go.AddComponent<UIDocument>();
+
+            var panelSettings = Resources.Load<PanelSettings>("GMPanelPS");
+            var uxml = Resources.Load<VisualTreeAsset>("GMPanel");
+
+            if (ui == null) return false;
+            
+            ui.panelSettings = panelSettings;
+            ui.visualTreeAsset = uxml;
+            
+            go.AddComponent<GameMaster>();
+            go.AddComponent<GameMasterUI>();
+            
+            DontDestroyOnLoad(go);
+            return true;
+        }
+    }
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UIDocs/common.uss?fileID=7433441132597879392&amp;guid=406963a874a714adaa5af0f7e03f880f&amp;type=3" />
+    <Style src="project://database/Assets/UIDocs/gm.uss?fileID=7433441132597879392&amp;guid=aaf73d4cbf3a4684bd8c7907868fbfd6&amp;type=3#gm" />
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; height: 60%;">
+            <UI.UIDocs.ConsoleView name="console" />
+            <ui:TextField name="input" />
+        </ui:VisualElement>
+        <ui:VisualElement name="state" style="flex-grow: 1; height: 40%; width: 50%;">
+            <UI.UIDocs.ConsoleView name="state" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

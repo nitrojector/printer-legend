@@ -1,3 +1,4 @@
+using Printer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,8 +10,6 @@ public class PauseController : MonoBehaviour
     void Start()
     {
         pauseMenuUI.SetActive(false);
-
-
     }
 
     // Update is called once per frame
@@ -18,18 +17,19 @@ public class PauseController : MonoBehaviour
     {
 
     }
+    
     public void Pause()
     {
-        
         pauseMenuUI.SetActive(true);
+        PlayerManager.SetPaused(true);
         Time.timeScale = 0f;
         Debug.Log("Game Paused");
     }
 
     public void Resume()
     {
-       
         pauseMenuUI.SetActive(false);
+        PlayerManager.SetPaused(false);
         Time.timeScale = 1f;
         Debug.Log("Game Resumed");
     }

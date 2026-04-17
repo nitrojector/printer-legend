@@ -13,6 +13,11 @@ namespace Printer
         [field: Header("Auto Cursor Advance")]
         [field: SerializeField, Min(0.001f)]
         public float PrintStepsPerSecond { get; set; } = 10f;
+
+        /// <summary>
+        /// Whether player is paused so no input propagate
+        /// </summary>
+        private bool _isPlayerPaused = false;
         
         /// <summary>
         /// Whether the player is currently printing
@@ -52,6 +57,16 @@ namespace Printer
         {
             printhead = GetComponent<PrintheadController>();
             magic     = GetComponent<PrinterMagic>();
+            
+            printAction  = InputSystem.actions["Printer/Print"];
+            lfAction     = InputSystem.actions["Printer/LF"];
+            crAction     = InputSystem.actions["Printer/CR"];
+            speedAction  = InputSystem.actions["Printer/Speed"];
+            color1Action = InputSystem.actions["Printer/Color1"];
+            color2Action = InputSystem.actions["Printer/Color2"];
+            color3Action = InputSystem.actions["Printer/Color3"];
+            color4Action = InputSystem.actions["Printer/Color4"];
+            resetAction = InputSystem.actions["UI/Reset"];
 
             // Build per-index delegates once; lambdas capture the loop variable correctly
             for (int i = 0; i < 4; i++)
@@ -65,20 +80,22 @@ namespace Printer
             magic.EnableAbility(PrinterAbility.SpeedAdjustment);
             magic.EnableAbility(PrinterAbility.CarriageReturn);
             magic.EnableAbility(PrinterAbility.ColorAdjustment);
+            
+            PlayerManager.RegisterPlayer(this);
         }
 
         private void OnEnable()
         {
-            printAction  = InputSystem.actions["Printer/Print"];
-            lfAction     = InputSystem.actions["Printer/LF"];
-            crAction     = InputSystem.actions["Printer/CR"];
-            speedAction  = InputSystem.actions["Printer/Speed"];
-            color1Action = InputSystem.actions["Printer/Color1"];
-            color2Action = InputSystem.actions["Printer/Color2"];
-            color3Action = InputSystem.actions["Printer/Color3"];
-            color4Action = InputSystem.actions["Printer/Color4"];
-            resetAction = InputSystem.actions["UI/Reset"];
+            RegisterInput();
+        }
 
+        private void OnDisable()
+        {
+            UnregisterInput();
+        }
+        
+        private void RegisterInput()
+        {
             lfAction.performed += OnLF;
             crAction.performed += OnCR;
             resetAction.performed += OnReset;
@@ -86,7 +103,8 @@ namespace Printer
             SubscribeColorActions(true);
         }
 
-        private void OnDisable()
+
+        private void UnregisterInput()
         {
             lfAction.performed -= OnLF;
             crAction.performed -= OnCR;
@@ -99,8 +117,15 @@ namespace Printer
                 magic.ReleaseColor(i);
         }
 
+        private void OnDestroy()
+        {
+            PlayerManager.UnregisterPlayer(this);
+        }
+
         private void Update()
         {
+            if (_isPlayerPaused) return;
+                
             if (!printingStarted && printAction.IsPressed())
             {
                 printingStarted = true;
@@ -118,31 +143,14 @@ namespace Printer
             }
 
             // ── Print: action binding + LMB ───────────────────────────────────
-            bool isPrinting = (printAction != null && printAction.IsPressed())
-                              || Mouse.current.leftButton.isPressed;
+            bool isPrinting = printAction != null && printAction.IsPressed();
             if (isPrinting)
                 printhead.Print();
-
-            // ── Ability-gated input ───────────────────────────────────────────
-
-            // Newline: RMB (action-based path handled in OnLF callback)
-            if (magic.IsAbilityEnabled(PrinterAbility.Newline)
-                && Mouse.current.rightButton.wasPressedThisFrame)
-            {
-                printhead.AdvanceLine();
-            }
-
-            // Carriage Return: middle mouse button (action-based path in OnCR)
-            if (magic.IsAbilityEnabled(PrinterAbility.CarriageReturn)
-                && Mouse.current.middleButton.wasPressedThisFrame)
-            {
-                printhead.CarriageReturn();
-            }
 
             // Speed adjustment: scroll wheel
             if (magic.IsAbilityEnabled(PrinterAbility.SpeedAdjustment))
             {
-                float scroll = Mouse.current.scroll.ReadValue().y;
+                float scroll = speedAction.ReadValue<Vector2>().y;
                 if (Mathf.Abs(scroll) > 0.01f)
                 {
                     PrintStepsPerSecond = Mathf.Clamp(
@@ -211,6 +219,24 @@ namespace Printer
                     actions[i].canceled  -= colorReleaseDelegates[i];
                 }
             }
+        }
+
+        public bool SetPaused(bool paused)
+        {
+            if (paused == _isPlayerPaused) return false;
+            if (!enabled) return false;
+            
+            _isPlayerPaused = paused;
+            if (_isPlayerPaused)
+            {
+                UnregisterInput();
+            }
+            else
+            {
+                RegisterInput();
+            }
+
+            return true;
         }
     }
 }
