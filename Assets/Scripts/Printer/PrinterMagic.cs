@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Config;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -70,38 +71,10 @@ namespace Printer
         public float MaxPrintSpeed   => maxPrintSpeed;
         public float SpeedScrollStep => speedScrollStep;
 
-        // ── Paper Jam parameters ──────────────────────────────────────────────
-
-        [Header("Paper Jam")]
-        [Tooltip("Number of lines the player must reprint after a jam (min 1).")]
-        [SerializeField, Min(1)] private int paperJamLineDuration = 2;
-
-        [Tooltip("Number of ink pixels displaced during the jam.")]
-        [SerializeField, Min(1)] private int paperJamShuffleCount = 12;
-
-        [Tooltip("When true, horizontal displacement snaps to the print-size grid.")]
-        [SerializeField] private bool paperJamRespectPrintSize = true;
-
-        // ── Internet Disconnect parameters ────────────────────────────────────
-
-        [Header("Internet Disconnect")]
-        [Tooltip("Number of lines the reference image stays disrupted.")]
-        [SerializeField, Min(1)] private int internetDisconnectLineDuration = 4;
-
-        [Tooltip("Seconds the reference image stays fully blacked out.")]
-        [SerializeField, Min(0f)] private float internetDisconnectBlackoutSeconds = 1.5f;
-
-        [Tooltip("Seconds to fade the reference image back in.")]
-        [SerializeField, Min(0f)] private float internetDisconnectFadeInSeconds = 0.5f;
+        // ── Internet Disconnect references ────────────────────────────────────
 
         [Tooltip("CanvasGroup on the reference image GameObject (assign in Inspector).")]
         [SerializeField] private CanvasGroup referenceImageGroup;
-
-        // ── Motor Malfunction parameters ──────────────────────────────────────
-
-        [Header("Motor Malfunction")]
-        [Tooltip("Number of lines the printhead runs right-to-left (min 1).")]
-        [SerializeField, Min(1)] private int motorMalfunctionLineDuration = 2;
 
         // ── Internal state ────────────────────────────────────────────────────
 
@@ -112,6 +85,7 @@ namespace Printer
         private PrintheadController printhead;
         private Image               printheadImage;  
         private PrintCanvas         canvas;
+        private MagicConfig         magicConfig;
         private Coroutine           disconnectCoroutine;
 
         // Per-color state (index into InkPalette)
@@ -137,6 +111,7 @@ namespace Printer
             printhead = GetComponent<PrintheadController>();
             canvas    = GetComponent<PrintCanvas>();
             printheadImage = printhead.printheadMarker.GetComponent<Image>();
+            magicConfig = GameConfig.Instance.Magic;
 
             // Newline is always available out of the box
             enabledAbilities.Add(PrinterAbility.Newline);
@@ -183,6 +158,9 @@ namespace Printer
         /// <summary>Returns the remaining line count for an active obstacle, or 0 if inactive.</summary>
         public int ObstacleRemainingLines(PrinterObstacle obstacle) =>
             activeObstacles.TryGetValue(obstacle, out int v) ? v : 0;
+
+        /// <summary>Spawn chance for this obstacle in the range [0..1].</summary>
+        public float ObstacleChance(PrinterObstacle obstacle) => ChanceFor(obstacle);
 
         public void EnableObstacle(PrinterObstacle obstacle)  => enabledObstacles.Add(obstacle);
         public void DisableObstacle(PrinterObstacle obstacle) => enabledObstacles.Remove(obstacle);
@@ -365,7 +343,8 @@ namespace Printer
         {
             if (canvas == null) return;
 
-            int startLine = Mathf.Max(0, printhead.CurrentLine - paperJamLineDuration + 1);
+            int lineDuration = Mathf.Max(1, magicConfig.PaperJamLineCount);
+            int startLine = Mathf.Max(0, printhead.CurrentLine - lineDuration + 1);
             int count     = printhead.CurrentLine - startLine + 1;
 
             // Shuffle pixels on the affected lines
@@ -373,8 +352,8 @@ namespace Printer
                 canvas.ShuffleLinePixels(
                     startLine + li,
                     printhead.LinePixelHeight,
-                    paperJamShuffleCount,
-                    paperJamRespectPrintSize,
+                    Mathf.Max(1, magicConfig.PaperJamShuffleCount),
+                    magicConfig.PaperJamRespectPrintSize,
                     printhead.LinePixelWidth);
 
             // Rewind the printhead so the player reprints those lines
@@ -389,15 +368,15 @@ namespace Printer
 
             referenceImageGroup.alpha = 0f;
 
-            if (internetDisconnectBlackoutSeconds > 0f)
-                yield return new WaitForSeconds(internetDisconnectBlackoutSeconds);
+            if (magicConfig.InternetDisconnectBlackoutSeconds > 0f)
+                yield return new WaitForSeconds(magicConfig.InternetDisconnectBlackoutSeconds);
 
             // Fade back in
             float elapsed = 0f;
-            while (elapsed < internetDisconnectFadeInSeconds)
+            while (elapsed < magicConfig.InternetDisconnectFadeInSeconds)
             {
                 elapsed += Time.deltaTime;
-                referenceImageGroup.alpha = Mathf.Clamp01(elapsed / Mathf.Max(0.001f, internetDisconnectFadeInSeconds));
+                referenceImageGroup.alpha = Mathf.Clamp01(elapsed / Mathf.Max(0.001f, magicConfig.InternetDisconnectFadeInSeconds));
                 yield return null;
             }
 
@@ -409,10 +388,18 @@ namespace Printer
 
         private int LineDurationFor(PrinterObstacle obstacle) => obstacle switch
         {
-            PrinterObstacle.PaperJam            => paperJamLineDuration,
-            PrinterObstacle.InternetDisconnect  => internetDisconnectLineDuration,
-            PrinterObstacle.MotorMalfunction    => motorMalfunctionLineDuration,
+            PrinterObstacle.PaperJam            => Mathf.Max(1, magicConfig.PaperJamLineCount),
+            PrinterObstacle.InternetDisconnect  => Mathf.Max(1, magicConfig.InternetDisconnectLineCount),
+            PrinterObstacle.MotorMalfunction    => Mathf.Max(1, magicConfig.MotorMalfunctionLineCount),
             _                                   => 1,
+        };
+
+        private float ChanceFor(PrinterObstacle obstacle) => obstacle switch
+        {
+            PrinterObstacle.PaperJam            => Mathf.Clamp01(magicConfig.PaperJamChance),
+            PrinterObstacle.InternetDisconnect  => Mathf.Clamp01(magicConfig.InternetDisconnectChance),
+            PrinterObstacle.MotorMalfunction    => Mathf.Clamp01(magicConfig.MotorMalfunctionChance),
+            _                                   => 0f,
         };
     }
 }

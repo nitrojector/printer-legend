@@ -1,0 +1,17 @@
+{
+  "magic": {
+    "print_speed_slow": 5.0,
+    "print_speed_normal": 10.0,
+    "print_speed_fast": 20.0,
+    "paperjam_chance": 0.1,
+    "paperjam_line_count": 2,
+    "paperjam_shuffle_count": 12,
+    "paperjam_respect_print_size": true,
+    "internet_disconnect_chance": 0.1,
+    "internet_disconnect_line_count": 4,
+    "internet_disconnect_blackout_seconds": 1.5,
+    "internet_disconnect_fadein_seconds": 0.5,
+    "motor_malfunction_chance": 0.1,
+    "motor_malfunction_line_count": 2
+  }
+}
