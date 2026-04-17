@@ -4,7 +4,7 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - ToHide
+  - Hide
   layers:
   - Default
   - TransparentFX
