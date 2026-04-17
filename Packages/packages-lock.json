@@ -184,6 +184,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.render-pipelines.core": {
       "version": "17.3.0",
       "depth": 1,
@@ -282,6 +289,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "io.takina.extern.imagehash": {
+      "version": "https://git.takina.io/nitrojector/imagehash-csharp.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "466639b33b602b66d7f02e55f67fec78eeffea17"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
