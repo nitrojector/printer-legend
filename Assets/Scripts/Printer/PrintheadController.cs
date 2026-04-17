@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using AudioSystem;
 using UnityEngine;
 
 namespace Printer
@@ -39,6 +40,16 @@ namespace Printer
         public event Action OnLineAdvanced;
 
         private RectTransform CanvasRect => canvas.DisplayRect;
+        
+        // ── Audio ──────────────────────────────────────────────────────────────
+
+        private AudioClip sfxInking;
+        private AudioClip sfxLine;
+        private AudioClip sfxNewLine;
+
+        private AudioHandle inkLoopHandle;
+        private bool        inkLoopActive;   // true once PlayManaged has succeeded
+        private bool        printedThisFrame;
 
         // ── Accessors ──────────────────────────────────────────────────────────
 
@@ -58,6 +69,9 @@ namespace Printer
 
         private void Awake()
         {
+            sfxInking = Resources.Load<AudioClip>("Audio/print_ink");
+            sfxLine = Resources.Load<AudioClip>("Audio/print_line");
+            sfxNewLine = Resources.Load<AudioClip>("Audio/print_cr");
             canvas     = GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
@@ -100,6 +114,9 @@ namespace Printer
 
             int x = canvas.NormalisedToCanvasX(NormalisedX);
             CommitInterval(new PrintInterval(x, inkColor, linePixelWidth));
+
+            printedThisFrame = true;
+            EnsureInkLoopPlaying();
         }
 
         public void AdvanceLine()
@@ -111,6 +128,7 @@ namespace Printer
             {
                 SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
                 OnLineAdvanced?.Invoke();
+                AudioManager.Instance.Play(sfxLine, transform, AudioBus.SFX);
             }
         }
 
@@ -145,6 +163,40 @@ namespace Printer
             lineState.SetCurrentLine(targetLine);
             SetIndicatorLine(targetLine, totalLines, linePixelHeight);
             return true;
+        }
+
+        // ── Audio helpers ──────────────────────────────────────────────────────
+
+        private void LateUpdate()
+        {
+            if (!printedThisFrame)
+                PauseInkLoop();
+            printedThisFrame = false;
+        }
+
+        private void OnDestroy()
+        {
+            if (inkLoopActive)
+                AudioManager.Instance.Stop(inkLoopHandle);
+        }
+
+        private void EnsureInkLoopPlaying()
+        {
+            var am = AudioManager.Instance;
+            if (!inkLoopActive)
+            {
+                inkLoopActive = am.PlayManaged(sfxInking, transform, AudioBus.SFX,
+                    out inkLoopHandle, loop: true);
+                return;
+            }
+            // Resume covers both the already-playing and the paused cases cleanly
+            am.Resume(inkLoopHandle);
+        }
+
+        private void PauseInkLoop()
+        {
+            if (inkLoopActive)
+                AudioManager.Instance.Pause(inkLoopHandle);
         }
 
         // ── Printhead Position ─────────────────────────────────────────────────
