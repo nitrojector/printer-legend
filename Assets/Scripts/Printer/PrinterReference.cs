@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem.XInput;
+using UnityEngine.UI;
 
 namespace Printer
 {
@@ -14,6 +17,11 @@ namespace Printer
     public class PrinterReference : MonoBehaviour
     {
         [SerializeField] private RectTransform indicator;
+        
+        /// <summary>
+        /// Reference to the image that is used as reference
+        /// </summary>
+        public Image ReferenceImage { get; private set; }
 
         private RectTransform containerRect;
         private int imageSizePixels;
@@ -23,6 +31,14 @@ namespace Printer
         private void Awake()
         {
             containerRect = GetComponent<RectTransform>();
+            ReferenceImage = GetComponent<Image>();
+            
+            GameManager.RegisterReference(this);
+        }
+
+        private void OnDestroy()
+        {
+            GameManager.UnregisterReference(this);
         }
 
         // ── Setup ─────────────────────────────────────────────────────────────

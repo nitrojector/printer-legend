@@ -81,7 +81,7 @@ namespace Printer
             magic.EnableAbility(PrinterAbility.CarriageReturn);
             magic.EnableAbility(PrinterAbility.ColorAdjustment);
             
-            PlayerManager.RegisterPlayer(this);
+            GameManager.RegisterPlayer(this);
         }
 
         private void OnEnable()
@@ -119,7 +119,7 @@ namespace Printer
 
         private void OnDestroy()
         {
-            PlayerManager.UnregisterPlayer(this);
+            GameManager.UnregisterPlayer(this);
         }
 
         private void Update()

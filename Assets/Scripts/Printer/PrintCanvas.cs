@@ -21,6 +21,8 @@ namespace Printer
 
         public RectTransform DisplayRect => displayTarget.rectTransform;
 
+        public Texture2D DO_NOT_MODIFY_CanvasInternalTexture => texture;
+
         private Texture2D texture;
         private RenderTexture renderTexture;
         private bool dirty;
@@ -29,6 +31,7 @@ namespace Printer
 
         private void Awake()
         {
+            GameManager.RegisterCanvas(this);
             if (displayTarget == null)
                 displayTarget = GetComponent<RawImage>();
 
@@ -65,6 +68,7 @@ namespace Printer
 
         private void OnDestroy()
         {
+            GameManager.UnregisterCanvas(this);
             Destroy(texture);
             renderTexture.Release();
             Destroy(renderTexture);

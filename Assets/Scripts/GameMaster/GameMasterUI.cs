@@ -72,7 +72,7 @@ namespace Utility.GameMaster
                 Active = !Active;
                 SetDisplayActive(Active);
                 Time.timeScale = Active ? 0f : 1f;
-                PlayerManager.SetPaused(Active);
+                GameManager.SetPaused(Active);
             }
 
             if (Active)
