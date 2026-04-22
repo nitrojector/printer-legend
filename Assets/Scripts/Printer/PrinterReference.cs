@@ -22,6 +22,11 @@ namespace Printer
         /// Reference to the image that is used as reference
         /// </summary>
         public Image ReferenceImage { get; private set; }
+        
+        /// <summary>
+        /// Convenience accessor for the sprite assigned to the reference image.
+        /// </summary>
+        public Sprite ReferenceSprite => ReferenceImage.sprite;
 
         private RectTransform containerRect;
         private int imageSizePixels;
@@ -34,6 +39,11 @@ namespace Printer
             ReferenceImage = GetComponent<Image>();
             
             GameManager.RegisterReference(this);
+        }
+
+        private void Start()
+        {
+            LoadRandomReference();
         }
 
         private void OnDestroy()
@@ -65,6 +75,16 @@ namespace Printer
         }
 
         // ── Runtime ───────────────────────────────────────────────────────────
+        
+        public void LoadReference(Sprite sprite)
+        {
+            ReferenceImage.sprite = sprite;
+        }
+
+        public void LoadRandomReference()
+        {
+            ReferenceImage.sprite = PrintRefManager.Instance.GetRandom();
+        }
 
         /// <summary>
         /// Moves the indicator to cover the print line at <paramref name="lineIndex"/>.

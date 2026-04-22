@@ -57,7 +57,6 @@ namespace Printer
             Color.red,
             Color.green,
             Color.blue,
-            Color.black,
         };
 
         // ── Speed Adjustment parameters ───────────────────────────────────────
@@ -254,16 +253,25 @@ namespace Printer
         {
             float r = 0f, g = 0f, b = 0f;
             bool any = false;
+            bool all = true;
             for (int i = 0; i < InkPalette.Length; i++)
             {
-                if (!IsColorContributing(i)) continue;
+                if (!IsColorContributing(i))
+                {
+                    Debug.Log($"Color index {i} is not contributing");
+                    all = false;
+                    continue;
+                }
                 Color c = InkPalette[i];
                 r += c.r; g += c.g; b += c.b;
                 any = true;
             }
-            return any
-                ? new Color(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b))
-                : Color.black;
+
+            Debug.Log($"all={all}");
+            if (!any || all)
+                return Color.black;
+            
+            return new Color(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b));
         }
 
         // ── Line-advance tracking ─────────────────────────────────────────────
