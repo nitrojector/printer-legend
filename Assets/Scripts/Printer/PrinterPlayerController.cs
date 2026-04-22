@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework.Constraints;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -13,6 +14,10 @@ namespace Printer
         [field: Header("Auto Cursor Advance")]
         [field: SerializeField, Min(0.001f)]
         public float PrintStepsPerSecond { get; set; } = 10f;
+        
+        [Header("References")]
+        [SerializeField] private GameObject startGamePrompt;
+        [SerializeField] private TMP_Text coundownText;
 
         /// <summary>
         /// Whether player is paused so no input propagate
@@ -23,6 +28,15 @@ namespace Printer
         /// Whether the player is currently printing
         /// </summary>
         private bool printingStarted = false;
+
+        private bool printingCountdownActive = false;
+
+        /// <summary>
+        /// Count down before print starts
+        /// </summary>
+        private float startTimer = 0f;
+
+        private const float StartTimeDelay = 3.0f;
 
         private PrintheadController printhead;
         private PrinterMagic        magic;
@@ -81,12 +95,15 @@ namespace Printer
             magic.EnableAbility(PrinterAbility.CarriageReturn);
             magic.EnableAbility(PrinterAbility.ColorAdjustment);
             
+            startGamePrompt.SetActive(true);
+            coundownText.gameObject.SetActive(false);
+            
             GameManager.RegisterPlayer(this);
         }
 
         private void OnEnable()
         {
-            RegisterInput();
+            // RegisterInput();
         }
 
         private void OnDisable()
@@ -129,6 +146,27 @@ namespace Printer
             if (!printingStarted && printAction.IsPressed())
             {
                 printingStarted = true;
+                printingCountdownActive = true;
+                startGamePrompt.SetActive(false);
+                
+                startTimer = StartTimeDelay;
+                coundownText.SetText($"{Mathf.CeilToInt(startTimer)}");
+                coundownText.gameObject.SetActive(true);
+                return;
+            }
+
+            if (printingCountdownActive)
+            {
+                coundownText.SetText($"{Mathf.CeilToInt(startTimer)}");
+                startTimer -= Time.deltaTime;
+                if (startTimer <= 0f)
+                {
+                    printingCountdownActive = false;
+                    RegisterInput();
+                    coundownText.gameObject.SetActive(false);
+                }
+
+                return;
             }
             
             if (!printingStarted || printhead.IsComplete) return;
@@ -185,6 +223,7 @@ namespace Printer
             printhead.Canvas.Clear();
             printhead.SetPrintheadLine(0);
             printhead.SetPrintheadPosition(0);
+            startGamePrompt.SetActive(true);
         }
 
         // Color hold/release — wired to color action performed/canceled

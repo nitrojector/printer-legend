@@ -7,7 +7,7 @@ namespace Printer
 {
     public class PrintheadController : MonoBehaviour
     {
-        [Header("Prefab References — assign in Inspector")]
+        [Header("References")]
         [SerializeField] private RectTransform printheadRoot;
         [SerializeField] public RectTransform printheadMarker;
         [SerializeField] private PrinterReference printerReference;
