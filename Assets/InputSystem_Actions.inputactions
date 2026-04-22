@@ -1087,6 +1087,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Speed0",
+                    "type": "Button",
+                    "id": "c5b6bdc8-4f54-48d4-b312-1467f9f382fc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Speed1",
+                    "type": "Button",
+                    "id": "f8d20095-ac22-49f1-84a4-1a4d18be097f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Speed2",
+                    "type": "Button",
+                    "id": "9bcf9042-7950-47c3-998a-90e3ddaf69f9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1296,6 +1323,39 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Color4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d4a72af-a206-4228-a98e-16f7089cd84c",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Speed0",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a796ff3-501d-4795-b5b3-ed64b9aed5c2",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Speed1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "99400c6e-a29e-4e44-9d81-7d1445115b06",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Speed2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
