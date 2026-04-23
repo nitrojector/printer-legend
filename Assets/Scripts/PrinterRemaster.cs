@@ -68,6 +68,7 @@ public class PrinterTypewriter_Game2 : MonoBehaviour
 
     private const float PRINT_LINE_MARGIN_FROM_BOTTOM_PX = 12f;
 
+    public int restartCount = 0;
     private enum State
     {
         Scanning,      // head moves L->R, can print while holding space
@@ -138,6 +139,7 @@ public class PrinterTypewriter_Game2 : MonoBehaviour
 
     void ResetRun()
     {
+        restartCount++;
         // clear paper back to lined base
         for (int y = 0; y < paperH; y++)
         {
