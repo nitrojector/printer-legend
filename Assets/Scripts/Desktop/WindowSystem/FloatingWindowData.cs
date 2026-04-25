@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	public struct FloatingWindowData
 	{

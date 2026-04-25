@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using Utility;
 
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	public class WindowDragHandle : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 	{

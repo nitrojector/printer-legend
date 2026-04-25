@@ -1,4 +1,4 @@
-﻿using Desktop.Window;
+﻿using Desktop.WindowSystem;
 using UnityEngine;
 
 namespace WindowContents

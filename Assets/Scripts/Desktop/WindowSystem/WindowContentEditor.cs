@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 #if UNITY_EDITOR
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	[CustomEditor(typeof(WindowContent), editorForChildClasses: true)]
 	public class WindowContentEditor : Editor

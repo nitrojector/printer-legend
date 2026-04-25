@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	[CustomEditor(typeof(Window))]
 	public class WindowEditor : Editor

@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Utility;
 
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	public class Window : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 	{

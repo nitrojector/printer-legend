@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using Utility;
 
-namespace Desktop.Window
+namespace Desktop.WindowSystem
 {
 	[ExecuteAlways]
 	public abstract class WindowContent : MonoBehaviour, ILayoutController
@@ -82,5 +82,14 @@ namespace Desktop.Window
 		/// This can happen when the window is resized, maximized, or when the screen size changes.
 		/// </summary>
 		public virtual void OnResize() {}
+
+		/// <summary>
+		/// Called when window is trying to be destroyed via <see cref="Window.Close"/> or window close button.
+		/// Return true to allow the window to be closed, or false to cancel the close action.
+		/// </summary>
+		public virtual bool OnQuit()
+		{
+			return true;
+		}
 	}
 }
