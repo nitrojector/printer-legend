@@ -73,7 +73,7 @@ namespace Desktop.WindowSystem
 		public virtual void OnShow() {}
 		
 		/// <summary>
-		/// Called when the window GameObject is hidden (set inactive) via <see cref="Window.Minimize"/>.
+		/// Called when the window GameObject is hidden (set inactive) or destroyed via <see cref="Window.Minimize"/>.
 		/// </summary>
 		public virtual void OnMinimize() {}
 
@@ -84,7 +84,7 @@ namespace Desktop.WindowSystem
 		public virtual void OnResize() {}
 
 		/// <summary>
-		/// Called when window is trying to be destroyed via <see cref="Window.Close"/> or window close button.
+		/// Called when window is trying to be destroyed via <see cref="Window.Quit"/> or window close button.
 		/// Return true to allow the window to be closed, or false to cancel the close action.
 		/// </summary>
 		public virtual bool OnQuit()

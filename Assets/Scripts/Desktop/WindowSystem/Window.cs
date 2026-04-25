@@ -10,12 +10,26 @@ namespace Desktop.WindowSystem
 	public class Window : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 	{
 		/// <summary>
+		/// Internal handle for Window for use by <see cref="WindowManager"/>
+		/// </summary>
+		public sealed class InternalWindowHandle
+		{
+			public readonly Window target;
+
+			internal InternalWindowHandle(Window win) => target = win;
+
+			public void SetWindowId(int id) => target.WindowId = id;
+		}
+		
+		/// <summary>
 		/// Gets or sets the title of the window. This is displayed in the title bar of the window.
 		/// </summary>
 		public string Title { 
 			get => titleText.text; 
 			set => titleText.text = value; 
 		}
+		
+		public int WindowId { get; private set; }
 		
 		/// <summary>
 		/// Gets the content the window's container currently owns.
@@ -180,10 +194,11 @@ namespace Desktop.WindowSystem
 		}
 
 		/// <summary>
-		/// Closes the window, destroying it and any attached content.
+		/// Quits the window, destroying it and any attached content.
 		/// </summary>
-		public void Close()
+		public void Quit()
 		{
+			if (!content.OnQuit()) return;
 			RemoveContent();
 			Destroy(gameObject);
 		}
@@ -359,6 +374,8 @@ namespace Desktop.WindowSystem
 		
 		private void Awake()
 		{
+			WindowManager.Instance.RegisterWindow(new InternalWindowHandle(this));
+			
 			RectTransform = GetComponent<RectTransform>();
 			contentContainerRect = contentContainer.GetComponent<RectTransform>();
 
@@ -367,7 +384,7 @@ namespace Desktop.WindowSystem
 				Logr.Error("Window and its content must have RectTransforms.");
 			}
 			
-			closeButton.onClick.AddListener(Close);
+			closeButton.onClick.AddListener(Quit);
 			maximizeButton?.onClick.AddListener(ToggleMaximize);
 			minimizeButton?.onClick.AddListener(Minimize);
 			
@@ -395,7 +412,7 @@ namespace Desktop.WindowSystem
 
 		private void OnEnable()
 		{
-			Logr.Info($"Showing window '{Title}'");
+			Logr.Info($"Show window '{Title}'");
 			if (content != null)
 			{
 				content.OnShow();
@@ -406,7 +423,7 @@ namespace Desktop.WindowSystem
 		private void OnDisable()
 		{
 			if (!shown) return;
-			Logr.Info($"Minimizing window '{Title}'");
+			Logr.Info($"Minimize/Close window '{Title}'");
 			if (content != null)
 			{
 				content.OnMinimize();
@@ -414,5 +431,9 @@ namespace Desktop.WindowSystem
 			shown = false;
 		}
 
+		private void OnDestroy()
+		{
+			WindowManager.Instance.UnregisterWindow(WindowId);
+		}
 	}
 }

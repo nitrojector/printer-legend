@@ -1,134 +1,175 @@
 using System;
 using System.Collections.Generic;
+using Desktop.WindowSystem;
 using Printer;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GameMaster
 {
-    public class GameMaster : MonoBehaviour
-    {
-        public static GameMaster Instance { get; private set; }
+	public class GameMaster : MonoBehaviour
+	{
+		public static GameMaster Instance { get; private set; }
 
-        private string _consoleOutput;
+		private string _consoleOutput;
         
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else if (Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-        }
+		private void Awake()
+		{
+			if (Instance == null)
+			{
+				Instance = this;
+				DontDestroyOnLoad(gameObject);
+			}
+			else if (Instance != this)
+			{
+				Destroy(gameObject);
+				return;
+			}
+		}
 
-        public string GetGameStateStr()
-        {
-            string s = "";
+		public string GetGameStateStr()
+		{
+			string s = "";
 
-            {
-                var similarity = GameState.GetRawSimilarity();
-                s += $"Similarity: {similarity * 100.0f:0.00}%\n";
-            }
+			{
+				var similarity = GameState.GetRawSimilarity();
+				s += $"Similarity: {similarity * 100.0f:0.00}%\n";
+			}
 
-            return s;
-        }
+			return s;
+		}
 
-        public string GetConsoleOutput()
-        {
-            return _consoleOutput;
-        }
+		public string GetConsoleOutput()
+		{
+			return _consoleOutput;
+		}
 
-        public void Evaluate(string input)
-        {
-            List<string> tokens = new(input.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+		public void Evaluate(string input)
+		{
+			List<string> tokens = new(input.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
-            _consoleOutput = "";
+			_consoleOutput = "";
             
-            if (tokens.Count < 1) return;
+			if (tokens.Count < 1) return;
             
-            string cmd = tokens[0].ToLower();
+			string cmd = tokens[0].ToLower();
             
-            if (string.IsNullOrEmpty(cmd))
-                cmd = "help";
+			if (string.IsNullOrEmpty(cmd))
+				cmd = "help";
 
-            try
-            {
-                switch (cmd)
-                {
-                    case "help": {
-                        InfoLn("Available commands:");
-                        InfoLn("help - <u>Show this help message</u>");
-                        InfoLn("timescale - <u>Set the game timescale</u>");
-                        break;
-                    }
+			try
+			{
+				switch (cmd)
+				{
+					case "help": {
+						InfoLn("Available commands:");
+						InfoLn("help - <u>Show this help message</u>");
+						InfoLn("timescale - <u>Set the game timescale</u>");
+						InfoLn("newref - <u>grab new reference image</u>");
+						InfoLn("ps - <u>list active windows</u>");
+						InfoLn("kill [id] - <u>kill window by id</u>");
+						InfoLn("killall - <u>kill all windows</u>");
+						break;
+					}
 
-                    case "timescale":
-                    {
-                        if (tokens.Count < 2 || !float.TryParse(tokens[1], out float scale))
-                        {
-                            InfoLn("Usage: timescale [scale]");
-                            break;
-                        }
+					case "timescale":
+					{
+						if (tokens.Count < 2 || !float.TryParse(tokens[1], out float scale))
+						{
+							InfoLn("Usage: timescale [scale]");
+							break;
+						}
                         
-                        Time.timeScale = scale;
-                        InfoLn($"Time scale set to {scale}");
-                        break;
-                    }
+						Time.timeScale = scale;
+						InfoLn($"Time scale set to {scale}");
+						
+						break;
+					}
 
-                    case "renew":
-                    {
-                        GameManager.Reference.LoadRandomReference();
-                        break;
-                    }
+					case "newref":
+					{
+						GameManager.Reference.LoadRandomReference();
+						InfoLn("Loaded new reference image");
+						
+						break;
+					}
 
-                    default:
-                    {
-                        ErrLn($"Unknown command: {cmd}");
-                        break;
-                    }
-                }
-            } catch (Exception e)
-            {
-                ErrLn($"Error evaluating command: {e.Message}");
-                ErrLn(e.StackTrace);
-            }
-        }
+					case "ps":
+					{
+						WindowManager.Instance.ActiveWindows.ForEach(w =>
+						{
+							InfoLn($"{$"[{w.WindowId}]",5} (<color=yellow>{w.Content.GetType().Name}</color>) {w.Title}");
+						});
+						InfoLn($"\t{WindowManager.Instance.ActiveWindows.Count} window(s)");
+
+						break;
+					}
+
+					case "kill":
+					{
+						if (tokens.Count < 2 || !int.TryParse(tokens[1], out int id))
+						{
+							InfoLn("Usage: kill [windowId]");
+							break;
+						}
+						
+						WindowManager.Instance.Kill(id);
+						InfoLn($"Killed window with ID {id}");
+						
+						break;
+					}
+
+					case "killall":
+					{
+						WindowManager.Instance.KillAll();
+						InfoLn("Killed all windows");
+						
+						break;
+					}
+
+					default:
+					{
+						ErrLn($"Unknown command: {cmd}");
+						break;
+					}
+				}
+			} catch (Exception e)
+			{
+				ErrLn($"Error evaluating command: {e.Message}");
+				ErrLn(e.StackTrace);
+			}
+		}
         
-        private void InfoLn(string output)
-        {
-            _consoleOutput += $"<#0F0>{output}</color>\n";
-        }
+		private void InfoLn(string output)
+		{
+			_consoleOutput += $"<#0F0>{output}</color>\n";
+		}
 
-        private void ErrLn(string output)
-        {
-            _consoleOutput += $"<#F00>{output}</color>\n";
-        }
+		private void ErrLn(string output)
+		{
+			_consoleOutput += $"<#F00>{output}</color>\n";
+		}
 
-        public static bool Instantiate()
-        {
-            if (Instance != null) return false;
+		public static bool Instantiate()
+		{
+			if (Instance != null) return false;
             
-            GameObject go = new GameObject("GameMaster");
-            var ui = go.AddComponent<UIDocument>();
+			GameObject go = new GameObject("GameMaster");
+			var ui = go.AddComponent<UIDocument>();
 
-            var panelSettings = Resources.Load<PanelSettings>("GMPanelPS");
-            var uxml = Resources.Load<VisualTreeAsset>("GMPanel");
+			var panelSettings = Resources.Load<PanelSettings>("GMPanelPS");
+			var uxml = Resources.Load<VisualTreeAsset>("GMPanel");
 
-            if (ui == null) return false;
+			if (ui == null) return false;
             
-            ui.panelSettings = panelSettings;
-            ui.visualTreeAsset = uxml;
+			ui.panelSettings = panelSettings;
+			ui.visualTreeAsset = uxml;
             
-            go.AddComponent<GameMaster>();
-            go.AddComponent<GameMasterUI>();
+			go.AddComponent<GameMaster>();
+			go.AddComponent<GameMasterUI>();
             
-            DontDestroyOnLoad(go);
-            return true;
-        }
-    }
+			DontDestroyOnLoad(go);
+			return true;
+		}
+	}
 }
