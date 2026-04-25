@@ -7,10 +7,18 @@ namespace Desktop.Window
 	[ExecuteAlways]
 	public abstract class WindowContent : MonoBehaviour, ILayoutController
 	{
+		public Vector2 MinContentSize => enforceMinSize ? minContentSize : Vector2.zero;
+		public Vector2 MaxContentSize => enforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
+
+		[Header("Window Size Constraints")]
+		[SerializeField] private bool enforceMinSize = true;
+		[SerializeField] private Vector2 minContentSize = new Vector2(100, 100);
+		[SerializeField] private bool enforceMaxSize = false;
+		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
 		
 		private DrivenRectTransformTracker tracker;
 		private RectTransform rt;
-
+		
 		protected RectTransform RectTransform => rt ??= GetComponent<RectTransform>();
 
 		private void OnEnable()
@@ -35,7 +43,6 @@ namespace Desktop.Window
 			if (RectTransform == null) return;
 			SetLayoutHorizontal();
 			SetLayoutVertical();
-			Logr.Info($"Validated layout for {name}");
 		}
 #endif
 

@@ -107,6 +107,7 @@ namespace Desktop.Window
 		private Vector2 _resizeDragStart;
 		private Vector2 _resizeOffsetMinStart;
 		private Vector2 _resizeOffsetMaxStart;
+		private Vector2 _chromeSizeAtDragStart;
 
 		private const int ResizeLeft = 1;
 		private const int ResizeRight = 2;
@@ -292,6 +293,7 @@ namespace Desktop.Window
 				RectTransform.parent as RectTransform, eventData.position, eventData.pressEventCamera, out _resizeDragStart);
 			_resizeOffsetMinStart = RectTransform.offsetMin;
 			_resizeOffsetMaxStart = RectTransform.offsetMax;
+			_chromeSizeAtDragStart = RectTransform.rect.size - contentContainerRect.rect.size;
 		}
 
 		public void OnDrag(PointerEventData eventData)
@@ -309,6 +311,32 @@ namespace Desktop.Window
 			if ((_resizeEdgeMask & ResizeRight) != 0) offsetMax.x += delta.x;
 			if ((_resizeEdgeMask & ResizeBottom) != 0) offsetMin.y += delta.y;
 			if ((_resizeEdgeMask & ResizeTop) != 0) offsetMax.y += delta.y;
+
+			if (content != null)
+			{
+				var minContent = content.MinContentSize;
+				var maxContent = content.MaxContentSize;
+
+				var proposedW = offsetMax.x - offsetMin.x;
+				var minW = minContent.x > 0f ? minContent.x + _chromeSizeAtDragStart.x : float.NegativeInfinity;
+				var maxW = float.IsPositiveInfinity(maxContent.x) ? float.PositiveInfinity : maxContent.x + _chromeSizeAtDragStart.x;
+				var clampedW = Mathf.Clamp(proposedW, minW, maxW);
+				if (!Mathf.Approximately(clampedW, proposedW))
+				{
+					if ((_resizeEdgeMask & ResizeLeft) != 0) offsetMin.x = offsetMax.x - clampedW;
+					else offsetMax.x = offsetMin.x + clampedW;
+				}
+
+				var proposedH = offsetMax.y - offsetMin.y;
+				var minH = minContent.y > 0f ? minContent.y + _chromeSizeAtDragStart.y : float.NegativeInfinity;
+				var maxH = float.IsPositiveInfinity(maxContent.y) ? float.PositiveInfinity : maxContent.y + _chromeSizeAtDragStart.y;
+				var clampedH = Mathf.Clamp(proposedH, minH, maxH);
+				if (!Mathf.Approximately(clampedH, proposedH))
+				{
+					if ((_resizeEdgeMask & ResizeBottom) != 0) offsetMin.y = offsetMax.y - clampedH;
+					else offsetMax.y = offsetMin.y + clampedH;
+				}
+			}
 
 			RectTransform.offsetMin = offsetMin;
 			RectTransform.offsetMax = offsetMax;
