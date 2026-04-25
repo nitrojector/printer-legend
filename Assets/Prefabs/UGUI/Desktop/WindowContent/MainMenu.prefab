@@ -1162,9 +1162,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 599895668510147782}
   - {fileID: 2569035337518488129}
   - {fileID: 7979787523443315853}
-  - {fileID: 599895668510147782}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1185,10 +1185,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindowContents.MainMenuWindowContent
   enforceMinSize: 1
-  minContentSize: {x: 755.61066, y: 578.8328}
+  minContentSize: {x: 943.2261, y: 587.0614}
   enforceMaxSize: 1
-  maxContentSize: {x: 1195.0259, y: 730.2417}
-  gameSceneName: GameScene
+  maxContentSize: {x: 943.2261, y: 587.0614}
+  pictureModeButton: {fileID: 3141588174836269843}
+  galleryButton: {fileID: 3599268559860337600}
+  exitButton: {fileID: 5203178258129213976}
 --- !u!222 &875256806934154013
 CanvasRenderer:
   m_ObjectHideFlags: 0

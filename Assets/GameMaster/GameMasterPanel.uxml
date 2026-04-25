@@ -1,0 +1,16 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/GameMaster/GameMasterPanel.uss?fileID=7433441132597879392&amp;guid=aaf73d4cbf3a4684bd8c7907868fbfd6&amp;type=3#GMPanel"/>
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; height: 60%; font-size: 30px;">
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row; height: 80%;">
+                <ui:VisualElement name="" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; width: 70%;">
+                    <GameMaster.Scripts.UI.ConsoleView name="console"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1; position: absolute; top: 0; bottom: 0; width: 30%; right: 0;">
+                    <GameMaster.Scripts.UI.ConsoleView name="state"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:TextField name="input" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/FiraCode/FiraCode-Regular.ttf?fileID=12800000&amp;guid=46c6cc9ea27eb9d46993b5b83ac326a2&amp;type=3#FiraCode-Regular&quot;);"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

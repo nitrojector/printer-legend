@@ -2,17 +2,20 @@ using System;
 using System.Collections.Generic;
 using Desktop.WindowSystem;
 using Printer;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GameMaster
+namespace GameMaster.Scripts
 {
 	public class GameMaster : MonoBehaviour
 	{
 		public static GameMaster Instance { get; private set; }
+		
+		[SerializeField] private float stateUpdateInterval = 0.25f;
+		private float nextUpdateTime = 0f;
+		private GameMasterUI ui;
 
-		private string _consoleOutput;
-        
 		private void Awake()
 		{
 			if (Instance == null)
@@ -25,32 +28,38 @@ namespace GameMaster
 				Destroy(gameObject);
 				return;
 			}
+			
+			ui = GetComponent<GameMasterUI>();
 		}
 
-		public string GetGameStateStr()
+		private void Update()
 		{
-			string s = "";
+			if (ui.Ready && Time.time >= nextUpdateTime)
+			{
+				UpdateStateStr();
+				nextUpdateTime = Time.time + stateUpdateInterval;
+			}
+		}
 
+		private void UpdateStateStr()
+		{
+			var view = ui.StateView;
+			view.ClearConsole();
+			
 			{
 				var similarity = GameState.GetRawSimilarity();
-				s += $"Similarity: {similarity * 100.0f:0.00}%\n";
+				 view.Info($"Similarity: {similarity * 100.0f:0.00}%\n");
 			}
-
-			return s;
-		}
-
-		public string GetConsoleOutput()
-		{
-			return _consoleOutput;
 		}
 
 		public void Evaluate(string input)
 		{
+			input = input.Trim();
 			List<string> tokens = new(input.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
-			_consoleOutput = "";
-            
 			if (tokens.Count < 1) return;
+			
+			InfoLn($"[<color=aqua>>></color>] <color=green>{input}</color>");
             
 			string cmd = tokens[0].ToLower();
             
@@ -69,6 +78,7 @@ namespace GameMaster
 						InfoLn("ps - <u>list active windows</u>");
 						InfoLn("kill [id] - <u>kill window by id</u>");
 						InfoLn("killall - <u>kill all windows</u>");
+						InfoLn("clear - <u>clear console</u>");
 						break;
 					}
 
@@ -100,7 +110,8 @@ namespace GameMaster
 						{
 							InfoLn($"{$"[{w.WindowId}]",5} (<color=yellow>{w.Content.GetType().Name}</color>) {w.Title}");
 						});
-						InfoLn($"\t{WindowManager.Instance.ActiveWindows.Count} window(s)");
+						var count = WindowManager.Instance.ActiveWindows.Count;
+						InfoLn($"{count} window{(count != 1 ? "s" : "")}");
 
 						break;
 					}
@@ -126,6 +137,12 @@ namespace GameMaster
 						
 						break;
 					}
+					
+					case "clear":
+					{
+						ui.ConsoleView.ClearConsole();
+						break;
+					}
 
 					default:
 					{
@@ -140,14 +157,19 @@ namespace GameMaster
 			}
 		}
         
-		private void InfoLn(string output)
+		private void InfoLn(string line)
 		{
-			_consoleOutput += $"<#0F0>{output}</color>\n";
+			ui.ConsoleView.Info(line);
+		}
+		
+		private void WarnLn(string line)
+		{
+			ui.ConsoleView.Warn(line);
 		}
 
-		private void ErrLn(string output)
+		private void ErrLn(string line)
 		{
-			_consoleOutput += $"<#F00>{output}</color>\n";
+			ui.ConsoleView.Error(line);
 		}
 
 		public static bool Instantiate()

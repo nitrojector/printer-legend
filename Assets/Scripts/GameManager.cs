@@ -11,6 +11,11 @@ public static class GameManager
     public static List<PrinterPlayerController> Players { get; } = new();
     
     private static bool _isPaused = false;
+
+    static GameManager()
+    {
+        GameMaster.Scripts.GameMasterUI.OnToggle += SetPaused;
+    }
         
     public static void RegisterPlayer(PrinterPlayerController player)
     {
@@ -75,10 +80,6 @@ public static class GameManager
             
         _isPaused = paused;
             
-#if UNITY_EDITOR
-        Debug.Log($"{nameof(GameManager)} is paused: {_isPaused}");
-#endif
-
         foreach (var p in Players)
         {
             p.SetPaused(paused);

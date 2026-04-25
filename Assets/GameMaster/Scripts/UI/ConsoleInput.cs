@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-namespace UI.UIDocs
+namespace GameMaster.Scripts.UI
 {
     [UxmlElement("ConsoleInput", libraryPath = "GM", visibility = LibraryVisibility.Visible)]
     public partial class ConsoleInput : Label
