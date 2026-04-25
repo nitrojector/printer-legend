@@ -204,6 +204,15 @@ namespace Printer
 		}
 
 		// ── Action callbacks ──────────────────────────────────────────────────
+		
+		private void OnReset(InputAction.CallbackContext ctx)
+		{
+			printingStarted = false;
+			printhead.ResetCanvasAndPrinthead();
+			coundownText.gameObject.SetActive(false);
+			startGamePrompt.SetActive(true);
+			UnregisterInput();
+		}
 
 		private void OnLF(InputAction.CallbackContext ctx)
 		{
@@ -215,15 +224,6 @@ namespace Printer
 		{
 			if (!magic.IsAbilityEnabled(PrinterAbility.CarriageReturn)) return;
 			printhead.CarriageReturn();
-		}
-
-		private void OnReset(InputAction.CallbackContext ctx)
-		{
-			printingStarted = false;
-			printhead.Canvas.Clear();
-			printhead.SetPrintheadLine(0);
-			printhead.SetPrintheadPosition(0);
-			startGamePrompt.SetActive(true);
 		}
 
 		// Color hold/release — wired to color action performed/canceled

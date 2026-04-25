@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using AudioSystem;
 using UnityEngine;
+using Utility;
 
 namespace Printer
 {
@@ -47,6 +48,7 @@ namespace Printer
         private AudioClip sfxLine;
         private AudioClip sfxNewLine;
 
+        private AudioCategory newlineSfxCategory;
         private AudioHandle inkLoopHandle;
         private bool        inkLoopActive;   // true once PlayManaged has succeeded
         private bool        printedThisFrame;
@@ -76,6 +78,13 @@ namespace Printer
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
             printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
+
+            newlineSfxCategory = AudioManager.Instance.CreateCategory(new AudioCategoryConfig()
+            {
+                MaxVoices = 1,
+                MinInterval = 0.35f,
+                Overflow = AudioOverflowMode.StopOldest
+            });
         }
 
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
@@ -121,6 +130,7 @@ namespace Printer
 
         public void AdvanceLine()
         {
+            Logr.Warn("newline");
             if (lineState.IsComplete) return;
 
             bool advanced = lineState.AdvanceLine();
@@ -128,7 +138,7 @@ namespace Printer
             {
                 SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
                 OnLineAdvanced?.Invoke();
-                AudioManager.Instance.Play(sfxLine, transform, AudioBus.SFX);
+                AudioManager.Instance.Play(sfxLine, transform, AudioBus.SFX, newlineSfxCategory);
             }
         }
 
@@ -165,6 +175,14 @@ namespace Printer
             return true;
         }
 
+        public void ResetCanvasAndPrinthead()
+        {
+            Canvas.Clear();
+            SetPrintheadLine(0);
+            SetPrintheadPosition(0);
+            AudioManager.Instance.StopAllInCategory(newlineSfxCategory);
+        }
+        
         // ── Audio helpers ──────────────────────────────────────────────────────
 
         private void LateUpdate()
