@@ -7,13 +7,13 @@ namespace Desktop.WindowSystem
 	[ExecuteAlways]
 	public abstract class WindowContent : MonoBehaviour, ILayoutController
 	{
-		public Vector2 MinContentSize => enforceMinSize ? minContentSize : Vector2.zero;
-		public Vector2 MaxContentSize => enforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
+		public Vector2 MinContentSize => EnforceMinSize ? minContentSize : Vector2.zero;
+		public Vector2 MaxContentSize => EnforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
 
 		[Header("Window Size Constraints")]
-		[SerializeField] private bool enforceMinSize = true;
+		[field:SerializeField] public bool EnforceMinSize { get; private set; } = true;
 		[SerializeField] private Vector2 minContentSize = new Vector2(100, 100);
-		[SerializeField] private bool enforceMaxSize = false;
+		[field:SerializeField] public bool EnforceMaxSize { get; private set; } = false;
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
 		
 		private DrivenRectTransformTracker tracker;

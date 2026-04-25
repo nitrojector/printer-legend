@@ -69,13 +69,13 @@ namespace Desktop.WindowSystem
 		/// If disabled, the maximize button is hidden and the window cannot be maximized.
 		/// </summary>
 		public bool MaximizeEnabled { 
-			get => maximizeEnabled; 
+			get => !(content != null && content.EnforceMaxSize) && maximizeEnabled; 
 			set
 			{
 				maximizeEnabled = value;
 				if (maximizeButton != null)
 				{
-					maximizeButton.gameObject.SetActive(value);
+					maximizeButton.gameObject.SetActive(MaximizeEnabled);
 				}
 			}
 		}
@@ -222,7 +222,7 @@ namespace Desktop.WindowSystem
 				Destroy(content);
 			
 			content = Instantiate(prefab, contentContainer.transform);
-			AlignContent(content);
+			ConfigureContent(content);
 			content.OnInitialize();
 		}
 		
@@ -241,7 +241,7 @@ namespace Desktop.WindowSystem
 			}
 			
 			newContent.transform.SetParent(contentContainer.transform);
-			AlignContent(newContent);
+			ConfigureContent(newContent);
 			content = newContent;
 		}
 
@@ -264,12 +264,12 @@ namespace Desktop.WindowSystem
 			}
 			
 			newContent.transform.SetParent(contentContainer.transform);
-			AlignContent(newContent);
+			ConfigureContent(newContent);
 			content = newContent;
 			return prev;
 		}
 
-		private static void AlignContent(WindowContent newContent)
+		private void ConfigureContent(WindowContent newContent)
 		{
 			RectTransform contentRt = newContent.GetComponent<RectTransform>();
 			if (contentRt != null)
@@ -283,6 +283,11 @@ namespace Desktop.WindowSystem
 			{
 				Logr.Warn("Attached content does not have a RectTransform.");
 			}
+			
+			if (!MinimizeEnabled)
+				minimizeButton?.gameObject.SetActive(false);
+			if (!MaximizeEnabled)
+				maximizeButton?.gameObject.SetActive(false);
 		}
 
 		public void OnPointerDown(PointerEventData eventData)
@@ -397,15 +402,10 @@ namespace Desktop.WindowSystem
 				if (initialContent != null)
 				{
 					content = initialContent;
-					AlignContent(content);
+					ConfigureContent(content);
 					content.OnInitialize();
 				}
 			}
-			
-			if (!MinimizeEnabled)
-				minimizeButton?.gameObject.SetActive(false);
-			if (!MaximizeEnabled)
-				maximizeButton?.gameObject.SetActive(false);
 			
 			if (startShown) Show();
 		}

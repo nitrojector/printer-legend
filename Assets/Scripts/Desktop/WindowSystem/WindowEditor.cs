@@ -12,6 +12,7 @@ namespace Desktop.WindowSystem
 			DrawDefaultInspector();
 
 			var window = (Window)target;
+			var windowSO = new SerializedObject(window);
 			var content = window.GetComponentInChildren<WindowContent>();
 
 			if (content != null)
@@ -22,19 +23,25 @@ namespace Desktop.WindowSystem
 				var contentSO = new SerializedObject(content);
 				contentSO.Update();
 
+				if (content.EnforceMaxSize && windowSO.FindProperty("maximizeEnabled").boolValue)
+				{
+					EditorGUILayout.HelpBox("Enabling Maximize for Window is invalid when EnforceMaxSize is enabled on child WindowContent",
+						MessageType.Error);
+				}
+
 				EditorGUILayout.BeginHorizontal();
 				if (GUILayout.Button("Use Current Content Size as Min"))
 				{
 					var rt = content.GetComponent<RectTransform>();
 					contentSO.FindProperty("minContentSize").vector2Value = rt.rect.size;
-					contentSO.FindProperty("enforceMinSize").boolValue = true;
+					contentSO.FindProperty("<EnforceMinSize>k__BackingField").boolValue = true;
 					contentSO.ApplyModifiedProperties();
 				}
 				if (GUILayout.Button("Use Current Content Size as Max"))
 				{
 					var rt = content.GetComponent<RectTransform>();
 					contentSO.FindProperty("maxContentSize").vector2Value = rt.rect.size;
-					contentSO.FindProperty("enforceMaxSize").boolValue = true;
+					contentSO.FindProperty("<EnforceMaxSize>k__BackingField").boolValue = true;
 					contentSO.ApplyModifiedProperties();
 				}
 				EditorGUILayout.EndHorizontal();
