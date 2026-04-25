@@ -359,6 +359,7 @@ GameObject:
   - component: {fileID: 2559596650705022068}
   - component: {fileID: 8999332828493716967}
   - component: {fileID: 7419577545799994385}
+  - component: {fileID: 805997535539063122}
   m_Layer: 0
   m_Name: Window
   m_TagString: Untagged
@@ -451,6 +452,21 @@ MonoBehaviour:
   maximizeEnabled: 0
   startShown: 1
   resizeEdgeSize: 8
+--- !u!114 &805997535539063122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3769316614049992046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 4, y: -4}
+  m_UseGraphicAlpha: 1
 --- !u!1 &5106679618724936015
 GameObject:
   m_ObjectHideFlags: 0
