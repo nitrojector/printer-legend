@@ -1,12 +1,13 @@
 ﻿using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Utility;
 
 namespace Desktop.Window
 {
-	public class Window : MonoBehaviour
+	public class Window : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 	{
 		/// <summary>
 		/// Gets or sets the title of the window. This is displayed in the title bar of the window.
@@ -93,11 +94,24 @@ namespace Desktop.Window
 		[SerializeField] private bool minimizeEnabled = true;
 		[SerializeField] private bool maximizeEnabled = true;
 		[SerializeField] private bool startShown = false;
-		
+		[SerializeField] private float resizeEdgeSize = 8f;
+
 		// State
 		private bool shown = false;
 		private bool maximized = false;
 		private FloatingWindowData floatingData = default;
+
+		// Resize state
+		private bool _resizing = false;
+		private int _resizeEdgeMask = 0;
+		private Vector2 _resizeDragStart;
+		private Vector2 _resizeOffsetMinStart;
+		private Vector2 _resizeOffsetMaxStart;
+
+		private const int ResizeLeft = 1;
+		private const int ResizeRight = 2;
+		private const int ResizeTop = 4;
+		private const int ResizeBottom = 8;
 		
 		// RTs
 		private RectTransform contentContainerRect;
@@ -151,13 +165,15 @@ namespace Desktop.Window
 				RectTransform.anchorMax = Vector2.one;
 				RectTransform.offsetMin = Vector2.zero;
 				RectTransform.offsetMax = Vector2.zero;
-				content.OnMaximize();
 				Logr.Info("Maximizing window.");
 			}
 			else
 			{
 				floatingData.ApplyTo(RectTransform);
 			}
+			
+			if (content != null)
+				content.OnResize();
 
 			maximized = !maximized;
 		}
@@ -181,10 +197,8 @@ namespace Desktop.Window
 
 		/// <summary>
 		/// Initializes the window with the specified prefab as its content. Any existing content will be destroyed.
-		/// If the prefab implements <see cref="IWindowContent"/>,
-		/// it will also receive lifecycle callbacks.
 		/// </summary>
-		/// <param name="prefab"></param>
+		/// <param name="prefab"><see cref="WindowContent"/> prefab</param>
 		public void Initialize(WindowContent prefab)
 		{
 			if (prefab == null) return;
@@ -253,6 +267,58 @@ namespace Desktop.Window
 			{
 				Logr.Warn("Attached content does not have a RectTransform.");
 			}
+		}
+
+		public void OnPointerDown(PointerEventData eventData)
+		{
+			if (maximized) return;
+
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				RectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
+
+			var rect = RectTransform.rect;
+			int mask = 0;
+			if (localPoint.x - rect.xMin <= resizeEdgeSize) mask |= ResizeLeft;
+			if (rect.xMax - localPoint.x <= resizeEdgeSize) mask |= ResizeRight;
+			if (localPoint.y - rect.yMin <= resizeEdgeSize) mask |= ResizeBottom;
+			if (rect.yMax - localPoint.y <= resizeEdgeSize) mask |= ResizeTop;
+
+			if (mask == 0) return;
+
+			_resizing = true;
+			_resizeEdgeMask = mask;
+
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				RectTransform.parent as RectTransform, eventData.position, eventData.pressEventCamera, out _resizeDragStart);
+			_resizeOffsetMinStart = RectTransform.offsetMin;
+			_resizeOffsetMaxStart = RectTransform.offsetMax;
+		}
+
+		public void OnDrag(PointerEventData eventData)
+		{
+			if (!_resizing) return;
+
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				RectTransform.parent as RectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
+
+			var delta = localPoint - _resizeDragStart;
+			var offsetMin = _resizeOffsetMinStart;
+			var offsetMax = _resizeOffsetMaxStart;
+
+			if ((_resizeEdgeMask & ResizeLeft) != 0) offsetMin.x += delta.x;
+			if ((_resizeEdgeMask & ResizeRight) != 0) offsetMax.x += delta.x;
+			if ((_resizeEdgeMask & ResizeBottom) != 0) offsetMin.y += delta.y;
+			if ((_resizeEdgeMask & ResizeTop) != 0) offsetMax.y += delta.y;
+
+			RectTransform.offsetMin = offsetMin;
+			RectTransform.offsetMax = offsetMax;
+
+			content?.OnResize();
+		}
+
+		public void OnPointerUp(PointerEventData eventData)
+		{
+			_resizing = false;
 		}
 
 #if UNITY_EDITOR

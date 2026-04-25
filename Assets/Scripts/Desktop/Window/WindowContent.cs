@@ -18,12 +18,6 @@ namespace Desktop.Window
 		/// Called when the window GameObject is hidden (set inactive) via <see cref="Window.Minimize"/>.
 		/// </summary>
 		public virtual void OnMinimize() {}
-		
-		/// <summary>
-		/// Called when the window is maximized via <see cref="Window.ToggleMaximize"/>.
-		/// This is only called if maximize is enabled and the window is not already maximized.
-		/// </summary>
-		public virtual void OnMaximize() {}
 
 		/// <summary>
 		/// Called when the window content area is resized.
