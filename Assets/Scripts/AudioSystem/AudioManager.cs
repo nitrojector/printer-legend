@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -29,15 +30,22 @@ namespace AudioSystem
                 }
 
                 instance = new GameObject("AudioManager").AddComponent<AudioManager>();
+
+
                 return instance;
             }
         }
+
+        /// <summary>
+        /// Called when the audio manager is enabled.
+        /// </summary>
+        public static event Action OnEnableAudioManager;
 
         private static AudioManager instance;
         private AudioBusMap audioBusMap;
         private AudioMixer mixer;
 
-        private readonly Dictionary<AudioHandle, AudioSource> managedSources = new();
+        private readonly Dictionary<AudioHandle, AudioSource> activeSources = new();
 
         private readonly HashSet<AudioHandle> pausedHandles = new();
         private readonly HashSet<AudioHandle> loopingHandles = new();
@@ -66,8 +74,9 @@ namespace AudioSystem
 
             AudioSource source = CreateSource(clip, channel, false);
             source.transform.SetParent(target, false);
+            AudioHandle handle = GetNewHandle();
+            activeSources[handle] = source;
             source.Play();
-            Destroy(source.gameObject, clip.length);
             return true;
         }
 
@@ -84,8 +93,9 @@ namespace AudioSystem
 
             AudioSource source = CreateSource(clip, channel, false);
             source.transform.position = position;
+            AudioHandle handle = GetNewHandle();
+            activeSources[handle] = source;
             source.Play();
-            Destroy(source.gameObject, clip.length);
             return true;
         }
 
@@ -107,8 +117,8 @@ namespace AudioSystem
 
             AudioSource source = CreateSource(clip, channel, loop);
             source.transform.SetParent(target, false);
-            handle = new AudioHandle(nextHandleId++);
-            managedSources[handle] = source;
+            handle = GetNewHandle();
+            activeSources[handle] = source;
             if (loop)
             {
                 loopingHandles.Add(handle);
@@ -138,8 +148,8 @@ namespace AudioSystem
 
             AudioSource source = CreateSource(clip, channel, loop);
             source.transform.position = position;
-            handle = new AudioHandle(nextHandleId++);
-            managedSources[handle] = source;
+            handle = GetNewHandle();
+            activeSources[handle] = source;
             if (loop)
             {
                 loopingHandles.Add(handle);
@@ -147,6 +157,17 @@ namespace AudioSystem
 
             source.Play();
             return true;
+        }
+        
+        /// <summary>
+        /// Tries to get the AudioSource associated with a handle. This can be used to manually control the source.
+        /// </summary>
+        /// <param name="handle">handle to get source for</param>
+        /// <param name="source"><see cref="AudioSource"/> instance</param>
+        /// <returns>true on success</returns>
+        public bool TryGetAudioSource(AudioHandle handle, out AudioSource source)
+        {
+            return activeSources.TryGetValue(handle, out source) && source != null;
         }
 
         /// <summary>
@@ -156,14 +177,14 @@ namespace AudioSystem
         /// <returns>true if stopped</returns>
         public bool Stop(AudioHandle handle)
         {
-            if (!managedSources.TryGetValue(handle, out AudioSource source) || source == null)
+            if (!activeSources.TryGetValue(handle, out AudioSource source) || source == null)
             {
                 return false;
             }
 
             pausedHandles.Remove(handle);
             loopingHandles.Remove(handle);
-            managedSources.Remove(handle);
+            activeSources.Remove(handle);
             source.Stop();
             Destroy(source.gameObject);
             return true;
@@ -176,7 +197,7 @@ namespace AudioSystem
         /// <returns>true if paused</returns>
         public bool Pause(AudioHandle handle)
         {
-            if (!managedSources.TryGetValue(handle, out AudioSource source) || source == null)
+            if (!activeSources.TryGetValue(handle, out AudioSource source) || source == null)
             {
                 return false;
             }
@@ -191,7 +212,7 @@ namespace AudioSystem
         /// <returns>true if resumed</returns>
         public bool Resume(AudioHandle handle)
         {
-            if (!managedSources.TryGetValue(handle, out AudioSource source) || source == null)
+            if (!activeSources.TryGetValue(handle, out AudioSource source) || source == null)
             {
                 return false;
             }
@@ -206,12 +227,33 @@ namespace AudioSystem
         /// <returns>true if playing</returns>
         public bool IsPlaying(AudioHandle handle)
         {
-            if (!managedSources.TryGetValue(handle, out AudioSource source) || source == null)
+            if (!activeSources.TryGetValue(handle, out AudioSource source) || source == null)
             {
                 return false;
             }
 
             return source.isPlaying;
+        }
+
+        /// <summary>Checks whether a managed handle refers to a valid AudioSource(the handle is valid).</summary>
+        /// <param name="handle">handle to query</param>
+        /// <returns>true if vivaldi</returns>
+        public bool IsValid(AudioHandle handle)
+        {
+            if (!activeSources.TryGetValue(handle, out AudioSource source) || source == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>Checks whether a tracked instance is paused.</summary>
+        /// <param name="handle">handle to query</param>
+        /// <returns>true if paused</returns>
+        public bool IsPaused(AudioHandle handle)
+        {
+            return activeSources.ContainsKey(handle) && pausedHandles.Contains(handle);
         }
 
         /// <summary>Creates a configured AudioSource.</summary>
@@ -230,16 +272,43 @@ namespace AudioSystem
             return source;
         }
 
-        /// <summary>Cleans up finished managed sources.</summary>
+        private AudioHandle GetNewHandle()
+        {
+            uint candidate = nextHandleId;
+            int attempts = 0;
+
+            while (attempts <= activeSources.Count)
+            {
+                if (candidate == 0)
+                {
+                    candidate = 1;
+                }
+
+                AudioHandle handle = new AudioHandle(candidate);
+                if (!activeSources.ContainsKey(handle))
+                {
+                    nextHandleId = candidate + 1;
+                    return handle;
+                }
+
+                candidate++;
+                attempts++;
+            }
+
+            throw new InvalidOperationException(
+                "Ran out of audio handles. This should never happen unless you have more than 4 billion simultaneous audio instances.");
+        }
+
+        /// <summary>Cleans up finished tracked sources (managed and one-shot).</summary>
         private void LateUpdate()
         {
-            if (managedSources.Count == 0)
+            if (activeSources.Count == 0)
             {
                 return;
             }
 
             cleanupHandles.Clear();
-            foreach (var (handle, source) in managedSources)
+            foreach (var (handle, source) in activeSources)
             {
                 if (source == null)
                 {
@@ -255,7 +324,7 @@ namespace AudioSystem
 
             foreach (var handle in cleanupHandles)
             {
-                if (!managedSources.Remove(handle, out AudioSource source))
+                if (!activeSources.Remove(handle, out AudioSource source))
                 {
                     continue;
                 }
@@ -280,8 +349,14 @@ namespace AudioSystem
                 DontDestroyOnLoad(gameObject);
             }
 
-            audioBusMap = Resources.Load<AudioBusMap>("Audio/AudioBusMap");
+            audioBusMap = Resources.Load<AudioBusMap>("AudioSystem/AudioBusMap");
             mixer = audioBusMap.GetMixer();
+
+        }
+
+        private void OnEnable()
+        {
+            OnEnableAudioManager?.Invoke();
         }
     }
 }
