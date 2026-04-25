@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-namespace Utility.GameMaster
+namespace GameMaster
 {
     public class GameMasterUI : MonoBehaviour
     {

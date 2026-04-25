@@ -1,4 +1,5 @@
 using System;
+using EngineSystem;
 using NUnit.Framework.Constraints;
 using TMPro;
 using UnityEngine;
@@ -78,7 +79,7 @@ namespace Printer
 		{
 			printhead = GetComponent<PrintheadController>();
 			magic     = GetComponent<PrinterMagic>();
-            
+			
 			printAction  = InputSystem.actions["Printer/Print"];
 			lfAction     = InputSystem.actions["Printer/LF"];
 			crAction     = InputSystem.actions["Printer/CR"];

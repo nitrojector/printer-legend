@@ -2,11 +2,8 @@
 using UnityEngine;
 using Utility;
 
-namespace DefaultNamespace
+public class GameSettings : PersistentConfig<GameSettings>
 {
-	public class GameSettings : PersistentConfig<GameSettings>
-	{
-		public override string ConfigPath =>
-			Path.Combine(Application.persistentDataPath, "settings.json");
-	}
+	public override string ConfigPath =>
+		Path.Combine(Application.persistentDataPath, "settings.json");
 }

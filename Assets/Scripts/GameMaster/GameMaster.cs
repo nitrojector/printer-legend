@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Printer;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using Utility.GameMaster;
 
 namespace GameMaster
 {

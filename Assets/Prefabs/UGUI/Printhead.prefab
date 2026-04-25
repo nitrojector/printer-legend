@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8666667, g: 0.47058824, b: 0.2, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -130,6 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintheadController
   printheadRoot: {fileID: 2386206305411997930}
   printheadMarker: {fileID: 5242725131022442476}
+  printerReference: {fileID: 0}
   linePixelHeight: 4
   linePixelWidth: 4
   inkColor: {r: 0, g: 0, b: 0, a: 1}
@@ -146,6 +147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterPlayerController
   <PrintStepsPerSecond>k__BackingField: 10
+  startGamePrompt: {fileID: 0}
+  coundownText: {fileID: 0}
 --- !u!114 &8797576472796213078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,17 +161,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c810ea7affc48038be393db318707d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterMagic
+  slowPrintSpeed: 6
+  basePrintSpeed: 13
+  fastPrintSpeed: 30
   minPrintSpeed: 1
   maxPrintSpeed: 50
   speedScrollStep: 1
-  paperJamLineDuration: 2
-  paperJamShuffleCount: 12
-  paperJamRespectPrintSize: 1
-  internetDisconnectLineDuration: 4
-  internetDisconnectBlackoutSeconds: 1.5
-  internetDisconnectFadeInSeconds: 0.5
   referenceImageGroup: {fileID: 0}
-  motorMalfunctionLineDuration: 2
 --- !u!1 &6892094918119839179
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,9 +276,9 @@ RectTransform:
   m_Father: {fileID: 2386206305411997930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 202.28119, y: 53}
-  m_SizeDelta: {x: 521.0059, y: 137.5574}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 7.2514954, y: 29.5433}
+  m_SizeDelta: {x: 59.7126, y: 82.0007}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7255822972395108602
 CanvasRenderer:
@@ -310,7 +309,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 2081514566, guid: a51eee37481814beba0c96f84833de69, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -318,4 +317,4 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 5
