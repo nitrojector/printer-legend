@@ -25,6 +25,13 @@ namespace WindowContents
 			Debug.Log("Main Menu Initialized");
 		}
 
+		public override bool OnQuit()
+		{
+			// TODO: check for confirmation to quit, maybe?
+			OnExit();
+			return true;
+		}
+
 		private void OnPictureMode()
 		{
 			SceneManager.LoadScene("Printing", LoadSceneMode.Single);
