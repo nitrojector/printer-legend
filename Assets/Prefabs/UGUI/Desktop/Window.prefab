@@ -447,8 +447,10 @@ MonoBehaviour:
   closeButton: {fileID: 4373178922676360094}
   maximizeButton: {fileID: 647271261077755740}
   minimizeButton: {fileID: 4364926815163241588}
-  minimizeEnabled: 1
+  minimizeEnabled: 0
   maximizeEnabled: 1
+  startShown: 1
+  resizeEdgeSize: 8
 --- !u!1 &5106679618724936015
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,7 +589,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5564136051621857167
 RectTransform:
   m_ObjectHideFlags: 0
