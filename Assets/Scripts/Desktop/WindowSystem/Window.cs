@@ -68,15 +68,12 @@ namespace Desktop.WindowSystem
 		/// Gets or sets whether maximize is enabled.
 		/// If disabled, the maximize button is hidden and the window cannot be maximized.
 		/// </summary>
-		public bool MaximizeEnabled { 
-			get => !(content != null && content.EnforceMaxSize) && maximizeEnabled; 
+		public bool MaximizeEnabled {
+			get => maximizeEnabled && (content == null || !content.EnforceMaxSize);
 			set
 			{
 				maximizeEnabled = value;
-				if (maximizeButton != null)
-				{
-					maximizeButton.gameObject.SetActive(MaximizeEnabled);
-				}
+				RefreshMaximizeButton();
 			}
 		}
 
@@ -90,10 +87,7 @@ namespace Desktop.WindowSystem
 			set
 			{
 				minimizeEnabled = value;
-				if (minimizeButton != null)
-				{
-					minimizeButton.gameObject.SetActive(value);
-				}
+				RefreshMinimizeButton();
 			}
 		}
 		
@@ -208,6 +202,7 @@ namespace Desktop.WindowSystem
 		/// </summary>
 		public void RemoveContent()
 		{
+			if (content != null) content.SetAttachedWindow(null);
 			Destroy(content);
 		}
 
@@ -219,10 +214,13 @@ namespace Desktop.WindowSystem
 		{
 			if (prefab == null) return;
 			if (content != null)
+			{
+				content.SetAttachedWindow(null);
 				Destroy(content);
-			
+			}
+
 			content = Instantiate(prefab, contentContainer.transform);
-			ConfigureContent(content);
+			ConfigureContent();
 			content.OnInitialize();
 		}
 		
@@ -234,15 +232,16 @@ namespace Desktop.WindowSystem
 		public void Attach(WindowContent newContent)
 		{
 			if (newContent == null) return;
-			
+
 			if (content != null)
 			{
+				content.SetAttachedWindow(null);
 				Destroy(content);
 			}
-			
-			newContent.transform.SetParent(contentContainer.transform);
-			ConfigureContent(newContent);
+
 			content = newContent;
+			newContent.transform.SetParent(contentContainer.transform);
+			ConfigureContent();
 		}
 
 		/// <summary>
@@ -255,23 +254,26 @@ namespace Desktop.WindowSystem
 		public WindowContent SafeAttach(WindowContent newContent, Transform reparent = null)
 		{
 			if (newContent == null) return null;
-			
-			var prev = content;
 
+			var prev = content;
 			if (prev != null)
 			{
+				prev.SetAttachedWindow(null);
 				prev.transform.SetParent(reparent);
 			}
-			
-			newContent.transform.SetParent(contentContainer.transform);
-			ConfigureContent(newContent);
+
 			content = newContent;
+			newContent.transform.SetParent(contentContainer.transform);
+			ConfigureContent();
 			return prev;
 		}
 
-		private void ConfigureContent(WindowContent newContent)
+		/// <summary>
+		/// Configures <see cref="content"/> and update enabled buttons
+		/// </summary>
+		private void ConfigureContent()
 		{
-			RectTransform contentRt = newContent.GetComponent<RectTransform>();
+			RectTransform contentRt = content.RectTransform;
 			if (contentRt != null)
 			{
 				contentRt.anchorMin = Vector2.zero;
@@ -283,12 +285,19 @@ namespace Desktop.WindowSystem
 			{
 				Logr.Warn("Attached content does not have a RectTransform.");
 			}
-			
-			if (!MinimizeEnabled)
-				minimizeButton?.gameObject.SetActive(false);
-			if (!MaximizeEnabled)
-				maximizeButton?.gameObject.SetActive(false);
+
+			content.SetAttachedWindow(this);
+			RefreshMinimizeButton();
+			RefreshMaximizeButton();
 		}
+
+		private void RefreshMinimizeButton() =>
+			minimizeButton?.gameObject.SetActive(MinimizeEnabled);
+
+		private void RefreshMaximizeButton() =>
+			maximizeButton?.gameObject.SetActive(MaximizeEnabled);
+
+		internal void NotifyConstraintsChanged() => RefreshMaximizeButton();
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
@@ -397,16 +406,19 @@ namespace Desktop.WindowSystem
 			gameObject.SetActive(false);
 			
 			// if content is assigned in the editor, initialize it
+			var initialContent = contentContainer.GetComponentInChildren<WindowContent>();
+			if (initialContent != null)
 			{
-				var initialContent = contentContainer.GetComponentInChildren<WindowContent>();
-				if (initialContent != null)
-				{
-					content = initialContent;
-					ConfigureContent(content);
-					content.OnInitialize();
-				}
+				content = initialContent;
+				ConfigureContent();
+				content.OnInitialize();
 			}
-			
+			else
+			{
+				RefreshMinimizeButton();
+				RefreshMaximizeButton();
+			}
+
 			if (startShown) Show();
 		}
 

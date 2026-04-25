@@ -227,6 +227,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 931611702940452914, guid: 4ee5500ef4724cc448c6171ff396c820, type: 3}
+      propertyPath: <EnforceMaxSize>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4471751114721490230, guid: 4ee5500ef4724cc448c6171ff396c820, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -547,6 +551,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2787426138748599054, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3037837129573928829, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0.00048828125
@@ -566,6 +574,10 @@ PrefabInstance:
     - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -18.517456
+      objectReference: {fileID: 0}
+    - target: {fileID: 7419577545799994385, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: maximizeEnabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

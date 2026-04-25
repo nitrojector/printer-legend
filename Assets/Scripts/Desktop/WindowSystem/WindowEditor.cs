@@ -12,7 +12,6 @@ namespace Desktop.WindowSystem
 			DrawDefaultInspector();
 
 			var window = (Window)target;
-			var windowSO = new SerializedObject(window);
 			var content = window.GetComponentInChildren<WindowContent>();
 
 			if (content != null)
@@ -23,7 +22,7 @@ namespace Desktop.WindowSystem
 				var contentSO = new SerializedObject(content);
 				contentSO.Update();
 
-				if (content.EnforceMaxSize && windowSO.FindProperty("maximizeEnabled").boolValue)
+				if (content.EnforceMaxSize && serializedObject.FindProperty("maximizeEnabled").boolValue)
 				{
 					EditorGUILayout.HelpBox("Enabling Maximize for Window is invalid when EnforceMaxSize is enabled on child WindowContent",
 						MessageType.Error);
@@ -41,7 +40,7 @@ namespace Desktop.WindowSystem
 				{
 					var rt = content.GetComponent<RectTransform>();
 					contentSO.FindProperty("maxContentSize").vector2Value = rt.rect.size;
-					contentSO.FindProperty("<EnforceMaxSize>k__BackingField").boolValue = true;
+					contentSO.FindProperty("enforceMaxSize").boolValue = true;
 					contentSO.ApplyModifiedProperties();
 				}
 				EditorGUILayout.EndHorizontal();

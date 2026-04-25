@@ -13,13 +13,27 @@ namespace Desktop.WindowSystem
 		[Header("Window Size Constraints")]
 		[field:SerializeField] public bool EnforceMinSize { get; private set; } = true;
 		[SerializeField] private Vector2 minContentSize = new Vector2(100, 100);
-		[field:SerializeField] public bool EnforceMaxSize { get; private set; } = false;
+
+		[SerializeField] private bool enforceMaxSize = false;
+		public bool EnforceMaxSize
+		{
+			get => enforceMaxSize;
+			set
+			{
+				enforceMaxSize = value;
+				attachedWindow?.NotifyConstraintsChanged();
+			}
+		}
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
-		
+
+		private Window attachedWindow;
+
+		internal void SetAttachedWindow(Window window) => attachedWindow = window;
+
 		private DrivenRectTransformTracker tracker;
 		private RectTransform rt;
 		
-		protected RectTransform RectTransform => rt ??= GetComponent<RectTransform>();
+		public RectTransform RectTransform => rt ??= GetComponent<RectTransform>();
 
 		private void OnEnable()
 		{
@@ -43,6 +57,7 @@ namespace Desktop.WindowSystem
 			if (RectTransform == null) return;
 			SetLayoutHorizontal();
 			SetLayoutVertical();
+			attachedWindow?.NotifyConstraintsChanged();
 		}
 #endif
 

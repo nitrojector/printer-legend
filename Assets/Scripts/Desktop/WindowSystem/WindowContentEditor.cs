@@ -61,7 +61,7 @@ namespace Desktop.WindowSystem
 				{
 					var rt = window.GetComponent<RectTransform>();
 					serializedObject.FindProperty("minContentSize").vector2Value = rt.rect.size;
-					serializedObject.FindProperty("enforceMinSize").boolValue = true;
+					serializedObject.FindProperty("<EnforceMinSize>k__BackingField").boolValue = true;
 				}
 				if (GUILayout.Button("Use Current Content Size as Max"))
 				{
