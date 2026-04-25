@@ -115,6 +115,10 @@ namespace Utility
             }
 
             File.WriteAllText(filePath, json);
+
+            if (!instance.SaveOnApplicationQuit || quittingHandlerAdded) return;
+            Application.quitting += Save;
+            quittingHandlerAdded = true;
         }
 
     }
