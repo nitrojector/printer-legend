@@ -100,6 +100,9 @@ namespace Printer
         private void ApplyIndicatorHeight()
         {
             indicatorHeight = printPixelSize / (float)imageSizePixels * containerRect.rect.height;
+            Vector2 size = indicator.sizeDelta;
+            size.y = indicatorHeight;
+            indicator.sizeDelta = size;
         }
     }
 }
