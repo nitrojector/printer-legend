@@ -31,7 +31,7 @@ namespace Printer
 
         private void Awake()
         {
-            GameManager.RegisterCanvas(this);
+            GameManager.Instance.RegisterCanvas(this);
             if (displayTarget == null)
                 displayTarget = GetComponent<RawImage>();
 
@@ -68,7 +68,7 @@ namespace Printer
 
         private void OnDestroy()
         {
-            GameManager.UnregisterCanvas(this);
+            GameManager.Instance.UnregisterCanvas(this);
             Destroy(texture);
             renderTexture.Release();
             Destroy(renderTexture);

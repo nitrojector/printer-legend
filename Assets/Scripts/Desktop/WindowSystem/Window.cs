@@ -402,8 +402,8 @@ namespace Desktop.WindowSystem
 			maximizeButton?.onClick.AddListener(ToggleMaximize);
 			minimizeButton?.onClick.AddListener(Minimize);
 			
-			shown = false;
-			gameObject.SetActive(false);
+			shown = startShown;
+			gameObject.SetActive(startShown);
 			
 			// if content is assigned in the editor, initialize it
 			var initialContent = contentContainer.GetComponentInChildren<WindowContent>();
@@ -418,13 +418,11 @@ namespace Desktop.WindowSystem
 				RefreshMinimizeButton();
 				RefreshMaximizeButton();
 			}
-
-			if (startShown) Show();
 		}
 
 		private void OnEnable()
 		{
-			Logr.Info($"Show window '{Title}'");
+			Logr.Info($"Show window '{Title}'", this);
 			if (content != null)
 			{
 				content.OnShow();
@@ -435,7 +433,7 @@ namespace Desktop.WindowSystem
 		private void OnDisable()
 		{
 			if (!shown) return;
-			Logr.Info($"Minimize/Close window '{Title}'");
+			Logr.Info($"Minimize/Close window '{Title}'", this);
 			if (content != null)
 			{
 				content.OnMinimize();

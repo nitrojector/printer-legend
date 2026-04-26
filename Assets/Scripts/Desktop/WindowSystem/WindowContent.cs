@@ -10,6 +10,8 @@ namespace Desktop.WindowSystem
 		public Vector2 MinContentSize => EnforceMinSize ? minContentSize : Vector2.zero;
 		public Vector2 MaxContentSize => EnforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
 
+		protected virtual string WindowTitle => "Window";
+
 		[Header("Window Size Constraints")]
 		[field:SerializeField] public bool EnforceMinSize { get; private set; } = true;
 		[SerializeField] private Vector2 minContentSize = new Vector2(100, 100);
@@ -21,23 +23,27 @@ namespace Desktop.WindowSystem
 			set
 			{
 				enforceMaxSize = value;
-				attachedWindow?.NotifyConstraintsChanged();
+				_attachedWindow?.NotifyConstraintsChanged();
 			}
 		}
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
 
-		private Window attachedWindow;
+		private Window _attachedWindow;
 
-		internal void SetAttachedWindow(Window window) => attachedWindow = window;
-
-		private DrivenRectTransformTracker tracker;
-		private RectTransform rt;
+		private DrivenRectTransformTracker _tracker;
+		private RectTransform _rt;
 		
-		public RectTransform RectTransform => rt ??= GetComponent<RectTransform>();
+		public RectTransform RectTransform => _rt ??= GetComponent<RectTransform>();
+		
+		internal void SetAttachedWindow(Window window)
+		{
+			_attachedWindow = window;
+			_attachedWindow.Title = WindowTitle;
+		}
 
 		private void OnEnable()
 		{
-			tracker.Add(this, RectTransform,
+			_tracker.Add(this, RectTransform,
 				DrivenTransformProperties.Anchors |
 				DrivenTransformProperties.AnchoredPosition |
 				DrivenTransformProperties.SizeDelta |
@@ -48,7 +54,7 @@ namespace Desktop.WindowSystem
 
 		private void OnDisable()
 		{
-			tracker.Clear();
+			_tracker.Clear();
 		}
 		
 #if UNITY_EDITOR
@@ -57,7 +63,7 @@ namespace Desktop.WindowSystem
 			if (RectTransform == null) return;
 			SetLayoutHorizontal();
 			SetLayoutVertical();
-			attachedWindow?.NotifyConstraintsChanged();
+			_attachedWindow?.NotifyConstraintsChanged();
 		}
 #endif
 

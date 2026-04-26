@@ -9,6 +9,8 @@ namespace WindowContents
 {
 	public class MainMenuWindowContent : WindowContent
 	{
+		protected override string WindowTitle => "Main Menu";
+
 		[Header("Main Menu Settings")]
 		[SerializeField] private Button pictureModeButton;
 		[SerializeField] private Button galleryButton;

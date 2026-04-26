@@ -1,88 +1,116 @@
 using System.Collections.Generic;
 using Printer;
 using UnityEngine;
+using Utility;
 
-public static class GameManager
+public class GameManager
 {
-    public static PrintCanvas Canvas { get; private set; }
+	public static GameManager Instance
+	{
+		get
+		{
+			_instance ??= new GameManager();
+			return _instance;
+		}
+	}
     
-    public static PrinterReference Reference { get; private set; }
+	private static GameManager _instance;
     
-    public static List<PrinterPlayerController> Players { get; } = new();
+	public PrintCanvas Canvas { get; private set; }
     
-    private static bool _isPaused = false;
+	public PrinterReference Reference { get; private set; }
+    
+	public List<PrinterPlayerController> Players { get; } = new();
+    
+	private bool _isPaused = false;
 
-    static GameManager()
-    {
-        GameMaster.Scripts.GameMasterUI.OnToggle += SetPaused;
-    }
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+	private static void ResetStatics()
+	{
+		_instance = null;
+	}
+
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	private static void Initialize()
+	{
+		_instance ??= new GameManager(); // won't recreate if already exists
+	}
+	
+	public bool RegisterPlayer(PrinterPlayerController player)
+	{
+		if (Players.Contains(player))
+			return false;
         
-    public static void RegisterPlayer(PrinterPlayerController player)
-    {
-        if (!Players.Contains(player))
-            Players.Add(player);
-    }
+		Players.Add(player);
+		return true;
+	}
 
-    public static void UnregisterPlayer(PrinterPlayerController player)
-    {
-        Players.Remove(player);
-    }
+	public bool UnregisterPlayer(PrinterPlayerController player)
+	{
+		return Players.Remove(player);
+	}
 
-    public static void RegisterCanvas(PrintCanvas canvas)
-    {
-        if (Canvas != null)
-        {
-            Debug.LogError("Multiple PrintCanvas instances detected. This is not supported.", canvas);
-            return;
-        }
+	public void RegisterCanvas(PrintCanvas canvas)
+	{
+		if (Canvas != null)
+		{
+			Logr.Error("Multiple PrintCanvas instances detected. This is not supported.", canvas);
+			return;
+		}
 
-        Canvas = canvas;
-    }
+		Logr.Info("PrintCanvas registered.", canvas);
+		Canvas = canvas;
+	}
 
-    public static void UnregisterCanvas(PrintCanvas canvas)
-    {
-        if (canvas == null) return;
-        if (canvas != Canvas)
-        {
-            Debug.LogError("Multiple PrintCanvas instances detected. This is not supported.", Canvas);
-            return;
-        }
+	public void UnregisterCanvas(PrintCanvas canvas)
+	{
+		if (canvas == null) return;
+		if (canvas != Canvas)
+		{
+			Logr.Error("Multiple PrintCanvas instances detected. This is not supported.", canvas);
+			return;
+		}
             
-        Canvas = null;
-    }
+		Logr.Info("PrintCanvas unregistered.", canvas);
+		Canvas = null;
+	}
 
-    public static void RegisterReference(PrinterReference reference)
-    {
-        if (Canvas != null)
-        {
-            Debug.LogError("Multiple PrintCanvas instances detected. This is not supported.", reference);
-            return;
-        }
+	public bool RegisterReference(PrinterReference reference)
+	{
+		if (Reference != null)
+		{
+			Logr.Error("Multiple PrinterReference instances detected. This is not supported.", reference);
+			return false;
+		}
 
-        Reference = reference;
-    }
+		Logr.Info("PrinterReference registered.", reference);
+		Reference = reference;
+		return true;
+	}
 
-    public static void UnregisterReference(PrinterReference reference)
-    {
-        if (reference == null) return;
-        if (reference != Reference)
-        {
-            Debug.LogError("Multiple Printreference instances detected. This is not supported.", reference);
-            return;
-        }
+	public bool UnregisterReference(PrinterReference reference)
+	{
+		if (reference == null) return false;
+		if (reference != Reference)
+		{
+			Logr.Error("Multiple PrinterReference instances detected. This is not supported.", reference);
+			return false;
+		}
             
-        Reference = null;
-    }
+		Logr.Info("PrinterReference unregistered.", reference);
+		Reference = null;
+		return true;
+	}
 
-    public static void SetPaused(bool paused)
-    {
-        if (paused == _isPaused) return;
+	public void SetPaused(bool paused)
+	{
+		if (paused == _isPaused) return;
             
-        _isPaused = paused;
+		_isPaused = paused;
             
-        foreach (var p in Players)
-        {
-            p.SetPaused(paused);
-        }
-    }
+		foreach (var p in Players)
+		{
+			p.SetPaused(paused);
+		}
+	}
 }

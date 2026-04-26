@@ -8,13 +8,6 @@ namespace GameMaster.Scripts
 {
 	public class GameMasterUI : MonoBehaviour
 	{
-		/// <summary>
-		/// NOTE:
-		/// Should ONLY be subscribed under a static context.
-		/// Otherwise, if domain reload is off, can cause multiple subscriptions.
-		/// </summary>
-		public static Action<bool> OnToggle;
-            
 		public bool Active { get; set; } = false;
         
 		public ConsoleView ConsoleView { get; private set; }
@@ -93,7 +86,7 @@ namespace GameMaster.Scripts
 			Active = active;
 			SetDisplayActive(Active);
 			Time.timeScale = Active ? 0f : 1f;
-			OnToggle?.Invoke(Active);
+			GameManager.Instance.SetPaused(Active);
 		}
 
 		public void ToggleActive()
@@ -101,7 +94,7 @@ namespace GameMaster.Scripts
 			Active = !Active;
 			SetDisplayActive(Active);
 			Time.timeScale = Active ? 0f : 1f;
-			OnToggle?.Invoke(Active);
+			GameManager.Instance.SetPaused(Active);
 		}
 
 		private static bool IsChildOf(VisualElement child, VisualElement parent)
