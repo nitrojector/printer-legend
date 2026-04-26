@@ -1130,17 +1130,6 @@
                 },
                 {
                     "name": "",
-                    "id": "66521f3f-768c-420b-baad-8c1e0cc9f95d",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Print",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "70554b21-788f-425c-b068-4dbe9cc523de",
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
@@ -1154,17 +1143,6 @@
                     "name": "",
                     "id": "498a32cb-9721-419b-85c8-fcfcba5cdb4e",
                     "path": "<Keyboard>/enter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "LF",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ffa253fc-4395-4852-9a50-cc5d5c0d8d95",
-                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

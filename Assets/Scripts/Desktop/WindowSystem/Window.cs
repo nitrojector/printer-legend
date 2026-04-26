@@ -146,6 +146,8 @@ namespace Desktop.WindowSystem
 			
 			floatingData.ApplyTo(RectTransform);
 			maximized = false;
+			if (content != null)
+				content.OnResize();
 		}
 		
 		/// <summary>

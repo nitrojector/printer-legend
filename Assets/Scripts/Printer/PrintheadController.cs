@@ -11,7 +11,6 @@ namespace Printer
         [Header("References")]
         [SerializeField] private RectTransform printheadRoot;
         [SerializeField] public RectTransform printheadMarker;
-        [SerializeField] private PrinterReference printerReference;
 
         /// <summary>
         /// Reference to the PrintCanvas component where this printhead should draw.
@@ -27,7 +26,7 @@ namespace Printer
 
         private PrintLineState lineState;
         private int totalLines;
-        private int canvasX;
+        private int canvasX = 0;
 
         public float NormalisedX { get; private set; } = 0.5f;
 
@@ -77,7 +76,6 @@ namespace Printer
             canvas     = GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
-            printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
 
             newlineSfxCategory = AudioManager.Instance.CreateCategory(new AudioCategoryConfig()
             {
@@ -90,7 +88,7 @@ namespace Printer
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
         private IEnumerator Start()
         {
-            printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
+            GameManager.Instance.Reference?.Init(canvas.CanvasHeight, linePixelHeight);
             yield return null;
             RefreshLayout();
         }
@@ -102,7 +100,7 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
-            printerReference?.RefreshLayout();
+            GameManager.Instance.Reference?.RefreshLayout();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -137,6 +135,7 @@ namespace Printer
             if (advanced)
             {
                 SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
+                SetCanvasX(0);
                 OnLineAdvanced?.Invoke();
                 AudioManager.Instance.Play(sfxLine, transform, AudioBus.SFX, newlineSfxCategory);
             }
@@ -172,6 +171,7 @@ namespace Printer
             canvas.ClearLineRange(targetLine, rewindCount, linePixelHeight);
             lineState.SetCurrentLine(targetLine);
             SetIndicatorLine(targetLine, totalLines, linePixelHeight);
+            SetCanvasX(0);
             return true;
         }
 
@@ -282,15 +282,14 @@ namespace Printer
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
 
-            printerReference?.SetIndicatorLine(lineIndex);
-
-            SetCanvasX(0);
+            GameManager.Instance.Reference?.SetIndicatorLine(lineIndex);
         }
 
         public void SetPrintheadLine(int lineIndex)
         {
             lineState?.SetCurrentLine(lineIndex);
             SetIndicatorLine(lineIndex, totalLines, linePixelHeight);
+            SetCanvasX(0);
         }
 
         public void CommitInterval(PrintInterval interval)
