@@ -14,14 +14,26 @@ namespace Printer
         /// <summary>Player can manually trigger CR+LF. Default-enabled.</summary>
         Newline,
 
-        /// <summary>Scroll wheel adjusts printhead speed.</summary>
-        SpeedAdjustment,
-
-        /// <summary>Player can select from the primary-color ink palette.</summary>
-        ColorAdjustment,
-
         /// <summary>Player can trigger a carriage return (move to line start) without advancing the line.</summary>
         CarriageReturn,
+
+        /// <summary>Player can set the printhead to slow speed.</summary>
+        SpeedSlow,
+
+        /// <summary>Player can set the printhead to normal speed.</summary>
+        SpeedNormal,
+
+        /// <summary>Player can set the printhead to fast speed.</summary>
+        SpeedFast,
+
+        /// <summary>Player can toggle the red ink channel.</summary>
+        ColorRed,
+
+        /// <summary>Player can toggle the green ink channel.</summary>
+        ColorGreen,
+
+        /// <summary>Player can toggle the blue ink channel.</summary>
+        ColorBlue,
     }
 
     public enum PrinterObstacle
@@ -145,11 +157,9 @@ namespace Printer
         public void DisableAbility(PrinterAbility ability)
         {
             if (!enabledAbilities.Remove(ability)) return;
-            if (ability == PrinterAbility.ColorAdjustment && heldColors.Count > 0)
-            {
-                heldColors.Clear();
+            int colorIndex = ColorIndexForAbility(ability);
+            if (colorIndex >= 0 && heldColors.Remove(colorIndex))
                 RefreshInkColor();
-            }
             onAbilityChanged?.Invoke(ability, false);
         }
 
@@ -430,5 +440,13 @@ namespace Printer
             if (level == 2) return fastPrintSpeed;
             return fastPrintSpeed;
         }
+
+        private static int ColorIndexForAbility(PrinterAbility ability) => ability switch
+        {
+            PrinterAbility.ColorRed   => 0,
+            PrinterAbility.ColorGreen => 1,
+            PrinterAbility.ColorBlue  => 2,
+            _                         => -1,
+        };
     }
 }

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4f7337bb1bc01444eb1ed655a8a7209c
+guid: 6b1917af560b74f12a3fa0b257ec459d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6230093187717182035
-    second: b35b29aacd3236d1362caf7e602c33a3_0
+      213: -6036359434628252460
+    second: earring_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: b35b29aacd3236d1362caf7e602c33a3_0
+      name: earring_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 944
-        height: 883
+        width: 736
+        height: 920
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 352b67beebcb57650800000000000000
-      internalID: 6230093187717182035
+      spriteID: 4dcb762831b8a3ca0800000000000000
+      internalID: -6036359434628252460
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      b35b29aacd3236d1362caf7e602c33a3_0: 6230093187717182035
+      earring_0: -6036359434628252460
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

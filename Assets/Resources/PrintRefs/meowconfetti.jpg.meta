@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4a522d51258c14c57b46d8457895aaee
+guid: b810bb1fce2784cc38152cde438ec1cf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5654806337704773131
-    second: 444ef168eabe490dd668fceccf25c08f_0
+      213: 7834811793889512875
+    second: meowconfetti_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 444ef168eabe490dd668fceccf25c08f_0
+      name: meowconfetti_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 800
-        height: 800
+        width: 488
+        height: 426
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b0645885768e97e40800000000000000
-      internalID: 5654806337704773131
+      spriteID: bad43d0e0d7dabc60800000000000000
+      internalID: 7834811793889512875
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      444ef168eabe490dd668fceccf25c08f_0: 5654806337704773131
+      meowconfetti_0: 7834811793889512875
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

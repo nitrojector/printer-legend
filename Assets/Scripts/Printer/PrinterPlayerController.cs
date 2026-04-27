@@ -4,6 +4,7 @@ using NUnit.Framework.Constraints;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Printer
@@ -30,6 +31,8 @@ namespace Printer
 		/// </summary>
 		private bool printingStarted = false;
 
+		private bool completionTriggered = false;
+
 		private bool printingCountdownActive = false;
 
 		/// <summary>
@@ -38,6 +41,8 @@ namespace Printer
 		private float startTimer = 0f;
 
 		private const float StartTimeDelay = 3.0f;
+
+		[SerializeField] private LevelManager levelManager;
 
 		private PrintheadController printhead;
 		private PrinterMagic        magic;
@@ -101,11 +106,6 @@ namespace Printer
 				colorReleaseDelegates[idx] = _ => OnColorRelease(idx);
 			}
 
-			// TODO: remove, for testing
-			magic.EnableAbility(PrinterAbility.SpeedAdjustment);
-			magic.EnableAbility(PrinterAbility.CarriageReturn);
-			magic.EnableAbility(PrinterAbility.ColorAdjustment);
-            
 			startGamePrompt.SetActive(true);
 			coundownText.gameObject.SetActive(false);
             
@@ -181,8 +181,20 @@ namespace Printer
 
 				return;
 			}
-            
-			if (!printingStarted || printhead.IsComplete) return;
+
+			if (!printingStarted) return;
+
+			if (printhead.IsComplete)
+			{
+				if (!completionTriggered)
+				{
+					completionTriggered = true;
+					SceneManager.LoadScene("FinishPrinting", LoadSceneMode.Single);
+				}
+				return;
+			}
+
+			
 
 			// ── Auto cursor advance (always on) ───────────────────────────────
 			cursorStepTimer += Time.deltaTime;
@@ -198,9 +210,8 @@ namespace Printer
 			if (isPrinting)
 				printhead.Print();
 
-			// Color: sync mixed color to printhead each frame
-			if (magic.IsAbilityEnabled(PrinterAbility.ColorAdjustment))
-				printhead.InkColor = magic.CurrentInkColor;
+			// Color: always sync — black when no channels are active
+			printhead.InkColor = magic.CurrentInkColor;
 		}
 
 		// ── Action callbacks ──────────────────────────────────────────────────
@@ -229,7 +240,14 @@ namespace Printer
 		// Color hold/release — wired to color action performed/canceled
 		private void OnColorHold(int index)
 		{
-			if (magic.IsAbilityEnabled(PrinterAbility.ColorAdjustment))
+			PrinterAbility? ability = index switch
+			{
+				0 => PrinterAbility.ColorRed,
+				1 => PrinterAbility.ColorGreen,
+				2 => PrinterAbility.ColorBlue,
+				_ => null,
+			};
+			if (ability.HasValue && magic.IsAbilityEnabled(ability.Value))
 				magic.HoldColor(index);
 		}
 
@@ -254,7 +272,8 @@ namespace Printer
 				{
 					speedDelegates[level] = ctx =>
 					{
-						PrintStepsPerSecond = magic.GetSpeedForLevel(level);
+						if (magic.IsAbilityEnabled(SpeedAbilityForLevel(level)))
+							PrintStepsPerSecond = magic.GetSpeedForLevel(level);
 					};
 					actions[i].performed += speedDelegates[level];
 				}
@@ -284,6 +303,13 @@ namespace Printer
 				}
 			}
 		}
+
+		private static PrinterAbility SpeedAbilityForLevel(int level) => level switch
+		{
+			0 => PrinterAbility.SpeedSlow,
+			1 => PrinterAbility.SpeedNormal,
+			_ => PrinterAbility.SpeedFast,
+		};
 
 		public bool SetPaused(bool paused)
 		{

@@ -128,7 +128,7 @@ namespace Printer
 
         public void AdvanceLine()
         {
-            Logr.Warn("newline");
+            
             if (lineState.IsComplete) return;
 
             bool advanced = lineState.AdvanceLine();
