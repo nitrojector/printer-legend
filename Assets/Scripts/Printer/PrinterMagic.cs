@@ -71,30 +71,6 @@ namespace Printer
             Color.blue,
         };
 
-        // ── Speed Adjustment parameters ───────────────────────────────────────
-
-        [Header("Speed Adjustment")]
-        
-        [SerializeField] private float slowPrintSpeed    = 6f;
-        [SerializeField] private float basePrintSpeed    = 13f;
-        [SerializeField] private float fastPrintSpeed    = 30f;
-        
-        [Obsolete]
-        [SerializeField, Min(0.001f)] private float minPrintSpeed   = 1f;
-        [Obsolete]
-        [SerializeField]              private float maxPrintSpeed   = 50f;
-        [Obsolete]
-        [SerializeField, Min(0.001f)] private float speedScrollStep = 1f;
-
-        [Obsolete]
-        public float MinPrintSpeed   => minPrintSpeed;
-        [Obsolete]
-        public float MaxPrintSpeed   => maxPrintSpeed;
-        [Obsolete]
-        public float SpeedScrollStep => speedScrollStep;
-        
-        
-
         // ── Internet Disconnect references ────────────────────────────────────
 
         [Tooltip("CanvasGroup on the reference image GameObject (assign in Inspector).")]
@@ -435,10 +411,11 @@ namespace Printer
 
         public float GetSpeedForLevel(int level)
         {
-            if (level <= 0) return slowPrintSpeed;
-            if (level == 1) return basePrintSpeed;
-            if (level == 2) return fastPrintSpeed;
-            return fastPrintSpeed;
+            var speed = GameSettings.Instance.PrintHeadSpeeds.Fast;
+            if (level <= 0) speed = GameSettings.Instance.PrintHeadSpeeds.Slow;
+            if (level == 1) speed = GameSettings.Instance.PrintHeadSpeeds.Normal;
+            if (level == 2) speed = GameSettings.Instance.PrintHeadSpeeds.Fast;
+            return speed;
         }
 
         private static int ColorIndexForAbility(PrinterAbility ability) => ability switch

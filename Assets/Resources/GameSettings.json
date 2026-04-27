@@ -1,0 +1,7 @@
+﻿{
+  "printhead_speeds": {
+    "slow": 10.0,
+    "normal": 22.0,
+    "fast": 32.0
+  }
+}
