@@ -42,6 +42,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Windows
+    uniqueID: 3002451973
+    locked: 0
   - name: Label
     uniqueID: 1241015365
     locked: 0
