@@ -152,6 +152,17 @@ namespace Gallery
 		}
 
 		/// <summary>
+		/// Loads the creation image for <paramref name="entry"/> directly from disk without touching the cache.
+		/// The caller owns the returned texture and must destroy it when done.
+		/// Returns null if the file is missing or unreadable.
+		/// </summary>
+		public static Texture2D LoadImageOwned(GalleryEntry entry)
+		{
+			if (string.IsNullOrEmpty(entry.ImagePath)) return null;
+			return LoadFromDisk(ToFullPath(entry.ImagePath));
+		}
+
+		/// <summary>
 		/// Returns the reference image for <paramref name="entry"/>.
 		/// Internal paths are loaded via Resources.Load; external paths are disk-loaded and buffered.
 		/// Returns null if missing or unreadable.
@@ -210,6 +221,13 @@ namespace Gallery
 
 		private static Texture2D LoadAndCache(string fullPath, GalleryImageBuffer buffer)
 		{
+			var tex = LoadFromDisk(fullPath);
+			if (tex != null) buffer.Put(fullPath, tex);
+			return tex;
+		}
+
+		private static Texture2D LoadFromDisk(string fullPath)
+		{
 			if (!File.Exists(fullPath))
 			{
 				Logr.Warn($"Gallery: image not found at '{fullPath}'");
@@ -224,12 +242,8 @@ namespace Gallery
 				return null;
 			}
 
-			var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-			if (tex.LoadImage(bytes))
-			{
-				buffer.Put(fullPath, tex);
-				return tex;
-			}
+			var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
+			if (tex.LoadImage(bytes)) return tex;
 
 			UnityEngine.Object.Destroy(tex);
 			Logr.Error($"Gallery: failed to decode image at '{fullPath}'");

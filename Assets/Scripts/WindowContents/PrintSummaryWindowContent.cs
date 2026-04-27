@@ -43,11 +43,7 @@ namespace WindowContents
 
 		public override bool OnQuit()
 		{
-			if (_entry != null)
-			{
-				GalleryManager.UnloadImage(_entry);
-				GalleryManager.UnloadReferenceImage(_entry);
-			}
+			_entry = null;
 			return true;
 		}
 
@@ -59,7 +55,7 @@ namespace WindowContents
 
 		private static string BuildDetailsText(GalleryEntry e)
 		{
-			var date = e.Date.ToLocalTime().ToString("yyyy-MM-dd  HH:mm");
+			var date = e.Date.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
 			var score = e.SimilarityScore >= 0f
 				? $"{e.SimilarityScore * 100f:F1}%"
 				: "N/A";
@@ -67,10 +63,10 @@ namespace WindowContents
 				? $"{(int)(e.PrintDuration / 60)}m {(int)(e.PrintDuration % 60)}s"
 				: $"{e.PrintDuration:F1}s";
 
-			return $"Date:            {date}\n" +
-			       $"Similarity:      {score}\n" +
-			       $"Resets:          {e.ResetCount}\n" +
-			       $"Print Duration:  {duration}";
+			return $"<u>Date</u>\n{date}\n\n" +
+			       $"<u>Similarity</u>\n{score}\n\n" +
+			       $"<u>Resets</u>\n{e.ResetCount}\n\n" +
+			       $"<u>Print Duration</u>\n{duration}";
 		}
 	}
 }

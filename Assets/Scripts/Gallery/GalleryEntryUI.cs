@@ -18,6 +18,7 @@ namespace Gallery
 
 		private const float DoubleClickThreshold = 0.3f;
 		private float _lastClickTime = -1f;
+		private Texture2D _ownedTexture;
 
 		public GalleryEntry Entry { get; private set; }
 
@@ -43,8 +44,9 @@ namespace Gallery
 		public void Setup(GalleryEntry entry)
 		{
 			Entry = entry;
+			_ownedTexture = GalleryManager.LoadImageOwned(entry);
 			if (creationThumbnail != null)
-				creationThumbnail.texture = GalleryManager.LoadImage(entry);
+				creationThumbnail.texture = _ownedTexture;
 			SetSelected(false);
 		}
 
@@ -56,8 +58,8 @@ namespace Gallery
 
 		private void OnDestroy()
 		{
-			if (Entry == null) return;
-			GalleryManager.UnloadImage(Entry);
+			if (_ownedTexture != null)
+				UnityEngine.Object.Destroy(_ownedTexture);
 		}
 	}
 }
