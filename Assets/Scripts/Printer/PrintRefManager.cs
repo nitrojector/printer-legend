@@ -43,5 +43,12 @@ namespace Printer
 			_lastRandomIndex = index;
 			return _sprites[index];
 		}
+
+		public Sprite GetByName(string name)
+		{
+			foreach (var s in _sprites)
+				if (s.name == name) return s;
+			return null;
+		}
 	}
 }

@@ -43,7 +43,7 @@ namespace Printer
 
         private void Start()
         {
-            LoadRandomReference();
+            // Reference image is loaded by LevelManager
         }
 
         private void OnDestroy()

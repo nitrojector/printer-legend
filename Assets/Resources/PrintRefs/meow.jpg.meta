@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2c283e5a21c6d4b639d48a18a299b0e6
+guid: 7f3e7a321d3c34e9a99dd50e2e1dadbc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3480934419363632572
-    second: 2ba83e9c239ebdf0ef8452f23ee3466b_0
+      213: -1526860884898925678
+    second: meow_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 2ba83e9c239ebdf0ef8452f23ee3466b_0
+      name: meow_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 582
-        height: 783
+        width: 736
+        height: 736
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 44a666f969c31bfc0800000000000000
-      internalID: -3480934419363632572
+      spriteID: 29339266d108fcae0800000000000000
+      internalID: -1526860884898925678
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      2ba83e9c239ebdf0ef8452f23ee3466b_0: -3480934419363632572
+      meow_0: -1526860884898925678
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Desktop.WindowSystem;
+using Printer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -36,6 +37,7 @@ namespace WindowContents
 
 		private void OnPictureMode()
 		{
+			LevelManager.ResetLevelIndex();
 			SceneManager.LoadScene("Printing", LoadSceneMode.Single);
 			Logr.Info("MainMenu: Picture Mode");
 		}

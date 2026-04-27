@@ -7,7 +7,9 @@ namespace Printer
         public static double GetRawSimilarity()
         {
             if (GameManager.Instance.Reference == null ||
-                GameManager.Instance.Canvas == null)
+                GameManager.Instance.Canvas == null ||
+                GameManager.Instance.Reference.ReferenceImage == null ||
+                GameManager.Instance.Reference.ReferenceImage.sprite == null)
                 return 0;
             Texture2D reference = GameManager.Instance.Reference.ReferenceImage.sprite.texture;
             Texture2D canvas = GameManager.Instance.Canvas.DO_NOT_MODIFY_CanvasInternalTexture;

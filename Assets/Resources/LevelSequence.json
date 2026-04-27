@@ -1,0 +1,39 @@
+{
+  "levels": [
+    {
+      "image_path": "PrintRefs/blacksquare_0",
+      "abilities": ["Newline"],
+      "obstacles": []
+    },
+    {
+      "image_path": "PrintRefs/meow_0",
+      "abilities": ["Newline", "CarriageReturn"],
+      "obstacles": []
+    },
+    {
+      "image_path": "PrintRefs/meowconfetti_0",
+      "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast"],
+      "obstacles": []
+    },
+    {
+      "image_path": "PrintRefs/image2_0",
+      "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast", "ColorRed", "ColorGreen", "ColorBlue"],
+      "obstacles": []
+    },
+    {
+      "image_path": "PrintRefs/hampterSpinnyHat_0",
+      "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast", "ColorRed", "ColorGreen", "ColorBlue"],
+      "obstacles": ["PaperJam"]
+    },
+    {
+      "image_path": "PrintRefs/star_0",
+      "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast", "ColorRed", "ColorGreen", "ColorBlue"],
+      "obstacles": ["PaperJam", "InternetDisconnect"]
+    },
+    {
+      "image_path": "PrintRefs/earring_0",
+      "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast", "ColorRed", "ColorGreen", "ColorBlue"],
+      "obstacles": ["PaperJam", "InternetDisconnect", "MotorMalfunction"]
+    }
+  ]
+}

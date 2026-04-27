@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ef041ae6420204e108283cde979f45e1
+guid: cd0aabaf5d9884b3c9c3b638c5744c98
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7024906877934260852
-    second: 321b88a031a736179a744c12aa76fffa_0
+      213: 4366939165395865884
+    second: hampterSpinnyHat_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 321b88a031a736179a744c12aa76fffa_0
+      name: hampterSpinnyHat_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 320
-        height: 320
+        width: 712
+        height: 608
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 472587ff59b7d7160800000000000000
-      internalID: 7024906877934260852
+      spriteID: c11592da80c7a9c30800000000000000
+      internalID: 4366939165395865884
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      321b88a031a736179a744c12aa76fffa_0: 7024906877934260852
+      hampterSpinnyHat_0: 4366939165395865884
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
