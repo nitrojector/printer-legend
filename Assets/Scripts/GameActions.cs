@@ -25,7 +25,6 @@ public class GameActions : MonoBehaviour
 
 	public void OpenProgressionPrint()
 	{
-			
 	}
 
 	public void OpenFreePrint()
@@ -44,6 +43,19 @@ public class GameActions : MonoBehaviour
 	}
 
 	public void ExitGame()
+	{
+		WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((window, content) =>
+		{
+			window.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+			content.Title = "Exit Game";
+			content.Message = "Are you sure you want to exit the game?";
+			content.ConfirmText = "Exit";
+			content.CancelText = "Cancel";
+			content.OnConfirm += ExitGameForReal;
+		});
+	}
+
+	private void ExitGameForReal()
 	{
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;

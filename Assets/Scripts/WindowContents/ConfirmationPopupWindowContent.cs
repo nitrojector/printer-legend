@@ -15,7 +15,11 @@ namespace WindowContents
 		public string Title
 		{
 			get => WindowTitle;
-			set => SetTitle(value);
+			set
+			{
+				_title = value;
+				SetTitle(value);
+			}
 		}
 
 		public string Message
@@ -70,6 +74,7 @@ namespace WindowContents
 		/// </summary>
 		public event Action OnCancel;
 		
+		private string _title = "Confirmation";
 		private string _message = "Are you sure?";
 		private string _confirmText = "Confirm";
 		private string _cancelText = "Cancel";
@@ -106,7 +111,7 @@ namespace WindowContents
 
 		private void Awake()
 		{
-			SetTitle("Confirmation");
+			SetTitle(_title);
 			Message = _message;
 			ConfirmText = _confirmText;
 			CancelText = _cancelText;
