@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using Utility;
 
-namespace Gallery
+namespace Data
 {
 	public class GallerySave : PersistentConfig<GallerySave>
 	{

@@ -17,11 +17,14 @@ public class GameMgr
     
 	private static GameMgr _instance;
     
+	
 	public PrinterViewWindowContent PrinterViewWC { get; private set; }
     
 	public bool IsPrinterViewRegistered => PrinterViewWC != null;
 	
 	public PrinterReferenceWindowContent PrinterReferenceWC { get; private set; }
+	
+	public bool IsPrinterReferenceRegistered => PrinterReferenceWC != null;
     
 	public List<PrinterPlayerController> Players { get; } = new();
     

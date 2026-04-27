@@ -411,10 +411,10 @@ namespace Printer
 
         public float GetSpeedForLevel(int level)
         {
-            var speed = GameSettings.Instance.PrintHeadSpeeds.Fast;
-            if (level <= 0) speed = GameSettings.Instance.PrintHeadSpeeds.Slow;
-            if (level == 1) speed = GameSettings.Instance.PrintHeadSpeeds.Normal;
-            if (level == 2) speed = GameSettings.Instance.PrintHeadSpeeds.Fast;
+            var speed = magicConfig.PrintSpeedFast;
+            if (level <= 0) speed = magicConfig.PrintSpeedSlow;
+            if (level == 1) speed = magicConfig.PrintSpeedNormal;
+            if (level == 2) speed = magicConfig.PrintSpeedFast;
             return speed;
         }
 

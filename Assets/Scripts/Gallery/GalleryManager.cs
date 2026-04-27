@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Utility;
+using Data;
 
 namespace Gallery
 {
