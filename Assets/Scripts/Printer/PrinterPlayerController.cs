@@ -5,7 +5,6 @@ using NUnit.Framework.Constraints;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Printer
@@ -47,6 +46,10 @@ namespace Printer
 		private const float StartTimeDelay = 3.0f;
 
 		[SerializeField] private LevelManager levelManager;
+
+		public event Action OnPrintComplete;
+
+		public int RestartCount { get; private set; }
 
 		private PrintheadController printhead;
 		private PrinterMagic        magic;
@@ -195,7 +198,7 @@ namespace Printer
 				{
 					completionTriggered = true;
 					SavePrint();
-					SceneManager.LoadScene("FinishPrinting", LoadSceneMode.Single);
+					//SceneManager.LoadScene("FinishPrinting", LoadSceneMode.Single);
 				}
 				return;
 			}
@@ -331,6 +334,18 @@ namespace Printer
 			var sprite = levelManager != null ? levelManager.Reference?.ReferenceSprite : null;
 			if (sprite == null) return string.Empty;
 			return GalleryManager.MakeInternalPath("PrintRefs/" + sprite.name);
+		}
+		
+		public void ResetForNextLevel()
+		{
+			levelManager?.AdvanceLevel();
+			RestartCount = 0;
+			completionTriggered = false;
+			printingStarted = false;
+			printhead.ResetCanvasAndPrinthead();
+			coundownText.gameObject.SetActive(false);
+			startGamePrompt.SetActive(true);
+			UnregisterInput();
 		}
 
 		public bool SetPaused(bool paused)

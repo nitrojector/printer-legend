@@ -97,7 +97,13 @@ namespace Printer
                 string spriteName = System.IO.Path.GetFileName(entry.ImagePath);
                 Sprite sprite = PrintRefManager.Instance.GetByName(spriteName);
                 if (sprite != null)
-                    reference.LoadReference(sprite);
+                {
+                    var refWC = GameMgr.Instance.PrinterReferenceWC;
+                    if (refWC != null)
+                        refWC.SetReferenceSprite(sprite);
+                    else if (reference != null)
+                        reference.LoadReference(sprite);
+                }
                 else
                     Debug.LogWarning($"LevelManager: sprite '{spriteName}' not found in PrintRefs.");
             }
