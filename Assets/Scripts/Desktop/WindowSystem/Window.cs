@@ -330,8 +330,8 @@ namespace Desktop.WindowSystem
 
 		/// <summary>
 		/// Places the window so that the point <paramref name="pivot"/> (normalized on the window rect,
-		/// e.g. (0.5, 0.5) = centre) lands at <paramref name="position"/> in parent local space.
-		/// Has no effect while maximized.
+		/// e.g. (0,0) = bottom-left, (0.5,0.5) = centre, (1,1) = top-right) lands at
+		/// <paramref name="position"/> in parent local space. Has no effect while maximized.
 		/// </summary>
 		public void SetPosition(Vector2 position, Vector2 pivot)
 		{
@@ -340,14 +340,29 @@ namespace Desktop.WindowSystem
 			if (parentRt == null) return;
 
 			var r = parentRt.rect;
-			var anchorRef = new Vector2(
-				r.xMin + RectTransform.anchorMin.x * r.width,
-				r.yMin + RectTransform.anchorMin.y * r.height
+			var size = RectTransform.rect.size;
+			var bottomLeft = new Vector2(
+				r.xMin + RectTransform.anchorMin.x * r.width + RectTransform.offsetMin.x,
+				r.yMin + RectTransform.anchorMin.y * r.height + RectTransform.offsetMin.y
 			);
+			var delta = position - (bottomLeft + pivot * size);
+			RectTransform.offsetMin += delta;
+			RectTransform.offsetMax += delta;
+		}
 
-			// Shift so the requested pivot point on the window lands at position.
-			RectTransform.anchoredPosition = position - anchorRef
-				- (pivot - RectTransform.pivot) * RectTransform.rect.size;
+		/// <summary>
+		/// Same as <see cref="SetPosition"/> but <paramref name="normalizedPosition"/> is expressed
+		/// as a fraction of the parent rect ((0,0) = bottom-left, (1,1) = top-right).
+		/// </summary>
+		public void SetPositionNormalized(Vector2 normalizedPosition, Vector2 pivot)
+		{
+			if (maximized) return;
+			var parentRt = RectTransform.parent as RectTransform;
+			if (parentRt == null) return;
+
+			var r = parentRt.rect;
+			SetPosition(new Vector2(r.xMin + normalizedPosition.x * r.width,
+			                        r.yMin + normalizedPosition.y * r.height), pivot);
 		}
 
 		public void OnPointerDown(PointerEventData eventData)

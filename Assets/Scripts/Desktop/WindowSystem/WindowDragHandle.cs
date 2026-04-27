@@ -40,7 +40,7 @@ namespace Desktop.WindowSystem
 		public void OnDrag(PointerEventData eventData)
 		{
 			if (!_dragging) return;
-    
+
 			var mousePos = eventData.position;
 			if (mousePos.x < 0 || mousePos.x > Screen.width ||
 			    mousePos.y < 0 || mousePos.y > Screen.height)
@@ -49,53 +49,31 @@ namespace Desktop.WindowSystem
 				return;
 			}
 
+			var parentRt = window.RectTransform.parent as RectTransform;
+
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				parentRt, mousePos, eventData.pressEventCamera, out var mouseLocal);
+
 			if (window.Maximized)
 			{
-				var corners = new Vector3[4];
-				window.RectTransform.GetWorldCorners(corners);
-				var maxLeft = corners[0].x;
-				var maxTop = corners[1].y;
-				var maxWidth = corners[2].x - corners[0].x;
-
-				var normalizedX = (mousePos.x - maxLeft) / maxWidth;
-				var offsetFromTop = maxTop - mousePos.y;
+				var parentRect = parentRt.rect;
+				float normalizedX = Mathf.InverseLerp(parentRect.xMin, parentRect.xMax, mouseLocal.x);
+				float offsetFromTop = parentRect.yMax - mouseLocal.y;
 
 				window.SetFloating();
 
-				window.RectTransform.GetWorldCorners(corners);
-				var floatWidth = corners[2].x - corners[0].x;
-				var floatHeight = corners[1].y - corners[0].y;
+				// offsetMin/offsetMax are now restored; rect.size is valid immediately
+				var floatSize = window.RectTransform.rect.size;
 
-				// Target top-left: X starts from mouse position scaled by float width, Y from offsetFromTop
-				var targetTopLeft = new Vector3(
-					mousePos.x - normalizedX * floatWidth,
-					mousePos.y + offsetFromTop,
-					corners[0].z
-				);
+				// Place the window so the mouse sits at the same relative position it had
+				// within the maximized window (normalizedX horizontally, offsetFromTop from the top).
+				window.SetPosition(mouseLocal, new Vector2(normalizedX, 1f - offsetFromTop / floatSize.y));
 
-				window.RectTransform.position = targetTopLeft + new Vector3(
-					window.RectTransform.pivot.x * floatWidth,
-					-window.RectTransform.pivot.y * floatHeight,
-					0f
-				);
-
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(
-					window.RectTransform.parent as RectTransform,
-					mousePos,
-					eventData.pressEventCamera,
-					out var mouseLocal
-				);
 				_dragOffset = window.RectTransform.anchoredPosition - mouseLocal;
 				return;
-			}    
-			
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(
-				window.RectTransform.parent as RectTransform,
-				mousePos,
-				eventData.pressEventCamera,
-				out var lp
-			);
-			window.RectTransform.anchoredPosition = lp + _dragOffset;
+			}
+
+			window.RectTransform.anchoredPosition = mouseLocal + _dragOffset;
 		}
 		
 		public void OnPointerUp(PointerEventData eventData)

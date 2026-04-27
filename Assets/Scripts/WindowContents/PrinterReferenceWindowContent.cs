@@ -1,6 +1,7 @@
 ﻿using System;
 using Desktop.WindowSystem;
 using UnityEngine;
+using Utility;
 
 namespace WindowContents
 {
@@ -8,7 +9,8 @@ namespace WindowContents
 	{
 		private void Start()
 		{
-			AttachedWindow.SetPosition(Vector2.one, Vector2.one);
+			AttachedWindow.SetPositionNormalized(new Vector2(0.75f, 0.5f), new Vector2(0.5f, 0.5f));
+			Logr.Info("Printer Reference Window Initialized");
 		}
 	}
 }
