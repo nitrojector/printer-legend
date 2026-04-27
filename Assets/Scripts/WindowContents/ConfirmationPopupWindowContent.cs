@@ -1,7 +1,6 @@
 ﻿using System;
 using Desktop.WindowSystem;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +8,6 @@ namespace WindowContents
 {
 	public class ConfirmationPopupWindowContent : WindowContent
 	{
-		public override string WindowTitle { get; protected set; } = "Confirmation";
-
 		public override bool AllowMaximize => false;
 		
 		public override bool AllowMinimize => false;
@@ -85,7 +82,7 @@ namespace WindowContents
 
 		private void Awake()
 		{
-			WindowTitle = Title;
+			SetTitle("Confirmation");
 			Message = _message;
 			ConfirmText = _confirmText;
 			CancelText = _cancelText;

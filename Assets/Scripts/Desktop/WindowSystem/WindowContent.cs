@@ -9,7 +9,8 @@ namespace Desktop.WindowSystem
 		public Vector2 MinContentSize => EnforceMinSize ? minContentSize : Vector2.zero;
 		public Vector2 MaxContentSize => EnforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
 
-		public virtual string WindowTitle { get; protected set; } = "Window";
+		private string _windowTitle = "Window";
+		public virtual string WindowTitle => _windowTitle;
 
 		[Header("Window Controls")]
 		[SerializeField] private bool allowMaximize = true;
@@ -72,7 +73,7 @@ namespace Desktop.WindowSystem
 		/// <param name="title">title to set</param>
 		protected void SetTitle(string title)
 		{
-			WindowTitle = title;
+			_windowTitle = title;
 			AttachedWindow?.NotifyWindowInformationChanged();
 		}
 		
