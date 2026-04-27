@@ -63,12 +63,12 @@ namespace WindowContents
 		/// <summary>
 		/// Callback for when user confirms the confirmation popup.
 		/// </summary>
-		public Action OnConfirm;
+		public event Action OnConfirm;
 		
 		/// <summary>
 		/// Callback for when user cancels the confirmation popup.
 		/// </summary>
-		public Action OnCancel;
+		public event Action OnCancel;
 		
 		private string _message = "Are you sure?";
 		private string _confirmText = "Confirm";
@@ -79,6 +79,30 @@ namespace WindowContents
 		[SerializeField] private Button cancelButton;
 		[SerializeField] private TMP_Text cancelButtonText;
 		[SerializeField] private TMP_Text messageText;
+		
+		/// <summary>
+		/// Set whether the cancel button is shown.
+		/// If false, the user will be forced to confirm the confirmation popup.
+		/// </summary>
+		/// <param name="allowCancel">if cancel is allowed</param>
+		public void SetAllowCancel(bool allowCancel)
+		{
+			cancelButton.gameObject.SetActive(allowCancel);
+		}
+
+		public override bool OnQuit()
+		{
+			// quit is cancel if exists, otherwise confirm
+			if (cancelButton.gameObject.activeSelf)
+			{
+				OnCancel?.Invoke();
+			}
+			else
+			{
+				OnConfirm?.Invoke();
+			}
+			return true;
+		}
 
 		private void Awake()
 		{
