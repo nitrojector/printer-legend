@@ -1,4 +1,7 @@
-﻿using EngineSystem;
+﻿using System;
+using AudioSystem;
+using Data;
+using EngineSystem;
 using UnityEngine;
 
 namespace Setup
@@ -9,6 +12,13 @@ namespace Setup
 		private static void Initialize()
 		{
 			ReferenceManager.Instance.inputActions.Enable();
+			
+			// apply user settings =============================================
+			
+			foreach (AudioBus bus in Enum.GetValues(typeof(AudioBus)))
+			{
+				AudioManager.Instance.SetVolume(bus, UserSettings.Instance.Volumes[bus]);
+			}
 		}
 	}
 }

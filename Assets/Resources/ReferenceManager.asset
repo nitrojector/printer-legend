@@ -13,8 +13,4 @@ MonoBehaviour:
   m_Name: ReferenceManager
   m_EditorClassIdentifier: Assembly-CSharp::EngineSystem.ReferenceManager
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  confirmationPopupWindowContentPrefab: {fileID: 8887056242669416729, guid: ab74bc48e8fed254399c1008322d0318, type: 3}
-  printerViewWindowContentPrefab: {fileID: 2144574656448454996, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-  printerReferenceWindowContentPrefab: {fileID: 935764154417468743, guid: 2a6bfb52c06fbb14f8591dc97ac106d5, type: 3}
-  printSummaryWindowContentPrefab: {fileID: 0}
-  galleryWindowContentPrefab: {fileID: 0}
+  windowPrefab: {fileID: 7020696776867306935, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}

@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using EngineSystem;
 using UnityEngine;
+using Utility;
 
 namespace Desktop.WindowSystem
 {
@@ -19,6 +22,8 @@ namespace Desktop.WindowSystem
 				return _instance;
 			}
 		}
+		
+		private DesktopWrapper _desktop;
 
 		/// <summary>Base Canvas sortingOrder for the bottom-most window. Each window above it adds 1.</summary>
 		[SerializeField] private int baseSortOrder = 0;
@@ -53,6 +58,17 @@ namespace Desktop.WindowSystem
 			if (_instance == this) _instance = null;
 		}
 
+		private DesktopWrapper GetDesktop()
+		{
+			if (_desktop != null) return _desktop;
+			_desktop = FindAnyObjectByType<DesktopWrapper>();
+			if (_desktop == null)
+			{
+				Logr.Error("WindowManager requires a DesktopWrapper in the scene.", this);
+			}
+			return _desktop;
+		}
+
 		// ── Registration ──────────────────────────────────────────────────────
 
 		/// <summary>
@@ -79,6 +95,48 @@ namespace Desktop.WindowSystem
 			_handles.Remove(id);
 			_freedIds.Add(id);
 			AssignSortOrders();
+		}
+		
+		// ── Launch ────────────────────────────────────────────────────────────
+
+		/// <summary>
+		/// Launches a new window with content of type <typeparamref name="T"/>. <paramref name="configurator"/>
+		/// is called with <see cref="WindowContent"/> before the window is shown.
+		/// </summary>
+		/// <param name="configurator">delegate for configurator function for window and content</param>
+		/// <typeparam name="T">window content to launch</typeparam>
+		/// <returns>newly launched content</returns>
+		public T Launch<T>(Action<Window, T> configurator = null) where T : WindowContent
+		{
+			var desktop = GetDesktop();
+			var win = Instantiate(ReferenceManager.Instance.windowPrefab, desktop.transform);
+			win.Initialize(GetPrefab<T>());
+			var content = win.Content as T;
+			if (content != null)
+			{
+				configurator?.Invoke(win, content);
+			}
+			else
+			{
+				Logr.Error($"Launched window content of type {win.Content.GetType().Name}, " +
+				           $"but expected {typeof(T).Name}. Check the prefab setup.", this);
+				return null;
+			}
+			win.Show();
+			return content;
+		}
+
+		private T GetPrefab<T>() where T : WindowContent
+		{
+			string typeNamePrefix = typeof(T).Name.Replace("WindowContent", "");
+			string path = $"WindowContent/{typeNamePrefix}";
+			T prefab = Resources.Load<T>(path);
+			if (prefab == null)
+			{
+				Logr.Error($"Failed to load window content prefab at path \"{path}\". " +
+				           $"Make sure the prefab exists and is named correctly.", this);
+			}
+			return prefab;
 		}
 
 		// ── Focus ─────────────────────────────────────────────────────────────

@@ -622,7 +622,7 @@ MonoBehaviour:
   minimizeButton: {fileID: 4364926815163241588}
   minimizeEnabled: 0
   maximizeEnabled: 1
-  startShown: 1
+  startShown: 0
   resizeEdgeSize: 15
 --- !u!223 &4549087883958125398
 Canvas:

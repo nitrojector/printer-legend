@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Desktop.WindowSystem;
+using UnityEngine;
+using WindowContents;
 
 public class GameActions : MonoBehaviour
 {
@@ -16,6 +18,9 @@ public class GameActions : MonoBehaviour
 			Destroy(gameObject);
 			return;
 		}
+
+		// Preload WindowManager
+		_ = WindowManager.Instance;
 	}
 
 	public void OpenProgressionPrint()
@@ -25,7 +30,7 @@ public class GameActions : MonoBehaviour
 
 	public void OpenFreePrint()
 	{
-			
+		WindowManager.Instance.Launch<PrinterViewWindowContent>();
 	}
 
 	public void OpenGallery()
