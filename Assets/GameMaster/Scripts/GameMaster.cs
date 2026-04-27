@@ -98,7 +98,7 @@ namespace GameMaster.Scripts
 
 					case "newref":
 					{
-						GameManager.Instance.Reference.LoadRandomReference();
+						GameMgr.Instance.PrinterReferenceWC.pReference.LoadRandomReference();
 						InfoLn("Loaded new reference image");
 						
 						break;

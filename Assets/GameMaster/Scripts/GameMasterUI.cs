@@ -86,7 +86,7 @@ namespace GameMaster.Scripts
 			Active = active;
 			SetDisplayActive(Active);
 			Time.timeScale = Active ? 0f : 1f;
-			GameManager.Instance.SetPaused(Active);
+			GameMgr.Instance.SetPaused(Active);
 		}
 
 		public void ToggleActive()
@@ -94,7 +94,7 @@ namespace GameMaster.Scripts
 			Active = !Active;
 			SetDisplayActive(Active);
 			Time.timeScale = Active ? 0f : 1f;
-			GameManager.Instance.SetPaused(Active);
+			GameMgr.Instance.SetPaused(Active);
 		}
 
 		private static bool IsChildOf(VisualElement child, VisualElement parent)

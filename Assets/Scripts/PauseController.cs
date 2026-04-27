@@ -20,7 +20,7 @@ public class PauseController : MonoBehaviour
     public void Pause()
     {
         pauseMenuUI.SetActive(true);
-        GameManager.Instance.SetPaused(true);
+        GameMgr.Instance.SetPaused(true);
         Time.timeScale = 0f;
         Debug.Log("Game Paused");
     }
@@ -28,7 +28,7 @@ public class PauseController : MonoBehaviour
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
-        GameManager.Instance.SetPaused(false);
+        GameMgr.Instance.SetPaused(false);
         Time.timeScale = 1f;
         Debug.Log("Game Resumed");
     }

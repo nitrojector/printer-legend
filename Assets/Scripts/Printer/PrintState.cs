@@ -6,16 +6,16 @@ namespace Printer
     {
         public static double GetRawSimilarity()
         {
-            if (GameManager.Instance.Reference == null ||
-                GameManager.Instance.Canvas == null ||
-                GameManager.Instance.Reference.ReferenceImage == null ||
-                GameManager.Instance.Reference.ReferenceImage.sprite == null)
+            if (GameMgr.Instance.PrinterReferenceWC == null ||
+                GameMgr.Instance.PrinterViewWC == null ||
+                GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage == null ||
+                GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite == null)
                 return 0;
-            Texture2D reference = GameManager.Instance.Reference.ReferenceImage.sprite.texture;
-            Texture2D canvas = GameManager.Instance.Canvas.DO_NOT_MODIFY_CanvasInternalTexture;
+            Texture2D reference = GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite.texture;
+            Texture2D canvas = GameMgr.Instance.PrinterViewWC.pCanvas.DO_NOT_MODIFY_CanvasInternalTexture;
 
             // Blit reference sprite rect to a readable texture
-            var sprite = GameManager.Instance.Reference.ReferenceImage.sprite;
+            var sprite = GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite;
             var rect = sprite.textureRect;
             var rt = RenderTexture.GetTemporary((int)rect.width, (int)rect.height);
             Graphics.Blit(reference, rt);

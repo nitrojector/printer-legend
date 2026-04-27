@@ -10,22 +10,16 @@ namespace WindowContents
 	{
 		public override string WindowTitle => "Reference";
 		
-		[SerializeField] public PrinterReference printerReference;
+		[SerializeField] public PrinterReference pReference;
 		
-		private void Start()
-		{
-			AttachedWindow.SetPositionNormalized(new Vector2(0.75f, 0.5f), new Vector2(0.5f, 0.5f));
-			Logr.Info("Printer Reference Window Initialized");
-		}
-
 		public void SetReferenceSprite(Sprite reference)
 		{
-			if (printerReference == null)
+			if (pReference == null)
 			{
 				return;
 			}
 			
-			printerReference.ReferenceImage.sprite = reference;
+			pReference.ReferenceImage.sprite = reference;
 		}
 	}
 }

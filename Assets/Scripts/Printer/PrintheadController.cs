@@ -88,7 +88,7 @@ namespace Printer
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
         private IEnumerator Start()
         {
-            GameManager.Instance.Reference?.Init(canvas.CanvasHeight, linePixelHeight);
+            GameMgr.Instance.PrinterReferenceWC?.pReference.Init(canvas.CanvasHeight, linePixelHeight);
             yield return null;
             RefreshLayout();
         }
@@ -100,7 +100,7 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
-            GameManager.Instance.Reference?.RefreshLayout();
+            GameMgr.Instance.PrinterReferenceWC?.pReference.RefreshLayout();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -282,7 +282,7 @@ namespace Printer
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
 
-            GameManager.Instance.Reference?.SetIndicatorLine(lineIndex);
+            GameMgr.Instance.PrinterReferenceWC?.pReference.SetIndicatorLine(lineIndex);
         }
 
         public void SetPrintheadLine(int lineIndex)

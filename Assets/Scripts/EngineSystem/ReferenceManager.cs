@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using Utility;
+using WindowContents;
 
 namespace EngineSystem
 {
@@ -25,5 +26,12 @@ namespace EngineSystem
 		
 		[Header("Input Actions")]
 		public InputActionAsset inputActions;
+		
+		[Header("Prefabs")]
+		public ConfirmationPopupWindowContent confirmationPopupWindowContentPrefab;
+		public PrinterViewWindowContent printerViewWindowContentPrefab;
+		public PrinterReferenceWindowContent printerReferenceWindowContentPrefab;
+		public PrintSummaryWindowContent printSummaryWindowContentPrefab;
+		public GalleryWindowContent galleryWindowContentPrefab;
 	}
 }

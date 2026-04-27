@@ -237,7 +237,7 @@ MonoBehaviour:
   minContentSize: {x: 100, y: 100}
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
-  printerReference: {fileID: 0}
+  pReference: {fileID: 298361275934679515}
 --- !u!222 &922381886808761741
 CanvasRenderer:
   m_ObjectHideFlags: 0

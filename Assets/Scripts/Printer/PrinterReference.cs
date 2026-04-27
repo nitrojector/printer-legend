@@ -38,7 +38,6 @@ namespace Printer
             containerRect = GetComponent<RectTransform>();
             ReferenceImage = GetComponent<Image>();
             
-            GameManager.Instance.RegisterReference(this);
         }
 
         private void Start()
@@ -48,7 +47,6 @@ namespace Printer
 
         private void OnDestroy()
         {
-            GameManager.Instance.UnregisterReference(this);
         }
 
         // ── Setup ─────────────────────────────────────────────────────────────

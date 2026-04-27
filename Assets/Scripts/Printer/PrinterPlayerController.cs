@@ -109,7 +109,7 @@ namespace Printer
 			startGamePrompt.SetActive(true);
 			coundownText.gameObject.SetActive(false);
             
-			GameManager.Instance.RegisterPlayer(this);
+			GameMgr.Instance.RegisterPlayer(this);
 		}
 
 		private void OnEnable()
@@ -149,7 +149,7 @@ namespace Printer
 
 		private void OnDestroy()
 		{
-			GameManager.Instance.UnregisterPlayer(this);
+			GameMgr.Instance.UnregisterPlayer(this);
 		}
 
 		private void Update()

@@ -1,6 +1,7 @@
 ﻿using Desktop.WindowSystem;
 using Printer;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace WindowContents
 {
@@ -8,15 +9,15 @@ namespace WindowContents
 	{
 		public override string WindowTitle => "Printer View";
 
-		[SerializeField] private PrintCanvas printCanvas;
-		[SerializeField] private PrintheadController controller;
-		[SerializeField] private PrinterPlayerController playerController;
+		[SerializeField, FormerlySerializedAs("printCanvas")] public PrintCanvas pCanvas;
+		[SerializeField, FormerlySerializedAs("controller")] public PrintheadController pController;
+		[SerializeField, FormerlySerializedAs("playerController")] public PrinterPlayerController pPlayerController;
 
 		public override void OnResize()
 		{
-			if (controller != null)
+			if (pController != null)
 			{
-				controller.RefreshLayout();
+				pController.RefreshLayout();
 			}
 		}
 	}
