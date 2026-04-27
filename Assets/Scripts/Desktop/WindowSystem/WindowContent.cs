@@ -10,7 +10,14 @@ namespace Desktop.WindowSystem
 		public Vector2 MinContentSize => EnforceMinSize ? minContentSize : Vector2.zero;
 		public Vector2 MaxContentSize => EnforceMaxSize ? maxContentSize : new Vector2(float.PositiveInfinity, float.PositiveInfinity);
 
-		protected virtual string WindowTitle => "Window";
+		public virtual string WindowTitle { get; protected set; } = "Window";
+
+		[Header("Window Controls")]
+		[SerializeField] private bool allowMaximize = true;
+		public virtual bool AllowMaximize => allowMaximize;
+
+		[SerializeField] private bool allowMinimize = true;
+		public virtual bool AllowMinimize => allowMinimize;
 
 		[Header("Window Size Constraints")]
 		[field:SerializeField] public bool EnforceMinSize { get; private set; } = true;
@@ -23,66 +30,13 @@ namespace Desktop.WindowSystem
 			set
 			{
 				enforceMaxSize = value;
-				_attachedWindow?.NotifyConstraintsChanged();
+				AttachedWindow?.NotifyConfigChanged();
 			}
 		}
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
 
-		private Window _attachedWindow;
-
-		private DrivenRectTransformTracker _tracker;
-		private RectTransform _rt;
+		protected Window AttachedWindow;
 		
-		public RectTransform RectTransform => _rt ??= GetComponent<RectTransform>();
-		
-		internal void SetAttachedWindow(Window window)
-		{
-			_attachedWindow = window;
-			_attachedWindow.Title = WindowTitle;
-		}
-
-		private void OnEnable()
-		{
-			_tracker.Add(this, RectTransform,
-				DrivenTransformProperties.Anchors |
-				DrivenTransformProperties.AnchoredPosition |
-				DrivenTransformProperties.SizeDelta |
-				DrivenTransformProperties.Pivot);
-			SetLayoutHorizontal();
-			SetLayoutVertical();
-		}
-
-		private void OnDisable()
-		{
-			_tracker.Clear();
-		}
-		
-#if UNITY_EDITOR
-		protected void OnValidate()
-		{
-			if (RectTransform == null) return;
-			SetLayoutHorizontal();
-			SetLayoutVertical();
-			_attachedWindow?.NotifyConstraintsChanged();
-		}
-#endif
-
-		public void SetLayoutHorizontal()
-		{
-			RectTransform.anchorMin = new Vector2(0f, RectTransform.anchorMin.y);
-			RectTransform.anchorMax = new Vector2(1f, RectTransform.anchorMax.y);
-			RectTransform.offsetMin = new Vector2(0f, RectTransform.offsetMin.y);
-			RectTransform.offsetMax = new Vector2(0f, RectTransform.offsetMax.y);
-		}
-
-		public void SetLayoutVertical()
-		{
-			RectTransform.anchorMin = new Vector2(RectTransform.anchorMin.x, 0f);
-			RectTransform.anchorMax = new Vector2(RectTransform.anchorMax.x, 1f);
-			RectTransform.offsetMin = new Vector2(RectTransform.offsetMin.x, 0f);
-			RectTransform.offsetMax = new Vector2(RectTransform.offsetMax.x, 0f);
-		}
-
 		/// <summary>
 		/// Called when the window is initialized with this content.
 		/// </summary>
@@ -112,5 +66,80 @@ namespace Desktop.WindowSystem
 		{
 			return true;
 		}
+
+		/// <summary>
+		/// Convenience method to set the window title from this content and notify the parent window of the change.
+		/// </summary>
+		/// <param name="title">title to set</param>
+		protected void SetTitle(string title)
+		{
+			WindowTitle = title;
+			AttachedWindow?.NotifyWindowInformationChanged();
+		}
+		
+		/// <summary>
+		/// Convenience method to close the parent window from this content.
+		/// </summary>
+		protected void CloseWindow() { AttachedWindow?.Quit(); }
+
+		private DrivenRectTransformTracker _tracker;
+		private RectTransform _rt;
+		
+		public RectTransform RectTransform => _rt ??= GetComponent<RectTransform>();
+		
+		internal void SetAttachedWindow(Window window)
+		{
+			AttachedWindow = window;
+			if (window != null) window.Title = WindowTitle;
+		}
+
+		private void OnEnable()
+		{
+			_tracker.Add(this, RectTransform,
+				DrivenTransformProperties.Anchors |
+				DrivenTransformProperties.AnchoredPosition |
+				DrivenTransformProperties.SizeDelta |
+				DrivenTransformProperties.Pivot);
+			SetLayoutHorizontal();
+			SetLayoutVertical();
+		}
+
+		private void OnDisable()
+		{
+			_tracker.Clear();
+		}
+		
+#if UNITY_EDITOR
+		protected void OnValidate()
+		{
+			// Sync backing fields to the effective virtual value so the Inspector is never misleading.
+			// If a subclass overrides AllowMaximize/AllowMinimize the field reverts to the override value.
+			allowMaximize = AllowMaximize;
+			allowMinimize = AllowMinimize;
+
+			if (RectTransform == null) return;
+			SetLayoutHorizontal();
+			SetLayoutVertical();
+			// Push control/constraint changes to the parent window in the editor.
+			GetComponentInParent<Window>()?.SyncFromContent();
+		}
+#endif
+
+		public void SetLayoutHorizontal()
+		{
+			RectTransform.anchorMin = new Vector2(0f, RectTransform.anchorMin.y);
+			RectTransform.anchorMax = new Vector2(1f, RectTransform.anchorMax.y);
+			RectTransform.offsetMin = new Vector2(0f, RectTransform.offsetMin.y);
+			RectTransform.offsetMax = new Vector2(0f, RectTransform.offsetMax.y);
+		}
+
+		public void SetLayoutVertical()
+		{
+			RectTransform.anchorMin = new Vector2(RectTransform.anchorMin.x, 0f);
+			RectTransform.anchorMax = new Vector2(RectTransform.anchorMax.x, 1f);
+			RectTransform.offsetMin = new Vector2(RectTransform.offsetMin.x, 0f);
+			RectTransform.offsetMax = new Vector2(RectTransform.offsetMax.x, 0f);
+		}
+
 	}
 }

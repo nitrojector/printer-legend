@@ -69,7 +69,7 @@ namespace Desktop.WindowSystem
 		/// If disabled, the maximize button is hidden and the window cannot be maximized.
 		/// </summary>
 		public bool MaximizeEnabled {
-			get => maximizeEnabled && (content == null || !content.EnforceMaxSize);
+			get => maximizeEnabled && (content == null || (content.AllowMaximize && !content.EnforceMaxSize));
 			set
 			{
 				maximizeEnabled = value;
@@ -83,7 +83,7 @@ namespace Desktop.WindowSystem
 		/// </summary>
 		public bool MinimizeEnabled
 		{
-			get => minimizeEnabled;
+			get => minimizeEnabled && (content == null || content.AllowMinimize);
 			set
 			{
 				minimizeEnabled = value;
@@ -271,7 +271,7 @@ namespace Desktop.WindowSystem
 		}
 
 		/// <summary>
-		/// Configures <see cref="content"/> and update enabled buttons
+		/// Configures <see cref="content"/>, applies its control preferences, and refreshes buttons.
 		/// </summary>
 		private void ConfigureContent()
 		{
@@ -289,6 +289,7 @@ namespace Desktop.WindowSystem
 			}
 
 			content.SetAttachedWindow(this);
+
 			RefreshMinimizeButton();
 			RefreshMaximizeButton();
 		}
@@ -299,7 +300,47 @@ namespace Desktop.WindowSystem
 		private void RefreshMaximizeButton() =>
 			maximizeButton?.gameObject.SetActive(MaximizeEnabled);
 
-		internal void NotifyConstraintsChanged() => RefreshMaximizeButton();
+		/// <summary>
+		/// Refreshes window information such as the title from the content.
+		/// Called by content when it wants to push changes to the window.
+		/// </summary>
+		internal void NotifyWindowInformationChanged()
+		{
+			if (content == null) return;
+			Title = content.WindowTitle;
+		}
+
+		/// <summary>
+		/// Refreshes window information such as the title and control button states from the content.
+		/// </summary>
+		internal void NotifyConfigChanged()
+		{
+			Title = content?.WindowTitle;
+			RefreshMinimizeButton();
+			RefreshMaximizeButton();
+		}
+
+		/// <summary>
+		/// Places the window so that the point <paramref name="pivot"/> (normalized on the window rect,
+		/// e.g. (0.5, 0.5) = centre) lands at <paramref name="position"/> in parent local space.
+		/// Has no effect while maximized.
+		/// </summary>
+		public void SetPosition(Vector2 position, Vector2 pivot)
+		{
+			if (maximized) return;
+			var parentRt = RectTransform.parent as RectTransform;
+			if (parentRt == null) return;
+
+			var r = parentRt.rect;
+			var anchorRef = new Vector2(
+				r.xMin + RectTransform.anchorMin.x * r.width,
+				r.yMin + RectTransform.anchorMin.y * r.height
+			);
+
+			// Shift so the requested pivot point on the window lands at position.
+			RectTransform.anchoredPosition = position - anchorRef
+				- (pivot - RectTransform.pivot) * RectTransform.rect.size;
+		}
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
@@ -385,6 +426,16 @@ namespace Desktop.WindowSystem
 		{
 			MinimizeEnabled = minimizeEnabled;
 			MaximizeEnabled = maximizeEnabled;
+		}
+
+		/// <summary>
+		/// Called by a child <see cref="WindowContent"/> from its own OnValidate to push
+		/// its control changes to this window.
+		/// </summary>
+		internal void SyncFromContent()
+		{
+			RefreshMinimizeButton();
+			RefreshMaximizeButton();
 		}
 #endif
 		

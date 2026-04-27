@@ -10,7 +10,9 @@ namespace WindowContents
 {
 	public class MainMenuWindowContent : WindowContent
 	{
-		protected override string WindowTitle => "Main Menu";
+		public override string WindowTitle => "Main Menu";
+
+		public override bool AllowMaximize => false;
 
 		[Header("Main Menu Settings")]
 		[SerializeField] private Button pictureModeButton;

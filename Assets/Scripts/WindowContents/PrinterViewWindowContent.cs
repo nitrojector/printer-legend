@@ -6,7 +6,7 @@ namespace WindowContents
 {
 	public class PrinterViewWindowContent : WindowContent
 	{
-		protected override string WindowTitle => "Printer View";
+		public override string WindowTitle => "Printer View";
 
 		[SerializeField] private PrintCanvas printCanvas;
 		[SerializeField] private PrintheadController controller;
