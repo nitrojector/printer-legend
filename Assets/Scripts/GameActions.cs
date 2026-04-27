@@ -34,12 +34,12 @@ public class GameActions : MonoBehaviour
 
 	public void OpenGallery()
 	{
-			
+		WindowManager.Instance.Launch<GalleryWindowContent>();
 	}
 
 	public void OpenSettings()
 	{
-		
+		// TODO: does nothing, low priority
 	}
 
 	public void ExitGame()

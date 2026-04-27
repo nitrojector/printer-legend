@@ -19,6 +19,8 @@ namespace Printer
         [SerializeField] private PrinterMagic magic;
         [SerializeField] private PrinterReference reference;
 
+        public PrinterReference Reference => reference;
+
         public static int CurrentLevelIndex
         {
             get => PlayerPrefs.GetInt(LevelIndexKey, 0);

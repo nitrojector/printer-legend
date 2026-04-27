@@ -1,5 +1,6 @@
 using System;
 using EngineSystem;
+using Gallery;
 using NUnit.Framework.Constraints;
 using TMPro;
 using UnityEngine;
@@ -34,6 +35,9 @@ namespace Printer
 		private bool completionTriggered = false;
 
 		private bool printingCountdownActive = false;
+
+		private int _resetCount = 0;
+		private float _printStartTime = 0f;
 
 		/// <summary>
 		/// Count down before print starts
@@ -175,6 +179,7 @@ namespace Printer
 				if (startTimer <= 0f)
 				{
 					printingCountdownActive = false;
+					_printStartTime = Time.time;
 					RegisterInput();
 					coundownText.gameObject.SetActive(false);
 				}
@@ -189,6 +194,7 @@ namespace Printer
 				if (!completionTriggered)
 				{
 					completionTriggered = true;
+					SavePrint();
 					SceneManager.LoadScene("FinishPrinting", LoadSceneMode.Single);
 				}
 				return;
@@ -218,6 +224,8 @@ namespace Printer
 		
 		private void OnReset(InputAction.CallbackContext ctx)
 		{
+			_resetCount++;
+			completionTriggered = false;
 			printingStarted = false;
 			printhead.ResetCanvasAndPrinthead();
 			coundownText.gameObject.SetActive(false);
@@ -310,6 +318,20 @@ namespace Printer
 			1 => PrinterAbility.SpeedNormal,
 			_ => PrinterAbility.SpeedFast,
 		};
+
+		private void SavePrint()
+		{
+			float duration = Time.time - _printStartTime;
+			string refPath = BuildReferencePath();
+			GalleryManager.SaveEntry(printhead.Canvas.GetTexture(), refPath, (float)PrintState.GetSimilarityScore(), _resetCount, duration);
+		}
+
+		private string BuildReferencePath()
+		{
+			var sprite = levelManager != null ? levelManager.Reference?.ReferenceSprite : null;
+			if (sprite == null) return string.Empty;
+			return GalleryManager.MakeInternalPath("PrintRefs/" + sprite.name);
+		}
 
 		public bool SetPaused(bool paused)
 		{

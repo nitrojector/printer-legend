@@ -12,10 +12,10 @@ namespace Data
 		public override string ConfigPath =>
 			Path.Combine(Application.persistentDataPath, "gallery.json");
 
-		/// <summary>Absolute path to the directory where print images are stored.</summary>
+		/// <summary>Absolute path to the directory where user-created print images are stored.</summary>
 		[JsonIgnore]
 		public string ImageSaveDirectory =>
-			Path.Combine(Application.persistentDataPath, "gallery_images");
+			Path.Combine(Application.persistentDataPath, "creations");
 
 		[JsonProperty("entries")]
 		public List<GalleryEntry> Entries { get; set; } = new();

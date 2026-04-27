@@ -30,5 +30,6 @@ namespace EngineSystem
 
 		[Header("Prefabs")]
 		public Window windowPrefab;
+		public Gallery.GalleryEntryUI galleryEntryPrefab;
 	}
 }

@@ -23,6 +23,21 @@ namespace Printer
 
         public Texture2D DO_NOT_MODIFY_CanvasInternalTexture => texture;
 
+        /// <summary>
+        /// Flushes any pending pixel writes and returns the canvas texture.
+        /// Use this when you need to encode or sample the texture outside of the normal render loop.
+        /// </summary>
+        public Texture2D GetTexture()
+        {
+            if (dirty)
+            {
+                texture.Apply(updateMipmaps: false, makeNoLongerReadable: false);
+                Graphics.Blit(texture, renderTexture);
+                dirty = false;
+            }
+            return texture;
+        }
+
         private Texture2D texture;
         private RenderTexture renderTexture;
         private bool dirty;

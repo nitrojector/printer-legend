@@ -47,7 +47,7 @@ namespace GameMaster.Scripts
 			view.ClearConsole();
 			
 			{
-				var similarity = GameState.GetRawSimilarity();
+				var similarity = PrintState.GetSimilarityScore();
 				 view.Info($"Similarity: {similarity * 100.0f:0.00}%\n");
 			}
 		}

@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EngineSystem.ReferenceManager
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   windowPrefab: {fileID: 7020696776867306935, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+  galleryEntryPrefab: {fileID: 903326915139610872, guid: 1e47e8c6eb8f03d45b1d98482b3e8d9e, type: 3}
