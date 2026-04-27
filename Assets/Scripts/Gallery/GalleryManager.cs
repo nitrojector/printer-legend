@@ -101,6 +101,7 @@ namespace Gallery
 			{
 				ImagePath          = "creations/" + filename,
 				ReferenceImagePath = referencePath ?? string.Empty,
+				HasReference       = !string.IsNullOrEmpty(referencePath),
 				Date               = DateTime.UtcNow,
 				SimilarityScore    = similarityScore,
 				ResetCount         = resetCount,
@@ -175,9 +176,10 @@ namespace Gallery
 			if (IsInternalReference(path))
 			{
 				var resourcePath = path.Substring(InternalPrefix.Length);
-				var sprite = Resources.Load<Sprite>(resourcePath);
+				var spriteName = System.IO.Path.GetFileName(resourcePath);
+				var sprite = Printer.PrintRefManager.Instance.GetByName(spriteName);
 				if (sprite == null)
-					Logr.Warn($"Gallery: internal reference not found at Resources/{resourcePath}");
+					Logr.Warn($"Gallery: internal reference sprite '{spriteName}' not found in PrintRefs.");
 				return sprite != null ? sprite.texture : null;
 			}
 

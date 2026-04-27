@@ -206,7 +206,7 @@ RectTransform:
   m_Father: {fileID: 7562216568723476361}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -469,6 +469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7562216568723476361}
+  - component: {fileID: 5327209077304945238}
   m_Layer: 0
   m_Name: Creation/Reference
   m_TagString: Untagged
@@ -497,6 +498,32 @@ RectTransform:
   m_AnchoredPosition: {x: -160, y: 0}
   m_SizeDelta: {x: -320, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5327209077304945238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3820061389905015484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &4589559181895132704
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,8 +693,8 @@ RectTransform:
   - {fileID: 3069094817454235116}
   m_Father: {fileID: 7562216568723476361}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1197,6 +1224,8 @@ MonoBehaviour:
   minContentSize: {x: 1343.8, y: 589.16}
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  creationContainer: {fileID: 923503932154629658}
+  referenceContainer: {fileID: 4828601661710254528}
   creationDisplay: {fileID: 557862846060174888}
   referenceDisplay: {fileID: 8091398973825441753}
   detailsText: {fileID: 8821786361647503558}

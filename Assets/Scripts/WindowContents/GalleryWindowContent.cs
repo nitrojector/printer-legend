@@ -66,8 +66,20 @@ namespace WindowContents
 		private void OnDeleteClicked()
 		{
 			if (_selected == null) return;
-			GalleryManager.RemoveEntry(_selected.Entry);
-			Refresh();
+			var entryToDelete = _selected.Entry;
+			WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((w, c) =>
+			{
+				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+				c.Title = "Delete Entry";
+				c.Message = $"Delete \"{entryToDelete.Date.ToLocalTime():yyyy/MM/dd HH:mm}\"? This cannot be undone.";
+				c.ConfirmText = "Delete";
+				c.CancelText = "Cancel";
+				c.OnConfirm += () =>
+				{
+					GalleryManager.RemoveEntry(entryToDelete);
+					Refresh();
+				};
+			});
 		}
 
 		private void OpenDetailWindow(GalleryEntry entry)

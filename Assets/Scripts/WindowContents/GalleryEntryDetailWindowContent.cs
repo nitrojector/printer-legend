@@ -1,3 +1,4 @@
+using System.Text;
 using Data;
 using Desktop.WindowSystem;
 using Gallery;
@@ -11,6 +12,10 @@ namespace WindowContents
 	{
 		public override string WindowTitle => "Print Details";
 
+		[Header("Containers")]
+		[SerializeField] private GameObject creationContainer;
+		[SerializeField] private GameObject referenceContainer;
+
 		[Header("Images")]
 		[SerializeField] private RawImage creationDisplay;
 		[SerializeField] private RawImage referenceDisplay;
@@ -20,26 +25,25 @@ namespace WindowContents
 
 		private GalleryEntry _entry;
 
-		/// <summary>
-		/// Populates the detail view with <paramref name="entry"/>.
-		/// Safe to call before or after <see cref="WindowContent.OnInitialize"/>.
-		/// </summary>
 		public void SetEntry(GalleryEntry entry)
 		{
 			_entry = entry;
 
 			if (entry == null)
 			{
-				if (creationDisplay != null) creationDisplay.texture = null;
-				if (referenceDisplay != null) referenceDisplay.texture = null;
+				creationContainer?.SetActive(false);
+				referenceContainer?.SetActive(false);
 				if (detailsText != null) detailsText.text = string.Empty;
 				return;
 			}
 
+			creationContainer?.SetActive(true);
+			referenceContainer?.SetActive(entry.HasRef);
+
 			if (creationDisplay != null)
 				creationDisplay.texture = GalleryManager.LoadImage(entry);
 			if (referenceDisplay != null)
-				referenceDisplay.texture = GalleryManager.LoadReferenceImage(entry);
+				referenceDisplay.texture = entry.HasRef ? GalleryManager.LoadReferenceImage(entry) : null;
 			if (detailsText != null)
 				detailsText.text = BuildDetailsText(entry);
 		}
@@ -53,15 +57,17 @@ namespace WindowContents
 		private static string BuildDetailsText(GalleryEntry e)
 		{
 			var date = e.Date.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
-			var score = $"{e.SimilarityScore * 100f:F1}%";
 			var duration = e.PrintDuration >= 60f
 				? $"{(int)(e.PrintDuration / 60)}m {(int)(e.PrintDuration % 60)}s"
 				: $"{e.PrintDuration:F1}s";
 
-			return $"<u>Date</u>\n{date}\n\n" +
-			       $"<u>Similarity</u>\n{score}\n\n" +
-			       $"<u>Resets</u>\n{e.ResetCount}\n\n" +
-			       $"<u>Print Duration</u>\n{duration}";
+			var sb = new StringBuilder();
+			sb.Append($"<u>Date</u>\n{date}\n\n");
+			if (e.HasRef)
+				sb.Append($"<u>Similarity</u>\n{e.SimilarityScore * 100f:F1}%\n\n");
+			sb.Append($"<u>Resets</u>\n{e.ResetCount}\n\n");
+			sb.Append($"<u>Print Duration</u>\n{duration}");
+			return sb.ToString();
 		}
 	}
 }

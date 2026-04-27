@@ -54,5 +54,17 @@ namespace Data
 		/// <summary>Time in seconds taken for the final print pass.</summary>
 		[JsonProperty("print_duration")]
 		public float PrintDuration { get; set; }
+
+		/// <summary>
+		/// Whether a reference image was used for this print.
+		/// Stored explicitly on new saves; legacy entries (field absent) fall back to
+		/// checking whether <see cref="ReferenceImagePath"/> is non-empty.
+		/// </summary>
+		[JsonProperty("has_reference")]
+		public bool HasReference { get; set; }
+
+		/// <summary>True if this entry has an associated reference image (new or legacy).</summary>
+		[JsonIgnore]
+		public bool HasRef => HasReference || !string.IsNullOrEmpty(ReferenceImagePath);
 	}
 }
