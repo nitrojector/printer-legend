@@ -228,6 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintheadController
   printheadRoot: {fileID: 9131792621818456412}
   printheadMarker: {fileID: 3217411817075633200}
+  canvas: {fileID: 4806255266410797106}
   linePixelHeight: 4
   linePixelWidth: 4
   inkColor: {r: 0, g: 0, b: 0, a: 1}
@@ -259,12 +260,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c810ea7affc48038be393db318707d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterMagic
-  slowPrintSpeed: 6
-  basePrintSpeed: 13
-  fastPrintSpeed: 30
-  minPrintSpeed: 1
-  maxPrintSpeed: 50
-  speedScrollStep: 1
   referenceImageGroup: {fileID: 0}
 --- !u!1 &948241465721821062
 GameObject:
@@ -580,9 +575,9 @@ MonoBehaviour:
   minContentSize: {x: 865.4278, y: 817.9769}
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
-  printCanvas: {fileID: 4806255266410797106}
-  controller: {fileID: 2854695897016114906}
-  playerController: {fileID: 599019550480544260}
+  pCanvas: {fileID: 4806255266410797106}
+  pController: {fileID: 2854695897016114906}
+  pPlayerController: {fileID: 599019550480544260}
 --- !u!222 &5702250771745752277
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -857,7 +852,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 33}
+  m_AnchoredPosition: {x: 0, y: 33}
   m_SizeDelta: {x: 158.00003, y: 220.6718}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &220056058262215634

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -108,6 +109,7 @@ namespace Desktop.WindowSystem
 		private bool shown = false;
 		private bool maximized = false;
 		private FloatingWindowData floatingData = default;
+		private bool _pendingResizeOnShow = false;
 
 		// Resize state
 		private bool _resizing = false;
@@ -227,6 +229,7 @@ namespace Desktop.WindowSystem
 			content = Instantiate(prefab, contentContainer.transform);
 			ConfigureContent();
 			content.OnInitialize();
+			NotifyContentResized();
 		}
 		
 		/// <summary>
@@ -247,6 +250,7 @@ namespace Desktop.WindowSystem
 			content = newContent;
 			newContent.transform.SetParent(contentContainer.transform);
 			ConfigureContent();
+			NotifyContentResized();
 		}
 
 		/// <summary>
@@ -270,6 +274,7 @@ namespace Desktop.WindowSystem
 			content = newContent;
 			newContent.transform.SetParent(contentContainer.transform);
 			ConfigureContent();
+			NotifyContentResized();
 			return prev;
 		}
 
@@ -295,6 +300,20 @@ namespace Desktop.WindowSystem
 
 			RefreshMinimizeButton();
 			RefreshMaximizeButton();
+			ClampWindowToContentConstraints();
+		}
+
+		/// <summary>
+		/// Notifies content of a resize. If the window is currently inactive (content Awakes may
+		/// not have run yet), defers the call to the next <see cref="OnEnable"/> instead.
+		/// </summary>
+		private void NotifyContentResized()
+		{
+			if (content == null) return;
+			if (gameObject.activeInHierarchy)
+				content.OnResize();
+			else
+				_pendingResizeOnShow = true;
 		}
 
 		private void RefreshMinimizeButton() =>
@@ -410,35 +429,70 @@ namespace Desktop.WindowSystem
 			if ((_resizeEdgeMask & ResizeTop) != 0) offsetMax.y += delta.y;
 
 			if (content != null)
-			{
-				var minContent = content.MinContentSize;
-				var maxContent = content.MaxContentSize;
-
-				var proposedW = offsetMax.x - offsetMin.x;
-				var minW = minContent.x > 0f ? minContent.x + _chromeSizeAtDragStart.x : float.NegativeInfinity;
-				var maxW = float.IsPositiveInfinity(maxContent.x) ? float.PositiveInfinity : maxContent.x + _chromeSizeAtDragStart.x;
-				var clampedW = Mathf.Clamp(proposedW, minW, maxW);
-				if (!Mathf.Approximately(clampedW, proposedW))
-				{
-					if ((_resizeEdgeMask & ResizeLeft) != 0) offsetMin.x = offsetMax.x - clampedW;
-					else offsetMax.x = offsetMin.x + clampedW;
-				}
-
-				var proposedH = offsetMax.y - offsetMin.y;
-				var minH = minContent.y > 0f ? minContent.y + _chromeSizeAtDragStart.y : float.NegativeInfinity;
-				var maxH = float.IsPositiveInfinity(maxContent.y) ? float.PositiveInfinity : maxContent.y + _chromeSizeAtDragStart.y;
-				var clampedH = Mathf.Clamp(proposedH, minH, maxH);
-				if (!Mathf.Approximately(clampedH, proposedH))
-				{
-					if ((_resizeEdgeMask & ResizeBottom) != 0) offsetMin.y = offsetMax.y - clampedH;
-					else offsetMax.y = offsetMin.y + clampedH;
-				}
-			}
+				ApplyContentSizeConstraints(ref offsetMin, ref offsetMax, _chromeSizeAtDragStart, _resizeEdgeMask);
 
 			RectTransform.offsetMin = offsetMin;
 			RectTransform.offsetMax = offsetMax;
 
 			content?.OnResize();
+		}
+
+		/// <summary>
+		/// Clamps the window to its content's size constraints immediately and notifies the content.
+		/// Adjusts from the right and top edges, keeping the window's origin fixed.
+		/// No-op while maximized or when no content is attached.
+		/// </summary>
+		public void EnforceContentSizeConstraints()
+		{
+			ClampWindowToContentConstraints();
+			content?.OnResize();
+		}
+
+		/// <summary>
+		/// Applies the size clamp without firing <see cref="WindowContent.OnResize"/>.
+		/// Used during content configuration where the content may not be fully initialized yet.
+		/// </summary>
+		private void ClampWindowToContentConstraints()
+		{
+			if (content == null || maximized) return;
+			var chromeSize = RectTransform.rect.size - contentContainerRect.rect.size;
+			var offsetMin = RectTransform.offsetMin;
+			var offsetMax = RectTransform.offsetMax;
+			ApplyContentSizeConstraints(ref offsetMin, ref offsetMax, chromeSize, ResizeRight | ResizeTop);
+			RectTransform.offsetMin = offsetMin;
+			RectTransform.offsetMax = offsetMax;
+		}
+
+		/// <summary>
+		/// Clamps <paramref name="offsetMin"/>/<paramref name="offsetMax"/> so the resulting window
+		/// size satisfies the content's MinContentSize/MaxContentSize.
+		/// <paramref name="edgeMask"/> controls which side is adjusted when a clamp fires —
+		/// set to the active resize edge during a drag, or <c>ResizeRight|ResizeTop</c> to pin the origin.
+		/// </summary>
+		private void ApplyContentSizeConstraints(ref Vector2 offsetMin, ref Vector2 offsetMax, Vector2 chromeSize, int edgeMask)
+		{
+			var minContent = content.MinContentSize;
+			var maxContent = content.MaxContentSize;
+
+			var proposedW = offsetMax.x - offsetMin.x;
+			var minW = minContent.x > 0f ? minContent.x + chromeSize.x : float.NegativeInfinity;
+			var maxW = float.IsPositiveInfinity(maxContent.x) ? float.PositiveInfinity : maxContent.x + chromeSize.x;
+			var clampedW = Mathf.Clamp(proposedW, minW, maxW);
+			if (!Mathf.Approximately(clampedW, proposedW))
+			{
+				if ((edgeMask & ResizeLeft) != 0) offsetMin.x = offsetMax.x - clampedW;
+				else offsetMax.x = offsetMin.x + clampedW;
+			}
+
+			var proposedH = offsetMax.y - offsetMin.y;
+			var minH = minContent.y > 0f ? minContent.y + chromeSize.y : float.NegativeInfinity;
+			var maxH = float.IsPositiveInfinity(maxContent.y) ? float.PositiveInfinity : maxContent.y + chromeSize.y;
+			var clampedH = Mathf.Clamp(proposedH, minH, maxH);
+			if (!Mathf.Approximately(clampedH, proposedH))
+			{
+				if ((edgeMask & ResizeBottom) != 0) offsetMin.y = offsetMax.y - clampedH;
+				else offsetMax.y = offsetMin.y + clampedH;
+			}
 		}
 
 		public void OnPointerUp(PointerEventData eventData)
@@ -491,6 +545,7 @@ namespace Desktop.WindowSystem
 				content = initialContent;
 				ConfigureContent();
 				content.OnInitialize();
+				NotifyContentResized();
 			}
 			else
 			{
@@ -504,9 +559,22 @@ namespace Desktop.WindowSystem
 			Logr.Info($"Show window '{Title}'", this);
 			if (content != null)
 			{
+				if (_pendingResizeOnShow)
+				{
+					_pendingResizeOnShow = false;
+					StartCoroutine(DeferredOnResize());
+				}
 				content.OnShow();
 			}
 			shown = true;
+		}
+
+		private IEnumerator DeferredOnResize()
+		{
+			// Wait one frame so all child Awakes and Starts in the content hierarchy
+			// complete before we notify the content of its initial size.
+			yield return null;
+			content?.OnResize();
 		}
 		
 		private void OnDisable()

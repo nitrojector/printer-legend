@@ -15,10 +15,7 @@ namespace WindowContents
 
 		public override void OnResize()
 		{
-			if (pController != null)
-			{
-				pController.RefreshLayout();
-			}
+			if (pController) pController.RefreshLayout();
 		}
 	}
 }

@@ -16,8 +16,10 @@ namespace Printer
         /// Reference to the PrintCanvas component where this printhead should draw.
         /// </summary>
         private PrintCanvas canvas;
-        
+
         public PrintCanvas Canvas => canvas;
+        
+        private bool _initialized = false;
 
         [Header("Print Settings")]
         [SerializeField] private int linePixelHeight = 4;
@@ -73,9 +75,10 @@ namespace Printer
             sfxInking = Resources.Load<AudioClip>("Audio/print_ink");
             sfxLine = Resources.Load<AudioClip>("Audio/print_line");
             sfxNewLine = Resources.Load<AudioClip>("Audio/print_cr");
-            canvas     = GetComponentInParent<PrintCanvas>();
+            canvas     ??= GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
+            _initialized = true;
 
             newlineSfxCategory = AudioManager.Instance.CreateCategory(new AudioCategoryConfig()
             {
@@ -88,11 +91,14 @@ namespace Printer
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
         private IEnumerator Start()
         {
-            GameMgr.Instance.PrinterReferenceWC?.pReference.Init(canvas.CanvasHeight, linePixelHeight);
+            if (GameMgr.Instance.PrinterReferenceWC)
+            {
+                GameMgr.Instance.PrinterReferenceWC.pReference.Init(canvas.CanvasHeight, linePixelHeight);
+            }
             yield return null;
             RefreshLayout();
         }
-
+        
         /// <summary>
         /// Snaps the marker width to one print pixel and repositions the indicator line.
         /// Call after any runtime canvas resize.
@@ -100,7 +106,10 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
-            GameMgr.Instance.PrinterReferenceWC?.pReference.RefreshLayout();
+            if (GameMgr.Instance.PrinterReferenceWC)
+            {
+                GameMgr.Instance.PrinterReferenceWC.pReference.RefreshLayout();
+            }
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -282,7 +291,10 @@ namespace Printer
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
 
-            GameMgr.Instance.PrinterReferenceWC?.pReference.SetIndicatorLine(lineIndex);
+            if (GameMgr.Instance.PrinterReferenceWC)
+            {
+                GameMgr.Instance.PrinterReferenceWC.pReference.SetIndicatorLine(lineIndex);
+            }
         }
 
         public void SetPrintheadLine(int lineIndex)
