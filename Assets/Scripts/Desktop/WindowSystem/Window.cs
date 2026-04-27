@@ -124,7 +124,10 @@ namespace Desktop.WindowSystem
 		
 		// RTs
 		private RectTransform contentContainerRect;
-		
+
+		// Canvas (for sort order management)
+		private Canvas _canvas;
+
 		// Content
 		private WindowContent content = null;
 
@@ -321,6 +324,11 @@ namespace Desktop.WindowSystem
 		}
 
 		/// <summary>
+		/// Sets the Canvas sortingOrder for this window. Called exclusively by <see cref="WindowManager"/>.
+		/// </summary>
+		internal void ApplySortOrder(int order) => _canvas.sortingOrder = order;
+
+		/// <summary>
 		/// Places the window so that the point <paramref name="pivot"/> (normalized on the window rect,
 		/// e.g. (0.5, 0.5) = centre) lands at <paramref name="position"/> in parent local space.
 		/// Has no effect while maximized.
@@ -345,6 +353,8 @@ namespace Desktop.WindowSystem
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			if (maximized) return;
+			
+			WindowManager.Instance.BringToFront(this);
 
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(
 				RectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
@@ -441,15 +451,16 @@ namespace Desktop.WindowSystem
 		
 		private void Awake()
 		{
-			WindowManager.Instance.RegisterWindow(new InternalWindowHandle(this));
-			
 			RectTransform = GetComponent<RectTransform>();
 			contentContainerRect = contentContainer.GetComponent<RectTransform>();
+			_canvas = GetComponent<Canvas>();
 
 			if (RectTransform == null || contentContainerRect == null)
-			{
 				Logr.Error("Window and its content must have RectTransforms.");
-			}
+			if (_canvas == null)
+				Logr.Error("Window requires a Canvas component on the same GameObject.");
+
+			WindowManager.Instance.RegisterWindow(new InternalWindowHandle(this));
 			
 			closeButton.onClick.AddListener(Quit);
 			maximizeButton?.onClick.AddListener(ToggleMaximize);

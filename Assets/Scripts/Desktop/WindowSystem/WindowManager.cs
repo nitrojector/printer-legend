@@ -1,83 +1,131 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Desktop.WindowSystem
 {
-	public class WindowManager
+	[DefaultExecutionOrder(-100)]
+	public class WindowManager : MonoBehaviour
 	{
+		private static WindowManager _instance;
+
 		public static WindowManager Instance
 		{
 			get
 			{
-				if (_instance == null)
-				{
-					_instance = new WindowManager();
-				}
+				if (_instance != null) return _instance;
+				
+				var go = new GameObject("WindowManager");
+				_instance = go.AddComponent<WindowManager>();
 				return _instance;
 			}
 		}
-		
-		public readonly List<Window> ActiveWindows = new();
-		
-		private static WindowManager _instance;
-		
-		private int nextWindowId = 1;
-		private readonly SortedSet<int> freedWindowIds = new();
-		private readonly Dictionary<int, Window.InternalWindowHandle> windows = new();
+
+		/// <summary>Base Canvas sortingOrder for the bottom-most window. Each window above it adds 1.</summary>
+		[SerializeField] private int baseSortOrder = 0;
+
+		/// <summary>Windows ordered back-to-front; the last entry is the focused window.</summary>
+		private readonly List<Window> _focusStack = new();
+
+		private readonly Dictionary<int, Window.InternalWindowHandle> _handles = new();
+		private readonly SortedSet<int> _freedIds = new();
+		private int _nextId = 1;
+
+		/// <summary>Read-only view of all active windows, ordered back-to-front.</summary>
+		public IReadOnlyList<Window> ActiveWindows => _focusStack;
+
+		/// <summary>The currently focused (front-most) window, or null if none.</summary>
+		public Window FocusedWindow => _focusStack.Count > 0 ? _focusStack[^1] : null;
+
+		private void Awake()
+		{
+			if (_instance != null && _instance != this)
+			{
+				Destroy(gameObject);
+				return;
+			}
+			
+			_instance = this;
+			DontDestroyOnLoad(gameObject);
+		}
+
+		private void OnDestroy()
+		{
+			if (_instance == this) _instance = null;
+		}
+
+		// ── Registration ──────────────────────────────────────────────────────
 
 		/// <summary>
-		/// Destroys the window with the given ID.
-		/// This bypasses normal window closing procedures.
+		/// Registers a new window. The window is placed at the front of the focus stack.
+		/// Should only be called by <see cref="Window"/>.
 		/// </summary>
-		/// <param name="id"></param>
-		public void Kill(int id)
+		public void RegisterWindow(Window.InternalWindowHandle handle)
 		{
-			Object.Destroy(windows[id].target.gameObject);
+			int id = AllocId();
+			handle.SetWindowId(id);
+			_handles[id] = handle;
+			_focusStack.Add(handle.target);
+			AssignSortOrders();
 		}
-		
+
 		/// <summary>
-		/// Destroys all windows.
-		/// This bypasses normal window closing procedures.
+		/// Removes a window from the manager.
+		/// Should only be called by <see cref="Window"/>.
 		/// </summary>
-		public void KillAll()
-		{
-			foreach (var win in ActiveWindows)
-			{
-				Object.Destroy(win.gameObject);
-			}
-			ActiveWindows.Clear();
-			windows.Clear();
-			freedWindowIds.Clear();
-			nextWindowId = 1;
-		}
-		
-		/// <summary>
-		/// Registers a window with the WindowManager.
-		/// Should only be called by <see cref="Window"/>
-		/// </summary>
-		/// <param name="win"></param>
-		public void RegisterWindow(Window.InternalWindowHandle win)
-		{
-			var id = GetNextWindowId();
-			win.SetWindowId(id);
-			ActiveWindows.Add(win.target);
-			windows[id] = win;
-		}
-		
 		public void UnregisterWindow(int id)
 		{
-			if (!windows.ContainsKey(id)) return;
-			
-			ActiveWindows.Remove(windows[id].target);
-			windows.Remove(id);
-			freedWindowIds.Add(id);
+			if (!_handles.TryGetValue(id, out var handle)) return;
+			_focusStack.Remove(handle.target);
+			_handles.Remove(id);
+			_freedIds.Add(id);
+			AssignSortOrders();
 		}
 
-		private int GetNextWindowId()
+		// ── Focus ─────────────────────────────────────────────────────────────
+
+		/// <summary>
+		/// Moves <paramref name="window"/> to the front of the stack and reassigns sort orders.
+		/// No-op if the window is already focused or not registered.
+		/// </summary>
+		public void BringToFront(Window window)
 		{
-			if (freedWindowIds.Count == 0) return nextWindowId++;
-			int id = freedWindowIds.Min;
-			freedWindowIds.Remove(id);
+			int idx = _focusStack.IndexOf(window);
+			if (idx < 0 || idx == _focusStack.Count - 1) return;
+			_focusStack.RemoveAt(idx);
+			_focusStack.Add(window);
+			AssignSortOrders();
+		}
+
+		// ── Bulk operations ───────────────────────────────────────────────────
+
+		/// <summary>Destroys the window with the given ID, bypassing normal close procedures.</summary>
+		public void Kill(int id)
+		{
+			if (_handles.TryGetValue(id, out var handle))
+				Destroy(handle.target.gameObject);
+		}
+
+		/// <summary>Destroys all windows, bypassing normal close procedures.</summary>
+		public void KillAll()
+		{
+			var snapshot = new List<Window>(_focusStack);
+			foreach (var w in snapshot)
+				Destroy(w.gameObject);
+		}
+
+		// ── Internals ─────────────────────────────────────────────────────────
+
+		private void AssignSortOrders()
+		{
+			for (int i = 0; i < _focusStack.Count; i++)
+				_focusStack[i].ApplySortOrder(baseSortOrder + i);
+		}
+
+		private int AllocId()
+		{
+			if (_freedIds.Count == 0) return _nextId++;
+			int id = _freedIds.Min;
+			_freedIds.Remove(id);
 			return id;
 		}
 	}

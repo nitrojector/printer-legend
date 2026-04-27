@@ -15,6 +15,8 @@ namespace Desktop.WindowSystem
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
+			WindowManager.Instance.BringToFront(window);
+			
 			float timeSinceLastClick = Time.unscaledTime - _lastClickTime;
 			if (timeSinceLastClick <= doubleClickThreshold)
 			{

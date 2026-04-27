@@ -106,10 +106,10 @@ namespace GameMaster.Scripts
 
 					case "ps":
 					{
-						WindowManager.Instance.ActiveWindows.ForEach(w =>
+						foreach (var w in WindowManager.Instance.ActiveWindows)
 						{
 							InfoLn($"{$"[{w.WindowId}]",5} (<color=yellow>{w.Content.GetType().Name}</color>) {w.Title}");
-						});
+						}
 						var count = WindowManager.Instance.ActiveWindows.Count;
 						InfoLn($"{count} window{(count != 1 ? "s" : "")}");
 
