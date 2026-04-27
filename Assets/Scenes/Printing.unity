@@ -721,17 +721,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 701671769}
   m_CullTransparentMesh: 1
---- !u!114 &769290406 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 298361275934679515, guid: 2a6bfb52c06fbb14f8591dc97ac106d5, type: 3}
-  m_PrefabInstance: {fileID: 6718131819795264015}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58e5ae759bbbd42c4a844b729f97b3b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterReference
 --- !u!1 &815998498
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,29 +1021,45 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2387745969312632886, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 6.5339966
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387745969312632886, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -27.63031
-      objectReference: {fileID: 0}
     - target: {fileID: 3769316614049992046, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_Name
       value: Window (Reference)
       objectReference: {fileID: 0}
+    - target: {fileID: 4327656230104747285, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4327656230104747285, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4327656230104747285, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4327656230104747285, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5069896644958902269, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -27.866913
-      objectReference: {fileID: 0}
-    - target: {fileID: 5584077008588562360, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -58.615295
-      objectReference: {fileID: 0}
-    - target: {fileID: 5584077008588562360, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -27.630005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1793,17 +1798,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseController
   pauseMenuUI: {fileID: 1853514634}
---- !u!114 &1721072254 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4806255266410797106, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-  m_PrefabInstance: {fileID: 6176545977869229077}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4354e3d191744188eb654c0ecacc3d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintCanvas
 --- !u!1 &1853514634
 GameObject:
   m_ObjectHideFlags: 0
@@ -2137,29 +2131,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2387745969312632886, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 6.5339966
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387745969312632886, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -27.63031
-      objectReference: {fileID: 0}
-    - target: {fileID: 2787426138748599054, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3769316614049992046, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_Name
       value: Window (PrinterView)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3777000626085833347, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -8.6788025
-      objectReference: {fileID: 0}
-    - target: {fileID: 3777000626085833347, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -20.807983
       objectReference: {fileID: 0}
     - target: {fileID: 4327656230104747285, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2185,10 +2159,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4549087883958125398, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_OverridePixelPerfect
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5004336090878571821, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2209,37 +2179,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -27.866913
       objectReference: {fileID: 0}
-    - target: {fileID: 5564136051621857167, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5564136051621857167, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5564136051621857167, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5564136051621857167, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5584077008588562360, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -58.615295
-      objectReference: {fileID: 0}
-    - target: {fileID: 5584077008588562360, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -27.630005
-      objectReference: {fileID: 0}
     - target: {fileID: 7419577545799994385, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
       propertyPath: maximizeEnabled
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8454950721712193401, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2259,17 +2201,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3777000626085833347, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
   m_PrefabInstance: {fileID: 4835924364022005704}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5460986285367531664 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 599019550480544260, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-  m_PrefabInstance: {fileID: 6176545977869229077}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c85813173d47c38136c0412c0b890d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Printer.PrinterPlayerController
 --- !u!1001 &6176545977869229077
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2374,18 +2305,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2144574656448454996, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 7016854267127823413}
-    - target: {fileID: 2144574656448454996, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: printCanvas
-      value: 
-      objectReference: {fileID: 1721072254}
-    - target: {fileID: 2144574656448454996, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: playerController
-      value: 
-      objectReference: {fileID: 5460986285367531664}
     - target: {fileID: 2190905752531236063, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2402,30 +2321,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2854695897016114906, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: printerReference
-      value: 
-      objectReference: {fileID: 769290406}
     - target: {fileID: 3694492303044169459, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_Name
       value: PrinterView
       objectReference: {fileID: 0}
-    - target: {fileID: 3804000462889970551, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_Color.a
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3804000462889970551, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3804000462889970551, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3804000462889970551, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5605595696197568922, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2505,10 +2404,6 @@ PrefabInstance:
     - target: {fileID: 6692261317479719293, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7279105278176814195, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 700
       objectReference: {fileID: 0}
     - target: {fileID: 8074880800633928819, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2516,10 +2411,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8074880800633928819, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8074880800633928819, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8074880800633928819, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
@@ -2664,7 +2555,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9197679717261239814, guid: 2a6bfb52c06fbb14f8591dc97ac106d5, type: 3}
-      propertyPath: m_SizeDelta.x
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2672,17 +2563,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a6bfb52c06fbb14f8591dc97ac106d5, type: 3}
---- !u!114 &7016854267127823413 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2854695897016114906, guid: 4f55070afdfe1254698d8553b7e0e89f, type: 3}
-  m_PrefabInstance: {fileID: 6176545977869229077}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39b183abbd964b35bf9e9782518a488b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintheadController
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
