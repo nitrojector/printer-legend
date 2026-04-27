@@ -573,7 +573,7 @@ namespace Desktop.WindowSystem
 		{
 			// Wait one frame so all child Awakes and Starts in the content hierarchy
 			// complete before we notify the content of its initial size.
-			yield return null;
+			for (int i = 0; i < 8; i++) yield return null;
 			content?.OnResize();
 		}
 		

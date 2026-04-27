@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem.XInput;
 using UnityEngine.UI;
+using Utility;
 
 namespace Printer
 {
@@ -37,7 +38,7 @@ namespace Printer
         {
             containerRect = GetComponent<RectTransform>();
             ReferenceImage = GetComponent<Image>();
-            
+            // Logr.Info("ReferenceImage awake");
         }
 
         private void Start()
@@ -76,6 +77,7 @@ namespace Printer
         
         public void LoadReference(Sprite sprite)
         {
+            if (ReferenceImage == null) ReferenceImage = GetComponent<Image>();
             ReferenceImage.sprite = sprite;
         }
 

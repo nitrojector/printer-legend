@@ -1,59 +1,76 @@
-using System.Collections.Generic;
+using Data;
 using Desktop.WindowSystem;
+using Gallery;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace WindowContents
 {
-    public class PrintSummaryWindowContent : WindowContent
-    {
-        public override string WindowTitle => "Print Summary";
-        public override bool AllowMaximize => false;
-        public override bool AllowMinimize => false;
+	public class PrintSummaryWindowContent : WindowContent
+	{
+		public override string WindowTitle => "Print Summary";
+		public override bool AllowMaximize => false;
+		public override bool AllowMinimize => false;
 
-        [SerializeField] private TMP_Text restartsLabel;
-        [SerializeField] private TMP_Text accuracyLabel;
-        [SerializeField] private Button nextPrintButton;
+		[Header("Images")]
+		[SerializeField] private RawImage creationDisplay;
+		[SerializeField] private RawImage referenceDisplay;
 
-        private int _restarts;
-        private float _accuracy;
-        private PrinterViewWindowContent _printerView;
+		[Header("Info")]
+		[SerializeField] private TMP_Text detailsText;
 
-        private void Awake()
-        {
-            nextPrintButton?.onClick.AddListener(OnNextPrint);
-        }
+		[Header("Actions")]
+		[SerializeField] private Button nextPrintButton;
 
-        public void SetData(int restarts, float accuracy, PrinterViewWindowContent printerView)
-        {
-            _restarts = restarts;
-            _accuracy = accuracy;
-            _printerView = printerView;
-        }
+		private GalleryEntry _entry;
 
-        public override void OnShow()
-        {
-            if (restartsLabel != null)
-                restartsLabel.text = $"Restarts: {_restarts}";
+		private void Awake()
+		{
+			nextPrintButton?.onClick.AddListener(OnNextPrint);
+		}
 
-            if (accuracyLabel != null)
-                accuracyLabel.text = _accuracy < 0f ? "Accuracy: N/A" : $"Accuracy: {_accuracy:P0}";
-        }
+		public void SetEntry(GalleryEntry entry)
+		{
+			_entry = entry;
+			if (creationDisplay != null)
+				creationDisplay.texture = GalleryManager.LoadImage(entry);
+			if (referenceDisplay != null)
+				referenceDisplay.texture = GalleryManager.LoadReferenceImage(entry);
+			if (detailsText != null)
+				detailsText.text = BuildDetailsText(entry);
+		}
 
-        private void OnNextPrint()
-        {
-            CloseFinalPrintWindow();
-            CloseWindow();
-            _printerView?.ReactivateForNextLevel();
-        }
+		public override bool OnQuit()
+		{
+			if (_entry != null)
+			{
+				GalleryManager.UnloadImage(_entry);
+				GalleryManager.UnloadReferenceImage(_entry);
+			}
+			return true;
+		}
 
-        private void CloseFinalPrintWindow()
-        {
-            var snapshot = new List<Window>(WindowManager.Instance.ActiveWindows);
-            foreach (var win in snapshot)
-                if (win.Content is PrintFinalImageWindowContent)
-                    win.Quit();
-        }
-    }
+		private void OnNextPrint()
+		{
+			CloseWindow();
+			GameActions.Instance.OpenProgressionPrint();
+		}
+
+		private static string BuildDetailsText(GalleryEntry e)
+		{
+			var date = e.Date.ToLocalTime().ToString("yyyy-MM-dd  HH:mm");
+			var score = e.SimilarityScore >= 0f
+				? $"{e.SimilarityScore * 100f:F1}%"
+				: "N/A";
+			var duration = e.PrintDuration >= 60f
+				? $"{(int)(e.PrintDuration / 60)}m {(int)(e.PrintDuration % 60)}s"
+				: $"{e.PrintDuration:F1}s";
+
+			return $"Date:            {date}\n" +
+			       $"Similarity:      {score}\n" +
+			       $"Resets:          {e.ResetCount}\n" +
+			       $"Print Duration:  {duration}";
+		}
+	}
 }

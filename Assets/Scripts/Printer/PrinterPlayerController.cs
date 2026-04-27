@@ -1,7 +1,4 @@
 using System;
-using EngineSystem;
-using Gallery;
-using NUnit.Framework.Constraints;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,82 +13,59 @@ namespace Printer
 		[field: Header("Auto Cursor Advance")]
 		[field: SerializeField, Min(0.001f)]
 		public float PrintStepsPerSecond { get; set; } = 10f;
-        
+
 		[Header("References")]
 		[SerializeField] private GameObject startGamePrompt;
 		[SerializeField] private TMP_Text coundownText;
 
-		/// <summary>
-		/// Whether player is paused so no input propagate
-		/// </summary>
 		private bool _isPlayerPaused = false;
-        
-		/// <summary>
-		/// Whether the player is currently printing
-		/// </summary>
 		private bool printingStarted = false;
-
 		private bool completionTriggered = false;
-
 		private bool printingCountdownActive = false;
-
-		private int _resetCount = 0;
-		private float _printStartTime = 0f;
-
-		/// <summary>
-		/// Count down before print starts
-		/// </summary>
 		private float startTimer = 0f;
+		private float _printStartTime = 0f;
 
 		private const float StartTimeDelay = 3.0f;
 
-		[SerializeField] private LevelManager levelManager;
-
+		/// <summary>Fires once when the printhead reaches its last line.</summary>
 		public event Action OnPrintComplete;
 
+		/// <summary>Number of times the player reset during this session.</summary>
 		public int RestartCount { get; private set; }
+
+		/// <summary>
+		/// Elapsed seconds from the end of the countdown to print completion.
+		/// Valid only after <see cref="OnPrintComplete"/> has fired.
+		/// </summary>
+		public float PrintDuration { get; private set; }
 
 		private PrintheadController printhead;
 		private PrinterMagic        magic;
 
-		/// <summary>Print Activation Action</summary>
 		private InputAction printAction;
-
-		/// <summary>Line Feed Action</summary>
 		private InputAction lfAction;
-
-		/// <summary>Carriage Return Action</summary>
 		private InputAction crAction;
-
-		/// <summary>Speed Adjust Action</summary>
-		[Obsolete]
-		private InputAction speedAction;
-
+		[Obsolete] private InputAction speedAction;
 		private InputAction speed0Action;
 		private InputAction speed1Action;
 		private InputAction speed2Action;
-        
-		// Color channel actions (one per palette entry)
 		private InputAction color1Action;
 		private InputAction color2Action;
 		private InputAction color3Action;
 		private InputAction color4Action;
-
 		private InputAction resetAction;
 
-		// Stored delegates so subscribe/unsubscribe are symmetrical
 		private readonly Action<InputAction.CallbackContext>[] colorHoldDelegates    = new Action<InputAction.CallbackContext>[4];
 		private readonly Action<InputAction.CallbackContext>[] colorReleaseDelegates = new Action<InputAction.CallbackContext>[4];
+		private readonly Action<InputAction.CallbackContext>[] speedDelegates        = new Action<InputAction.CallbackContext>[3];
 
 		private float cursorStepTimer;
-		
-		private readonly Action<InputAction.CallbackContext>[] speedDelegates = new Action<InputAction.CallbackContext>[3];
 
 		private void Awake()
 		{
 			printhead = GetComponent<PrintheadController>();
 			magic     = GetComponent<PrinterMagic>();
-			
+
 			printAction  = InputSystem.actions["Printer/Print"];
 			lfAction     = InputSystem.actions["Printer/LF"];
 			crAction     = InputSystem.actions["Printer/CR"];
@@ -103,9 +77,8 @@ namespace Printer
 			speed0Action = InputSystem.actions["Printer/Speed0"];
 			speed1Action = InputSystem.actions["Printer/Speed1"];
 			speed2Action = InputSystem.actions["Printer/Speed2"];
-			resetAction = InputSystem.actions["UI/Reset"];
+			resetAction  = InputSystem.actions["UI/Reset"];
 
-			// Build per-index delegates once; lambdas capture the loop variable correctly
 			for (int i = 0; i < 4; i++)
 			{
 				int idx = i;
@@ -115,43 +88,15 @@ namespace Printer
 
 			startGamePrompt.SetActive(true);
 			coundownText.gameObject.SetActive(false);
-            
+
 			GameMgr.Instance.RegisterPlayer(this);
 		}
 
-		private void OnEnable()
-		{
-			// RegisterInput();
-		}
+		private void OnEnable() { }
 
 		private void OnDisable()
 		{
 			UnregisterInput();
-		}
-        
-		private void RegisterInput()
-		{
-			lfAction.performed += OnLF;
-			crAction.performed += OnCR;
-			resetAction.performed += OnReset;
-
-			SubscribeColorActions(true);
-			SubscribeSpeedActions(true);
-		}
-
-
-		private void UnregisterInput()
-		{
-			lfAction.performed -= OnLF;
-			crAction.performed -= OnCR;
-			resetAction.performed -= OnReset;
-
-			SubscribeColorActions(false);
-			SubscribeSpeedActions(false);
-
-			// Release any held channels so magic state stays clean
-			for (int i = 0; i < 4; i++)
-				magic.ReleaseColor(i);
 		}
 
 		private void OnDestroy()
@@ -159,16 +104,35 @@ namespace Printer
 			GameMgr.Instance.UnregisterPlayer(this);
 		}
 
+		private void RegisterInput()
+		{
+			lfAction.performed      += OnLF;
+			crAction.performed      += OnCR;
+			resetAction.performed   += OnReset;
+			SubscribeColorActions(true);
+			SubscribeSpeedActions(true);
+		}
+
+		private void UnregisterInput()
+		{
+			lfAction.performed      -= OnLF;
+			crAction.performed      -= OnCR;
+			resetAction.performed   -= OnReset;
+			SubscribeColorActions(false);
+			SubscribeSpeedActions(false);
+			for (int i = 0; i < 4; i++)
+				magic.ReleaseColor(i);
+		}
+
 		private void Update()
 		{
 			if (_isPlayerPaused) return;
-                
+
 			if (!printingStarted && printAction.IsPressed())
 			{
 				printingStarted = true;
 				printingCountdownActive = true;
 				startGamePrompt.SetActive(false);
-                
 				startTimer = StartTimeDelay;
 				coundownText.SetText($"{Mathf.CeilToInt(startTimer)}");
 				coundownText.gameObject.SetActive(true);
@@ -186,7 +150,6 @@ namespace Printer
 					RegisterInput();
 					coundownText.gameObject.SetActive(false);
 				}
-
 				return;
 			}
 
@@ -197,15 +160,13 @@ namespace Printer
 				if (!completionTriggered)
 				{
 					completionTriggered = true;
-					SavePrint();
-					//SceneManager.LoadScene("FinishPrinting", LoadSceneMode.Single);
+					PrintDuration = Time.time - _printStartTime;
+					OnPrintComplete?.Invoke();
 				}
 				return;
 			}
 
-			
-
-			// ── Auto cursor advance (always on) ───────────────────────────────
+			// ── Auto cursor advance ───────────────────────────────────────────
 			cursorStepTimer += Time.deltaTime;
 			float stepInterval = 1f / Mathf.Max(0.001f, PrintStepsPerSecond);
 			while (cursorStepTimer >= stepInterval)
@@ -214,20 +175,18 @@ namespace Printer
 				cursorStepTimer -= stepInterval;
 			}
 
-			// ── Print: action binding + LMB ───────────────────────────────────
-			bool isPrinting = printAction != null && printAction.IsPressed();
-			if (isPrinting)
+			// ── Print input ───────────────────────────────────────────────────
+			if (printAction != null && printAction.IsPressed())
 				printhead.Print();
 
-			// Color: always sync — black when no channels are active
 			printhead.InkColor = magic.CurrentInkColor;
 		}
 
 		// ── Action callbacks ──────────────────────────────────────────────────
-		
+
 		private void OnReset(InputAction.CallbackContext ctx)
 		{
-			_resetCount++;
+			RestartCount++;
 			completionTriggered = false;
 			printingStarted = false;
 			printhead.ResetCanvasAndPrinthead();
@@ -248,7 +207,6 @@ namespace Printer
 			printhead.CarriageReturn();
 		}
 
-		// Color hold/release — wired to color action performed/canceled
 		private void OnColorHold(int index)
 		{
 			PrinterAbility? ability = index switch
@@ -264,7 +222,6 @@ namespace Printer
 
 		private void OnColorRelease(int index)
 		{
-			// Always release regardless of ability state to prevent stuck channels
 			magic.ReleaseColor(index);
 		}
 
@@ -273,12 +230,10 @@ namespace Printer
 		private void SubscribeSpeedActions(bool subscribe)
 		{
 			InputAction[] actions = { speed0Action, speed1Action, speed2Action };
-
 			for (int i = 0; i < actions.Length; i++)
 			{
 				if (actions[i] == null) continue;
 				int level = i;
-
 				if (subscribe)
 				{
 					speedDelegates[level] = ctx =>
@@ -322,47 +277,13 @@ namespace Printer
 			_ => PrinterAbility.SpeedFast,
 		};
 
-		private void SavePrint()
-		{
-			float duration = Time.time - _printStartTime;
-			string refPath = BuildReferencePath();
-			GalleryManager.SaveEntry(printhead.Canvas.GetTexture(), refPath, (float)PrintState.GetSimilarityScore(), _resetCount, duration);
-		}
-
-		private string BuildReferencePath()
-		{
-			var sprite = levelManager != null ? levelManager.Reference?.ReferenceSprite : null;
-			if (sprite == null) return string.Empty;
-			return GalleryManager.MakeInternalPath("PrintRefs/" + sprite.name);
-		}
-		
-		public void ResetForNextLevel()
-		{
-			levelManager?.AdvanceLevel();
-			RestartCount = 0;
-			completionTriggered = false;
-			printingStarted = false;
-			printhead.ResetCanvasAndPrinthead();
-			coundownText.gameObject.SetActive(false);
-			startGamePrompt.SetActive(true);
-			UnregisterInput();
-		}
-
 		public bool SetPaused(bool paused)
 		{
 			if (paused == _isPlayerPaused) return false;
 			if (!enabled) return false;
-            
 			_isPlayerPaused = paused;
-			if (_isPlayerPaused)
-			{
-				UnregisterInput();
-			}
-			else
-			{
-				RegisterInput();
-			}
-
+			if (_isPlayerPaused) UnregisterInput();
+			else RegisterInput();
 			return true;
 		}
 	}

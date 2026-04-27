@@ -1,5 +1,8 @@
-﻿using Config;
+using System;
+using Config;
+using Data;
 using Desktop.WindowSystem;
+using Gallery;
 using Printer;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,6 +16,8 @@ namespace WindowContents
 		[SerializeField, FormerlySerializedAs("printCanvas")] public PrintCanvas pCanvas;
 		[SerializeField, FormerlySerializedAs("controller")] public PrintheadController pController;
 		[SerializeField, FormerlySerializedAs("playerController")] public PrinterPlayerController pPlayerController;
+
+		private bool _isProgressionMode;
 
 		public override void OnInitialize()
 		{
@@ -33,36 +38,36 @@ namespace WindowContents
 			if (pController) pController.RefreshLayout();
 		}
 
-		public void ReactivateForNextLevel()
+		/// <summary>
+		/// Enables or disables progression mode. When true, completing a print advances
+		/// UserSave.ProgressionNextPrintIdx and opens PrintSummaryWindowContent.
+		/// </summary>
+		public void SetProgressionMode(bool value) => _isProgressionMode = value;
+
+		/// <summary>
+		/// Applies a level's abilities and obstacles to the PrinterMagic on this content's printhead.
+		/// Call from the Launch configurator before the window is shown.
+		/// </summary>
+		public void ApplyLevel(LevelEntry entry)
 		{
-			pPlayerController?.ResetForNextLevel();
-			AttachedWindow?.Show();
-			GameMgr.Instance.PrinterReferenceWC?.SetWindowVisible(true);
+			if (pController == null) return;
+			var magic = pController.GetComponent<PrinterMagic>();
+			if (magic == null) return;
+
+			foreach (PrinterAbility ability in Enum.GetValues(typeof(PrinterAbility)))
+				magic.DisableAbility(ability);
+			foreach (PrinterObstacle obstacle in Enum.GetValues(typeof(PrinterObstacle)))
+				magic.DisableObstacle(obstacle);
+
+			foreach (var ability in entry.GetAbilities())
+				magic.EnableAbility(ability);
+			foreach (var obstacle in entry.GetObstacles())
+				magic.EnableObstacle(obstacle);
 		}
 
-		private void HandlePrintComplete()
-		{
-			int idx = LevelManager.CurrentLevelIndex;
-			Sprite refSprite = GetReferenceSprite(idx);
-			float accuracy = CalculateAccuracy(pCanvas.DO_NOT_MODIFY_CanvasInternalTexture, refSprite);
-			int restarts = pPlayerController.RestartCount;
-
-			AttachedWindow?.Minimize();
-			GameMgr.Instance.PrinterReferenceWC?.SetWindowVisible(false);
-
-			WindowManager.Instance.Launch<PrintFinalImageWindowContent>((w, c) =>
-			{
-				w.SetPositionNormalized(new(0.25f, 0.5f), new(0.5f, 0.5f));
-				c.SetPrintTexture(pCanvas.DO_NOT_MODIFY_CanvasInternalTexture);
-			});
-
-			WindowManager.Instance.Launch<PrintSummaryWindowContent>((w, c) =>
-			{
-				w.SetPositionNormalized(new(0.75f, 0.5f), new(0.5f, 0.5f));
-				c.SetData(restarts, accuracy, this);
-			});
-		}
-
+		/// <summary>
+		/// Returns the reference sprite for a given level index. Null if out of range or not found.
+		/// </summary>
 		public static Sprite GetReferenceSprite(int levelIndex)
 		{
 			var config = LevelSequenceConfig.Instance;
@@ -71,40 +76,36 @@ namespace WindowContents
 			return PrintRefManager.Instance.GetByName(name);
 		}
 
-		private static float CalculateAccuracy(Texture2D canvas, Sprite reference)
+		private void HandlePrintComplete()
 		{
-			if (canvas == null || reference == null) return -1f;
-			try
+			float accuracy = (float)PrintState.GetSimilarityScore();
+			string refPath = BuildReferencePath();
+			var entry = GalleryManager.SaveEntry(
+				pCanvas.GetTexture(), refPath, accuracy,
+				pPlayerController.RestartCount, pPlayerController.PrintDuration);
+
+			if (_isProgressionMode && entry != null)
 			{
-				var rect = reference.textureRect;
-				Color[] refPixels = reference.texture.GetPixels(
-					(int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-				Color[] canvasPixels = canvas.GetPixels();
+				UserSave.Instance.ProgressionNextPrintIdx++;
+				UserSave.Save();
 
-				int cw = canvas.width, ch = canvas.height;
-				int rw = (int)rect.width, rh = (int)rect.height;
-				int hit = 0, total = 0;
-
-				for (int cy = 0; cy < ch; cy++)
+				var captured = entry;
+				WindowManager.Instance.Launch<PrintSummaryWindowContent>((w, c) =>
 				{
-					for (int cx = 0; cx < cw; cx++)
-					{
-						int rx = Mathf.Clamp(Mathf.RoundToInt((float)cx / (cw - 1) * (rw - 1)), 0, rw - 1);
-						int ry = Mathf.Clamp(Mathf.RoundToInt((float)cy / (ch - 1) * (rh - 1)), 0, rh - 1);
-
-						Color rp = refPixels[ry * rw + rx];
-						Color cp = canvasPixels[cy * cw + cx];
-
-						bool refIsInk = rp.a > 0.5f && rp.grayscale < 0.9f;
-						bool canvasIsInk = cp.grayscale < 0.9f;
-
-						if (refIsInk) total++;
-						if (refIsInk && canvasIsInk) hit++;
-					}
-				}
-				return total > 0 ? (float)hit / total : 1f;
+					w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+					c.SetEntry(captured);
+				});
 			}
-			catch { return -1f; }
+
+			GameMgr.Instance.PrinterReferenceWC?.Close();
+			AttachedWindow?.Quit();
+		}
+
+		private string BuildReferencePath()
+		{
+			var sprite = GameMgr.Instance.PrinterReferenceWC?.pReference.ReferenceSprite;
+			if (sprite == null) return string.Empty;
+			return GalleryManager.MakeInternalPath("PrintRefs/" + sprite.name);
 		}
 	}
 }

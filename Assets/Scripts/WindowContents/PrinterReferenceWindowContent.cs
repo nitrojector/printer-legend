@@ -11,8 +11,8 @@ namespace WindowContents
 		public override string WindowTitle => "Reference";
 		
 		[SerializeField] public PrinterReference pReference;
-		
-		public override void OnInitialize()
+
+		private void Awake()
 		{
 			GameMgr.Instance.RegisterPrinterReference(this);
 		}
@@ -31,7 +31,10 @@ namespace WindowContents
 		public void SetReferenceSprite(Sprite reference)
 		{
 			if (pReference == null) return;
-			pReference.ReferenceImage.sprite = reference;
+			pReference.LoadReference(reference);
 		}
+
+		/// <summary>Destroys this window. Called by PrinterViewWindowContent after print completes.</summary>
+		public void Close() => CloseWindow();
 	}
 }

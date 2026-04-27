@@ -1,14 +1,3 @@
-using Desktop.WindowSystem;
+// Removed — finish screen is now handled by PrintSummaryWindowContent launched from PrinterViewWindowContent.
 using UnityEngine;
-using WindowContents;
-
-public class FinishPrintingController : MonoBehaviour
-{
-    private void Start()
-    {
-        WindowManager.Instance.Launch<PrintFinalImageWindowContent>();
-        WindowManager.Instance.Launch<PrintSummaryWindowContent>();
-
-    
-    }
-}
+public class FinishPrintingController : MonoBehaviour { }
