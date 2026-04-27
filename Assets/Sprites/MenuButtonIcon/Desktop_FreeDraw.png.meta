@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 195afaa1a49f7614f9c629ee3c0a3b75
+guid: 80bfd39f4dacc9f48a628b3aa0a1d6d0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1706626580014808002
-    second: Desktop_Gallery_0
+      213: -6624464223262787243
+    second: Desktop_FreeDraw_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Desktop_Gallery_0
+      name: Desktop_FreeDraw_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 0
-        width: 17
-        height: 23
+        width: 24
+        height: 24
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e344af5ea28d058e0800000000000000
-      internalID: -1706626580014808002
+      spriteID: 559332903ec2114a0800000000000000
+      internalID: -6624464223262787243
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Desktop_Gallery_0: -1706626580014808002
+      Desktop_FreeDraw_0: -6624464223262787243
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
