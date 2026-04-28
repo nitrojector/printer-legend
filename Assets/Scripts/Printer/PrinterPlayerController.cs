@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Utility;
 using WindowContents;
 
 namespace Printer
@@ -54,7 +55,6 @@ namespace Printer
 		private InputAction printAction;
 		private InputAction lfAction;
 		private InputAction crAction;
-		[Obsolete] private InputAction speedAction;
 		private InputAction speed0Action;
 		private InputAction speed1Action;
 		private InputAction speed2Action;
@@ -79,7 +79,6 @@ namespace Printer
 			printAction  = InputSystem.actions["Printer/Print"];
 			lfAction     = InputSystem.actions["Printer/LF"];
 			crAction     = InputSystem.actions["Printer/CR"];
-			speedAction  = InputSystem.actions["Printer/Speed"];
 			color1Action = InputSystem.actions["Printer/Color1"];
 			color2Action = InputSystem.actions["Printer/Color2"];
 			color3Action = InputSystem.actions["Printer/Color3"];
@@ -226,10 +225,11 @@ namespace Printer
 
 		private void ExecuteReset()
 		{
-			_paused             = false;
+			_paused = false;
 			RestartCount++;
 			completionTriggered = false;
-			printingStarted     = false;
+			printingStarted = false;
+			printingCountdownActive = false;
 			printhead.ResetCanvasAndPrinthead();
 			coundownText.gameObject.SetActive(false);
 			startGamePrompt.SetActive(true);

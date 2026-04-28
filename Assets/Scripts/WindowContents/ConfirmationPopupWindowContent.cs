@@ -78,6 +78,7 @@ namespace WindowContents
 		private string _message = "Are you sure?";
 		private string _confirmButtonText = "Confirm";
 		private string _cancelButtonText = "Cancel";
+		private bool _decided;
 
 		[SerializeField] private Button confirmButton;
 		[SerializeField] private TMP_Text confirmButtonText;
@@ -97,14 +98,12 @@ namespace WindowContents
 
 		public override bool OnQuit()
 		{
-			// quit is cancel if exists, otherwise confirm
-			if (cancelButton.gameObject.activeSelf)
+			if (!_decided)
 			{
-				OnCancel?.Invoke();
-			}
-			else
-			{
-				OnConfirm?.Invoke();
+				if (cancelButton.gameObject.activeSelf)
+					OnCancel?.Invoke();
+				else
+					OnConfirm?.Invoke();
 			}
 			return true;
 		}
@@ -115,15 +114,17 @@ namespace WindowContents
 			Message = _message;
 			ConfirmButtonText = _confirmButtonText;
 			CancelButtonText = _cancelButtonText;
-			
+
 			confirmButton.onClick.AddListener(() =>
 			{
+				_decided = true;
 				OnConfirm?.Invoke();
 				CloseWindow();
 			});
-			
+
 			cancelButton.onClick.AddListener(() =>
 			{
+				_decided = true;
 				OnCancel?.Invoke();
 				CloseWindow();
 			});
