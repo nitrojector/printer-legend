@@ -1,5 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/GameMaster/GameMasterPanel.uss?fileID=7433441132597879392&amp;guid=aaf73d4cbf3a4684bd8c7907868fbfd6&amp;type=3#GMPanel"/>
+    <Style src="project://database/Assets/GameMaster/GameMasterPanel.uss?fileID=7433441132597879392&amp;guid=406963a874a714adaa5af0f7e03f880f&amp;type=3#GameMasterPanel"/>
     <ui:VisualElement name="root" style="flex-grow: 1;">
         <ui:VisualElement style="flex-grow: 1; height: 60%; font-size: 30px;">
             <ui:VisualElement style="flex-grow: 0; flex-direction: row; height: 80%;">
