@@ -105,7 +105,7 @@ namespace Printer
                 }
             }
 
-            _printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
+            if (_printerReference) _printerReference.Init(canvas.CanvasHeight, linePixelHeight);
             yield return null;
             RefreshLayout();
         }
@@ -117,7 +117,7 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
-            _printerReference?.RefreshLayout();
+            if (_printerReference) _printerReference.RefreshLayout();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -299,7 +299,7 @@ namespace Printer
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
 
-            _printerReference?.SetIndicatorLine(lineIndex);
+            if(_printerReference) _printerReference.SetIndicatorLine(lineIndex);
         }
 
         public void SetPrintheadLine(int lineIndex)
