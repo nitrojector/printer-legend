@@ -11,8 +11,6 @@ namespace WindowContents
 	public class PrintSummaryWindowContent : WindowContent
 	{
 		public override string WindowTitle => "Print Summary";
-		public override bool AllowMaximize => false;
-		public override bool AllowMinimize => false;
 
 		[Header("Containers")]
 		[SerializeField] private GameObject creationContainer;
