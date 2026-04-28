@@ -86,7 +86,6 @@ namespace Printer
         private PrintheadController printhead;
         private Image               printheadImage;  
         private PrintCanvas         canvas;
-        private MagicConfig         magicConfig;
         private Coroutine           disconnectCoroutine;
 
         // Per-color state (index into InkPalette)
@@ -112,7 +111,7 @@ namespace Printer
             printhead = GetComponent<PrintheadController>();
             canvas    = GetComponent<PrintCanvas>();
             printheadImage = printhead.printheadMarker.GetComponent<Image>();
-            magicConfig = GameConfig.Instance.Magic;
+            GameConfig.Instance.Magic = GameConfig.Instance.Magic;
 
             // Newline is always available out of the box
             enabledAbilities.Add(PrinterAbility.Newline);
@@ -357,7 +356,7 @@ namespace Printer
         {
             if (canvas == null) return;
 
-            int lineDuration = Mathf.Max(1, magicConfig.PaperJamLineCount);
+            int lineDuration = Mathf.Max(1, GameConfig.Instance.Magic.PaperJamLineCount);
             int startLine = Mathf.Max(0, printhead.CurrentLine - lineDuration + 1);
             int count     = printhead.CurrentLine - startLine + 1;
 
@@ -366,8 +365,8 @@ namespace Printer
                 canvas.ShuffleLinePixels(
                     startLine + li,
                     printhead.LinePixelHeight,
-                    Mathf.Max(1, magicConfig.PaperJamShuffleCount),
-                    magicConfig.PaperJamRespectPrintSize,
+                    Mathf.Max(1, GameConfig.Instance.Magic.PaperJamShuffleCount),
+                    GameConfig.Instance.Magic.PaperJamRespectPrintSize,
                     printhead.LinePixelWidth);
 
             // Rewind the printhead so the player reprints those lines
@@ -382,15 +381,15 @@ namespace Printer
 
             referenceImageGroup.alpha = 0f;
 
-            if (magicConfig.InternetDisconnectBlackoutSeconds > 0f)
-                yield return new WaitForSeconds(magicConfig.InternetDisconnectBlackoutSeconds);
+            if (GameConfig.Instance.Magic.InternetDisconnectBlackoutSeconds > 0f)
+                yield return new WaitForSeconds(GameConfig.Instance.Magic.InternetDisconnectBlackoutSeconds);
 
             // Fade back in
             float elapsed = 0f;
-            while (elapsed < magicConfig.InternetDisconnectFadeInSeconds)
+            while (elapsed < GameConfig.Instance.Magic.InternetDisconnectFadeInSeconds)
             {
                 elapsed += Time.deltaTime;
-                referenceImageGroup.alpha = Mathf.Clamp01(elapsed / Mathf.Max(0.001f, magicConfig.InternetDisconnectFadeInSeconds));
+                referenceImageGroup.alpha = Mathf.Clamp01(elapsed / Mathf.Max(0.001f, GameConfig.Instance.Magic.InternetDisconnectFadeInSeconds));
                 yield return null;
             }
 
@@ -402,26 +401,26 @@ namespace Printer
 
         private int LineDurationFor(PrinterObstacle obstacle) => obstacle switch
         {
-            PrinterObstacle.PaperJam            => Mathf.Max(1, magicConfig.PaperJamLineCount),
-            PrinterObstacle.InternetDisconnect  => Mathf.Max(1, magicConfig.InternetDisconnectLineCount),
-            PrinterObstacle.MotorMalfunction    => Mathf.Max(1, magicConfig.MotorMalfunctionLineCount),
+            PrinterObstacle.PaperJam            => Mathf.Max(1, GameConfig.Instance.Magic.PaperJamLineCount),
+            PrinterObstacle.InternetDisconnect  => Mathf.Max(1, GameConfig.Instance.Magic.InternetDisconnectLineCount),
+            PrinterObstacle.MotorMalfunction    => Mathf.Max(1, GameConfig.Instance.Magic.MotorMalfunctionLineCount),
             _                                   => 1,
         };
 
         private float ChanceFor(PrinterObstacle obstacle) => obstacle switch
         {
-            PrinterObstacle.PaperJam            => Mathf.Clamp01(magicConfig.PaperJamChance),
-            PrinterObstacle.InternetDisconnect  => Mathf.Clamp01(magicConfig.InternetDisconnectChance),
-            PrinterObstacle.MotorMalfunction    => Mathf.Clamp01(magicConfig.MotorMalfunctionChance),
+            PrinterObstacle.PaperJam            => Mathf.Clamp01(GameConfig.Instance.Magic.PaperJamChance),
+            PrinterObstacle.InternetDisconnect  => Mathf.Clamp01(GameConfig.Instance.Magic.InternetDisconnectChance),
+            PrinterObstacle.MotorMalfunction    => Mathf.Clamp01(GameConfig.Instance.Magic.MotorMalfunctionChance),
             _                                   => 0f,
         };
 
         public float GetSpeedForLevel(int level)
         {
-            var speed = magicConfig.PrintSpeedFast;
-            if (level <= 0) speed = magicConfig.PrintSpeedSlow;
-            if (level == 1) speed = magicConfig.PrintSpeedNormal;
-            if (level == 2) speed = magicConfig.PrintSpeedFast;
+            var speed = GameConfig.Instance.Magic.PrintSpeedFast;
+            if (level <= 0) speed = GameConfig.Instance.Magic.PrintSpeedSlow;
+            if (level == 1) speed = GameConfig.Instance.Magic.PrintSpeedNormal;
+            if (level == 2) speed = GameConfig.Instance.Magic.PrintSpeedFast;
             return speed;
         }
 

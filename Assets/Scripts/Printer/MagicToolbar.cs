@@ -17,23 +17,44 @@ namespace Printer
         public struct AbilitySlot
         {
             public PrinterAbility ability;
-            public GameObject slot;
+            public MagicToolbarAction slot;
+        }
+
+        [Serializable]
+        public struct SpeedSlot
+        {
+            public int level; // 0=slow, 1=normal, 2=fast
+            public MagicToolbarAction slot;
         }
 
         [SerializeField] private PrinterMagic magic;
         [SerializeField] private AbilitySlot[] slots;
 
+        [Header("Speed")]
+        [SerializeField] private PrinterPlayerController playerController;
+        [SerializeField] private SpeedSlot[] speedSlots;
+
         private void OnEnable()
         {
-            if (magic == null) return;
-            magic.onAbilityChanged += OnAbilityChanged;
-            RefreshAll();
+            if (magic != null)
+            {
+                magic.onAbilityChanged += OnAbilityChanged;
+                RefreshAll();
+            }
+
+            if (playerController != null)
+            {
+                playerController.OnSpeedLevelChanged += OnSpeedLevelChanged;
+                RefreshSpeedActive(playerController.CurrentSpeedLevel);
+            }
         }
 
         private void OnDisable()
         {
-            if (magic == null) return;
-            magic.onAbilityChanged -= OnAbilityChanged;
+            if (magic != null)
+                magic.onAbilityChanged -= OnAbilityChanged;
+            if (playerController != null)
+                playerController.OnSpeedLevelChanged -= OnSpeedLevelChanged;
         }
 
         private void RefreshAll()
@@ -49,10 +70,19 @@ namespace Printer
                     SetSlotVisible(entry, enabled);
         }
 
+        private void OnSpeedLevelChanged(int level) => RefreshSpeedActive(level);
+
+        private void RefreshSpeedActive(int activeLevel)
+        {
+            foreach (var entry in speedSlots)
+                if (entry.slot != null)
+                    entry.slot.SetStyleActive(entry.level == activeLevel);
+        }
+
         private static void SetSlotVisible(AbilitySlot entry, bool visible)
         {
             if (entry.slot != null)
-                entry.slot.SetActive(visible);
+                entry.slot.gameObject.SetActive(visible);
         }
     }
 }

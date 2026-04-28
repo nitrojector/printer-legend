@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9213505081457605454}
+  - component: {fileID: 8328561788954373831}
   - component: {fileID: 2208196086607801578}
   - component: {fileID: 2003314340639905407}
   m_Layer: 5
@@ -39,6 +40,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8328561788954373831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363489276196524250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
+  defaultColor:
+    serializedVersion: 2
+    rgba: 2231369727
+  activeColor:
+    serializedVersion: 2
+    rgba: 2728435967
+  iconContainerImage: {fileID: 1736252459003466787}
+  keybindLabelText: {fileID: 6631737004998083864}
 --- !u!222 &2208196086607801578
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -272,7 +293,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5177388603050735206, guid: 71ebafeef3c03457483266a33ab2b270, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 053d844bc6da5ec44b25090118c2fbfd, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

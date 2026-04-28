@@ -30,6 +30,12 @@ namespace Printer
 		/// <summary>Fires once when the printhead reaches its last line.</summary>
 		public event Action OnPrintComplete;
 
+		/// <summary>Fires when the active speed level changes (0=slow, 1=normal, 2=fast).</summary>
+		public event Action<int> OnSpeedLevelChanged;
+
+		/// <summary>Current speed level (0=slow, 1=normal, 2=fast). Defaults to 1.</summary>
+		public int CurrentSpeedLevel { get; private set; } = 1;
+
 		/// <summary>Number of times the player reset during this session.</summary>
 		public int RestartCount { get; private set; }
 
@@ -65,6 +71,7 @@ namespace Printer
 		{
 			printhead = GetComponent<PrintheadController>();
 			magic     = GetComponent<PrinterMagic>();
+			PrintStepsPerSecond = magic.GetSpeedForLevel(1);
 
 			printAction  = InputSystem.actions["Printer/Print"];
 			lfAction     = InputSystem.actions["Printer/LF"];
@@ -238,8 +245,10 @@ namespace Printer
 				{
 					speedDelegates[level] = ctx =>
 					{
-						if (magic.IsAbilityEnabled(SpeedAbilityForLevel(level)))
-							PrintStepsPerSecond = magic.GetSpeedForLevel(level);
+						if (!magic.IsAbilityEnabled(SpeedAbilityForLevel(level))) return;
+						PrintStepsPerSecond = magic.GetSpeedForLevel(level);
+						CurrentSpeedLevel   = level;
+						OnSpeedLevelChanged?.Invoke(level);
 					};
 					actions[i].performed += speedDelegates[level];
 				}
