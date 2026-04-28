@@ -215,9 +215,11 @@ MonoBehaviour:
   allowMaximize: 1
   allowMinimize: 1
   <EnforceMinSize>k__BackingField: 1
-  minContentSize: {x: 100, y: 100}
+  minContentSize: {x: 1044.74, y: 443.34}
+  <LaunchWithMinSize>k__BackingField: 0
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  <LaunchWithMaxSize>k__BackingField: 0
   creationContainer: {fileID: 5569871186169974350}
   referenceContainer: {fileID: 520568354939954276}
   creationDisplay: {fileID: 527555152767369139}

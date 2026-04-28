@@ -1218,12 +1218,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d2c7808427442b482145c1f4679ef24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindowContents.PrintSummaryWindowContent
-  allowMaximize: 0
+  allowMaximize: 1
   allowMinimize: 0
   <EnforceMinSize>k__BackingField: 1
-  minContentSize: {x: 1343.8, y: 589.16}
+  minContentSize: {x: 999.78, y: 401.19}
+  <LaunchWithMinSize>k__BackingField: 0
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  <LaunchWithMaxSize>k__BackingField: 0
   creationContainer: {fileID: 923503932154629658}
   referenceContainer: {fileID: 4828601661710254528}
   creationDisplay: {fileID: 557862846060174888}
