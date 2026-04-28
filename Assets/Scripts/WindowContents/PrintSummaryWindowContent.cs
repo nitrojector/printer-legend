@@ -33,12 +33,13 @@ namespace WindowContents
 			nextPrintButton?.onClick.AddListener(OnNextPrint);
 		}
 
-		public void SetEntry(GalleryEntry entry)
+		public void SetEntry(GalleryEntry entry, bool isProgression = false)
 		{
 			_entry = entry;
 
 			creationContainer?.SetActive(true);
 			referenceContainer?.SetActive(entry.HasRef);
+			nextPrintButton?.gameObject.SetActive(isProgression);
 
 			if (creationDisplay != null)
 				creationDisplay.texture = GalleryManager.LoadImage(entry);

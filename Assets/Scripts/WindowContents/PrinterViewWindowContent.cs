@@ -143,7 +143,7 @@ namespace WindowContents
 				WindowManager.Instance.Launch<PrintSummaryWindowContent>((w, c) =>
 				{
 					w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-					c.SetEntry(captured);
+					c.SetEntry(captured, _isProgressionMode);
 				});
 			}
 
