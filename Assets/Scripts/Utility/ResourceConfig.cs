@@ -59,5 +59,10 @@ namespace Utility
             instance = token.ToObject<T>() ?? new T();
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetInstance()
+        {
+            instance = null;
+        }
     }
 }
