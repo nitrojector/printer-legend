@@ -1067,21 +1067,21 @@ MonoBehaviour:
   magic: {fileID: 3993360812694508409}
   slots:
   - ability: 0
-    slot: {fileID: 0}
+    slot: {fileID: 8277319147220127069}
   - ability: 1
-    slot: {fileID: 0}
+    slot: {fileID: 5807317959478768884}
   - ability: 2
-    slot: {fileID: 0}
+    slot: {fileID: 8609323614160728542}
   - ability: 3
-    slot: {fileID: 0}
+    slot: {fileID: 4766807316996200010}
   - ability: 4
-    slot: {fileID: 0}
+    slot: {fileID: 4720651238819863571}
   - ability: 5
-    slot: {fileID: 0}
+    slot: {fileID: 4794086319875125572}
   - ability: 6
-    slot: {fileID: 0}
+    slot: {fileID: 6056323547534678906}
   - ability: 7
-    slot: {fileID: 0}
+    slot: {fileID: 1310448470824771926}
   playerController: {fileID: 599019550480544260}
   speedSlots:
   - level: 0
@@ -1793,6 +1793,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2390528815791749305, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
   m_PrefabInstance: {fileID: 92903487554986906}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8277319147220127069 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8328561788954373831, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+  m_PrefabInstance: {fileID: 92903487554986906}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
 --- !u!224 &9121756497793341652 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9213505081457605454, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
@@ -2056,6 +2067,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2390528815791749305, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
   m_PrefabInstance: {fileID: 2522933026170477107}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5807317959478768884 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8328561788954373831, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+  m_PrefabInstance: {fileID: 2522933026170477107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
 --- !u!224 &6692261317479719293 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9213505081457605454, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
@@ -2194,6 +2216,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+--- !u!114 &6056323547534678906 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8328561788954373831, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+  m_PrefabInstance: {fileID: 2853202986042602941}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
 --- !u!224 &6360330558805790451 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9213505081457605454, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
@@ -2324,6 +2357,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+--- !u!114 &4794086319875125572 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8328561788954373831, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+  m_PrefabInstance: {fileID: 3538979151055888259}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
 --- !u!224 &5674545185350640845 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9213505081457605454, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
@@ -2732,6 +2776,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+--- !u!114 &1310448470824771926 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8328561788954373831, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
+  m_PrefabInstance: {fileID: 7042322647793962897}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3939288a0c894df59e7f4bd2fafce22b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Printer.MagicToolbarAction
 --- !u!224 &2190905752531236063 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9213505081457605454, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
@@ -2747,7 +2802,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1363489276196524250, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
       propertyPath: m_Name
-      value: Speed2
+      value: Reset
       objectReference: {fileID: 0}
     - target: {fileID: 1736252459003466787, guid: 8fb76e59c11f04f8fb695f42aee88657, type: 3}
       propertyPath: m_Type
