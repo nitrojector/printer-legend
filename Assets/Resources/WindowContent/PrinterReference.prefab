@@ -234,9 +234,11 @@ MonoBehaviour:
   allowMaximize: 1
   allowMinimize: 1
   <EnforceMinSize>k__BackingField: 1
-  minContentSize: {x: 100, y: 100}
+  minContentSize: {x: 598.31, y: 601.77}
+  <LaunchWithMinSize>k__BackingField: 0
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  <LaunchWithMaxSize>k__BackingField: 0
   pReference: {fileID: 298361275934679515}
 --- !u!222 &922381886808761741
 CanvasRenderer:
