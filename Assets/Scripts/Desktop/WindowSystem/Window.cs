@@ -8,7 +8,7 @@ using Utility;
 
 namespace Desktop.WindowSystem
 {
-	public class Window : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+	public class Window : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler, IPointerMoveHandler, IPointerExitHandler
 	{
 		/// <summary>
 		/// Internal handle for Window for use by <see cref="WindowManager"/>
@@ -95,6 +95,7 @@ namespace Desktop.WindowSystem
 		// Editor References
 		[SerializeField] private TMP_Text titleText;
 		[SerializeField] private GameObject contentContainer;
+		[SerializeField] private RectTransform dragHandleRect;
 		[SerializeField] private Button closeButton;
 		[SerializeField] private Button maximizeButton;
 		[SerializeField] private Button minimizeButton;
@@ -105,6 +106,7 @@ namespace Desktop.WindowSystem
 		[SerializeField] private bool startShown = false;
 		[SerializeField] private float resizeEdgeSize = 8f;
 
+
 		// State
 		private bool shown = false;
 		private bool maximized = false;
@@ -112,6 +114,8 @@ namespace Desktop.WindowSystem
 		private bool _pendingResizeOnShow = false;
 
 		// Resize state
+		private static Window _resizingWindow;
+		internal static bool IsAnyWindowResizing => _resizingWindow != null;
 		private bool _resizing = false;
 		private int _resizeEdgeMask = 0;
 		private Vector2 _resizeDragStart;
@@ -455,22 +459,14 @@ namespace Desktop.WindowSystem
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			if (maximized) return;
-			
+
 			WindowManager.Instance.BringToFront(this);
 
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(
-				RectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
-
-			var rect = RectTransform.rect;
-			int mask = 0;
-			if (localPoint.x - rect.xMin <= resizeEdgeSize) mask |= ResizeLeft;
-			if (rect.xMax - localPoint.x <= resizeEdgeSize) mask |= ResizeRight;
-			if (localPoint.y - rect.yMin <= resizeEdgeSize) mask |= ResizeBottom;
-			if (rect.yMax - localPoint.y <= resizeEdgeSize) mask |= ResizeTop;
-
+			int mask = ComputeResizeMask(eventData);
 			if (mask == 0) return;
 
 			_resizing = true;
+			_resizingWindow = this;
 			_resizeEdgeMask = mask;
 
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -478,6 +474,18 @@ namespace Desktop.WindowSystem
 			_resizeOffsetMinStart = RectTransform.offsetMin;
 			_resizeOffsetMaxStart = RectTransform.offsetMax;
 			_chromeSizeAtDragStart = RectTransform.rect.size - contentContainerRect.rect.size;
+		}
+
+		public void OnPointerMove(PointerEventData eventData)
+		{
+			if (_resizingWindow != null && _resizingWindow != this) return;
+			if (_resizing) return;
+			SetCursorForMask(maximized ? 0 : ComputeResizeMask(eventData));
+		}
+
+		public void OnPointerExit(PointerEventData eventData)
+		{
+			if (!_resizing) ResetCursor();
 		}
 
 		public void OnDrag(PointerEventData eventData)
@@ -566,6 +574,55 @@ namespace Desktop.WindowSystem
 		public void OnPointerUp(PointerEventData eventData)
 		{
 			_resizing = false;
+			if (_resizingWindow == this) _resizingWindow = null;
+			// Re-evaluate hover cursor; next OnPointerMove will refine if still inside.
+			ResetCursor();
+		}
+
+		private int ComputeResizeMask(PointerEventData eventData)
+		{
+			var cam = _canvas.worldCamera;
+
+			if (dragHandleRect != null && RectTransformUtility.RectangleContainsScreenPoint(
+				    dragHandleRect, eventData.position, cam))
+				return 0;
+
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				RectTransform, eventData.position, cam, out var localPoint);
+
+			var rect = RectTransform.rect;
+			int mask = 0;
+			if (localPoint.x - rect.xMin <= resizeEdgeSize) mask |= ResizeLeft;
+			if (rect.xMax - localPoint.x <= resizeEdgeSize) mask |= ResizeRight;
+			if (localPoint.y - rect.yMin <= resizeEdgeSize) mask |= ResizeBottom;
+			if (rect.yMax - localPoint.y <= resizeEdgeSize) mask |= ResizeTop;
+			return mask;
+		}
+
+		private void SetCursorForMask(int mask)
+		{
+			bool left   = (mask & ResizeLeft)   != 0;
+			bool right  = (mask & ResizeRight)  != 0;
+			bool top    = (mask & ResizeTop)    != 0;
+			bool bottom = (mask & ResizeBottom) != 0;
+
+			var rm = EngineSystem.ReferenceManager.Instance;
+			Texture2D tex;
+			if      ((top && right) || (bottom && left))  tex = rm.cursorResizeDiagNE;
+			else if ((top && left)  || (bottom && right)) tex = rm.cursorResizeDiagNW;
+			else if (left || right)                       tex = rm.cursorResizeH;
+			else if (top  || bottom)                      tex = rm.cursorResizeV;
+			else                                          tex = null;
+
+			var hotspot = tex != null ? new Vector2(tex.width * 0.5f, tex.height * 0.5f) : Vector2.zero;
+			Cursor.SetCursor(tex, hotspot, CursorMode.Auto);
+		}
+
+		internal static void ResetCursor()
+		{
+			var rm = EngineSystem.ReferenceManager.Instance;
+			var tex = rm != null ? rm.cursorDefault : null;
+			Cursor.SetCursor(tex, Vector2.zero, CursorMode.Auto);
 		}
 
 #if UNITY_EDITOR
@@ -656,8 +713,18 @@ namespace Desktop.WindowSystem
 			shown = false;
 		}
 
+		private void LateUpdate()
+		{
+			if (_resizing) SetCursorForMask(_resizeEdgeMask);
+		}
+
 		private void OnDestroy()
 		{
+			if (_resizingWindow == this)
+			{
+				_resizingWindow = null;
+				ResetCursor();
+			}
 			WindowManager.Instance.UnregisterWindow(WindowId);
 		}
 	}

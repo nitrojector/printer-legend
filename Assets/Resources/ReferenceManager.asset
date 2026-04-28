@@ -15,3 +15,8 @@ MonoBehaviour:
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   windowPrefab: {fileID: 7020696776867306935, guid: 9ddd83ca0e5bc2345a24258f563deca5, type: 3}
   galleryEntryPrefab: {fileID: 903326915139610872, guid: 1e47e8c6eb8f03d45b1d98482b3e8d9e, type: 3}
+  cursorDefault: {fileID: 2800000, guid: 40d4270eda33e0249ab464f9e2962438, type: 3}
+  cursorResizeH: {fileID: 2800000, guid: a09f5f36fcf69e249937f9a2df67a986, type: 3}
+  cursorResizeV: {fileID: 2800000, guid: a73de2365a82f144ca6a95be73e78782, type: 3}
+  cursorResizeDiagNE: {fileID: 2800000, guid: 5e9b4a507b083ae4aa549419be7270f0, type: 3}
+  cursorResizeDiagNW: {fileID: 2800000, guid: 10e19abd9efbe2741b3b4662209a0b55, type: 3}

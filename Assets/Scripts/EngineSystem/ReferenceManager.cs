@@ -31,5 +31,14 @@ namespace EngineSystem
 		[Header("Prefabs")]
 		public Window windowPrefab;
 		public Gallery.GalleryEntryUI galleryEntryPrefab;
+		
+		[Header("Cursor")]
+		public Texture2D cursorDefault;
+
+		[Header("Resize Cursors")]
+		public Texture2D cursorResizeH;
+		public Texture2D cursorResizeV;
+		public Texture2D cursorResizeDiagNE;
+		public Texture2D cursorResizeDiagNW;
 	}
 }

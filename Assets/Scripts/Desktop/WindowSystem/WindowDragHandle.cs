@@ -4,7 +4,7 @@ using Utility;
 
 namespace Desktop.WindowSystem
 {
-	public class WindowDragHandle : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+	public class WindowDragHandle : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler, IPointerMoveHandler
 	{
 		[SerializeField] private Window window;
 		[SerializeField] private float doubleClickThreshold = 0.3f;
@@ -79,6 +79,12 @@ namespace Desktop.WindowSystem
 		public void OnPointerUp(PointerEventData eventData)
 		{
 			_dragging = false;
+		}
+
+		public void OnPointerMove(PointerEventData eventData)
+		{
+			if (!Window.IsAnyWindowResizing)
+				Window.ResetCursor();
 		}
 	}
 }

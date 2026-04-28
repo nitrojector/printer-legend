@@ -617,6 +617,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Desktop.Window
   titleText: {fileID: 3139204708128478952}
   contentContainer: {fileID: 8833333197882362018}
+  dragHandleRect: {fileID: 3037837129573928829}
   closeButton: {fileID: 4373178922676360094}
   maximizeButton: {fileID: 647271261077755740}
   minimizeButton: {fileID: 4364926815163241588}
