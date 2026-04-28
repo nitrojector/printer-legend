@@ -1,7 +1,5 @@
-using System;
 using GameMaster.Scripts.UI;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace GameMaster.Scripts
@@ -30,6 +28,9 @@ namespace GameMaster.Scripts
 			doc = GetComponent<UIDocument>();
 			
 			BuildTree();
+			
+			Active = false;
+			SetDisplayActive(false);
 		}
 
 		private void BuildTree()
@@ -38,7 +39,7 @@ namespace GameMaster.Scripts
 			ConsoleView = root.Q<ConsoleView>("console");
 			StateView = root.Q<ConsoleView>("state");
 			input = root.Q<TextField>("input");
-            
+			
 			root.RegisterCallback<KeyDownEvent>(evt =>
 			{
 				if (evt.keyCode is KeyCode.Return or KeyCode.KeypadEnter)
@@ -51,22 +52,6 @@ namespace GameMaster.Scripts
 				}
 			}, TrickleDown.TrickleDown);
 
-			input.RegisterCallback<BlurEvent>(evt =>
-			{
-				input.Focus();
-				evt.StopImmediatePropagation();
-			}, TrickleDown.TrickleDown);
-
-			root.RegisterCallback<PointerDownEvent>(evt =>
-			{
-				var ve = evt.target as VisualElement;
-				if (ve != null && ve != input && !IsChildOf(ve, input))
-				{
-					evt.StopImmediatePropagation();
-					input.Focus();
-				}
-			}, TrickleDown.TrickleDown);
-
 			input.RegisterCallback<KeyDownEvent>(evt =>
 			{
 				if (evt.keyCode == KeyCode.Tab)
@@ -74,11 +59,8 @@ namespace GameMaster.Scripts
 					evt.StopImmediatePropagation();
 				}
 			}, TrickleDown.TrickleDown);
-
-			Ready = true;
 			
-			Active = false;
-			SetDisplayActive(Active);
+			Ready = true;
 		}
 
 		public void SetActive(bool active)
@@ -116,19 +98,6 @@ namespace GameMaster.Scripts
 			{
 				input.Focus();
 			}
-		}
-        
-		[Obsolete]
-		private static bool IsGmTogglePressed()
-		{
-			var kb = Keyboard.current;
-			if (kb == null) return false;
-
-			bool ctrl = kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed;
-			bool shift = kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
-			bool mPressedThisFrame = kb.mKey.wasPressedThisFrame;
-
-			return ctrl && shift && mPressedThisFrame;
-		}
+		}        
 	}
 }

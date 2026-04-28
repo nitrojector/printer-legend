@@ -6,14 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 990930e585df946d7b11d009dff91c02
-  - enabled: 1
-    path: Assets/Scenes/Printing.unity
-    guid: e58c52478f1124ece8a218f43172dcd9
-  - enabled: 1
-    path: Assets/Scenes/FinishPrinting.unity
-    guid: 4080a2f98619147a29e06dc271b25980
+    path: Assets/Scenes/Desktop.unity
+    guid: 1a92ac2c184eae440968b79c6799bac9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
