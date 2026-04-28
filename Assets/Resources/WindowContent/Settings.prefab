@@ -61,8 +61,10 @@ MonoBehaviour:
   allowMinimize: 1
   <EnforceMinSize>k__BackingField: 1
   minContentSize: {x: 553.48, y: 553.77}
+  <LaunchWithMinSize>k__BackingField: 1
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  <LaunchWithMaxSize>k__BackingField: 0
   masterVolumeSlider: {fileID: 918267350577259783}
   musicVolumeSlider: {fileID: 2686334773369950786}
   sfxVolumeSlider: {fileID: 4704859036620667181}
@@ -435,7 +437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5784116375878015538, guid: 9c2eb4fc137f71544a1ebb24faf029dc, type: 3}
       propertyPath: m_text
-      value: Next Print ID(3)
+      value: 'Next Print ID: 0'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -717,6 +719,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: ResetProgressionButton
       objectReference: {fileID: 0}
+    - target: {fileID: 3185729325510292395, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3185729325510292395, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 382071552467676534}
     - target: {fileID: 4802209517058877879, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -830,6 +840,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}
+--- !u!114 &382071552467676534 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5321439848532846911, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}
+  m_PrefabInstance: {fileID: 5518291992082547785}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!224 &1022327323270966782 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4802209517058877879, guid: e827ee7b9353b504298b0ee9023ea3db, type: 3}

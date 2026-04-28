@@ -22,6 +22,7 @@ namespace Desktop.WindowSystem
 		[Header("Window Size Constraints")]
 		[field:SerializeField] public bool EnforceMinSize { get; private set; } = true;
 		[SerializeField] private Vector2 minContentSize = new Vector2(100, 100);
+		[field:SerializeField] public bool LaunchWithMinSize { get; private set; } = false;
 
 		[SerializeField] private bool enforceMaxSize = false;
 		public bool EnforceMaxSize
@@ -34,6 +35,7 @@ namespace Desktop.WindowSystem
 			}
 		}
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
+		[field:SerializeField] public bool LaunchWithMaxSize { get; private set; } = false;
 
 		public Window AttachedWindow { get; private set; }
 		

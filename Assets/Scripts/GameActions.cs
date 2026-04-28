@@ -111,6 +111,7 @@ public class GameActions : MonoBehaviour
 	{
 		WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((window, content) =>
 		{
+			window.SetMinSize();
 			window.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 			content.Title = "Exit Game";
 			content.Message = "Are you sure you want to exit the game?";

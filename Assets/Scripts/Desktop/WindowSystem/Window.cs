@@ -301,6 +301,25 @@ namespace Desktop.WindowSystem
 			RefreshMinimizeButton();
 			RefreshMaximizeButton();
 			ClampWindowToContentConstraints();
+
+			if (content.LaunchWithMaxSize && content.EnforceMaxSize)
+				ApplyLaunchSize(content.MaxContentSize);
+			else if (content.LaunchWithMinSize && content.EnforceMinSize)
+				ApplyLaunchSize(content.MinContentSize);
+		}
+
+		/// <summary>
+		/// Resizes the window to fit <paramref name="contentSize"/> without firing OnResize.
+		/// Used during content configuration; OnResize is deferred to NotifyContentResized.
+		/// </summary>
+		private void ApplyLaunchSize(Vector2 contentSize)
+		{
+			var chromeSize = RectTransform.rect.size - contentContainerRect.rect.size;
+			var offsetMin  = RectTransform.offsetMin;
+			var offsetMax  = offsetMin + contentSize + chromeSize;
+			ApplyContentSizeConstraints(ref offsetMin, ref offsetMax, chromeSize, ResizeRight | ResizeTop);
+			RectTransform.offsetMin = offsetMin;
+			RectTransform.offsetMax = offsetMax;
 		}
 
 		/// <summary>
@@ -367,6 +386,43 @@ namespace Desktop.WindowSystem
 			var delta = position - (bottomLeft + pivot * size);
 			RectTransform.offsetMin += delta;
 			RectTransform.offsetMax += delta;
+		}
+
+		/// <summary>
+		/// Sets the content area to <paramref name="contentSize"/>, respecting the content's size
+		/// constraints. Keeps the window's origin (bottom-left) fixed. No-op while maximized.
+		/// </summary>
+		public void SetSize(Vector2 contentSize)
+		{
+			if (maximized) return;
+			var chromeSize = RectTransform.rect.size - contentContainerRect.rect.size;
+			var offsetMin  = RectTransform.offsetMin;
+			var offsetMax  = offsetMin + contentSize + chromeSize;
+			if (content != null)
+				ApplyContentSizeConstraints(ref offsetMin, ref offsetMax, chromeSize, ResizeRight | ResizeTop);
+			RectTransform.offsetMin = offsetMin;
+			RectTransform.offsetMax = offsetMax;
+			content?.OnResize();
+		}
+
+		/// <summary>
+		/// Resizes the window to the content's minimum size.
+		/// No-op if the content does not enforce a minimum size.
+		/// </summary>
+		public void SetMinSize()
+		{
+			if (content == null || !content.EnforceMinSize) return;
+			SetSize(content.MinContentSize);
+		}
+
+		/// <summary>
+		/// Resizes the window to the content's maximum size.
+		/// No-op if the content does not enforce a maximum size.
+		/// </summary>
+		public void SetMaxSize()
+		{
+			if (content == null || !content.EnforceMaxSize) return;
+			SetSize(content.MaxContentSize);
 		}
 
 		/// <summary>
