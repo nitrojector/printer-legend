@@ -22,6 +22,7 @@ namespace WindowContents
 		public int PrintViewId { get; private set; } = -1;
 
 		private bool _isProgressionMode;
+		private bool _forceQuit;
 
 		public override void OnInitialize()
 		{
@@ -36,6 +37,27 @@ namespace WindowContents
 				pPlayerController.OnPrintComplete -= HandlePrintComplete;
 			if (PrintViewId >= 0)
 				GameMgr.Instance.UnregisterPrintView(PrintViewId);
+		}
+
+		public override bool OnQuit()
+		{
+			if (_forceQuit) return true;
+			if (pController == null || pController.IsComplete || pController.Progress <= 0f) return true;
+
+			WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((w, c) =>
+			{
+				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+				c.Title = "Abandon Print?";
+				c.Message = "Closing now will lose all progress on this print. Are you sure?";
+				c.ConfirmButtonText = "Abandon";
+				c.CancelButtonText = "Keep Printing";
+				c.OnConfirm += () =>
+				{
+					_forceQuit = true;
+					AttachedWindow?.Quit();
+				};
+			});
+			return false;
 		}
 
 		public override void OnResize()
