@@ -15,6 +15,7 @@ namespace WindowContents
 
 		[SerializeField, FormerlySerializedAs("printCanvas")] public PrintCanvas pCanvas;
 		[SerializeField, FormerlySerializedAs("controller")] public PrintheadController pController;
+		[SerializeField] public PrinterMagic pMagic;
 		[SerializeField, FormerlySerializedAs("playerController")] public PrinterPlayerController pPlayerController;
 
 		/// <summary>ID assigned by GameMgr on registration. Valid after OnInitialize.</summary>
@@ -45,6 +46,32 @@ namespace WindowContents
 		public override string GetContentDescription()
 		{
 			return $"pView PrintID({PrintViewId}) Progression({_isProgressionMode})";
+		}
+		
+		/// <summary>
+		/// Enables or disables all magic abilities and obstacles on this content's printhead.
+		/// </summary>
+		/// <param name="enableAllMagic">if all magic abilities should be enabled</param>
+		public void SetAllMagicAbilitiesEnabled(bool enableAllMagic)
+		{
+			if (pMagic == null) return;
+
+			foreach (PrinterAbility ability in Enum.GetValues(typeof(PrinterAbility)))
+				pMagic.SetAbilityEnabled(ability, enableAllMagic);
+		}
+		
+		/// <summary>
+		/// Enables or disables all magic obstacles on this content's printhead.
+		/// </summary>
+		/// <param name="enableAllMagic">if all obstacles should be enabled</param>
+		public void SetAllMagicObstaclesEnabled(bool enableAllMagic)
+		{
+			if (pController == null) return;
+			var magic = pController.GetComponent<PrinterMagic>();
+			if (magic == null) return;
+
+			foreach (PrinterObstacle obstacle in Enum.GetValues(typeof(PrinterObstacle)))
+				magic.SetObstacleEnabled(obstacle, enableAllMagic);
 		}
 
 		/// <summary>

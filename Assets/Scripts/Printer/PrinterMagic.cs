@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Config;
 using UnityEngine;
 using UnityEngine.UI;
+using Utility;
 
 namespace Printer
 {
@@ -138,7 +139,7 @@ namespace Printer
                 RefreshInkColor();
             onAbilityChanged?.Invoke(ability, false);
         }
-
+        
         public void SetAbilityEnabled(PrinterAbility ability, bool enabled)
         {
             if (enabled) EnableAbility(ability);
@@ -162,6 +163,12 @@ namespace Printer
 
         public void EnableObstacle(PrinterObstacle obstacle)  => enabledObstacles.Add(obstacle);
         public void DisableObstacle(PrinterObstacle obstacle) => enabledObstacles.Remove(obstacle);
+        
+        public void SetObstacleEnabled(PrinterObstacle obstacle, bool enableObstacle)
+        {
+            if (enableObstacle) EnableObstacle(obstacle);
+            else         DisableObstacle(obstacle);
+        }
 
         /// <summary>
         /// Starts the obstacle if it is enabled and not already active.
@@ -257,7 +264,7 @@ namespace Printer
             {
                 if (!IsColorContributing(i))
                 {
-                    Debug.Log($"Color index {i} is not contributing");
+                    Logr.Info($"Color index {i} is not contributing");
                     all = false;
                     continue;
                 }
@@ -266,7 +273,7 @@ namespace Printer
                 any = true;
             }
 
-            Debug.Log($"all={all}");
+            Logr.Info($"all={all}");
             if (!any || all)
                 return Color.black;
             

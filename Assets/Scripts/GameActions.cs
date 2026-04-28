@@ -77,9 +77,10 @@ public class GameActions : MonoBehaviour
 
 	public void OpenFreePrint()
 	{
-		WindowManager.Instance.Launch<PrinterViewWindowContent>((w, _) =>
+		WindowManager.Instance.Launch<PrinterViewWindowContent>((w, c) =>
 		{
 			w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+			c.SetAllMagicAbilitiesEnabled(true);
 		});
 	}
 

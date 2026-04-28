@@ -228,7 +228,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Printer.PrintheadController
   printheadRoot: {fileID: 9131792621818456412}
   printheadMarker: {fileID: 3217411817075633200}
-  canvas: {fileID: 4806255266410797106}
   linePixelHeight: 4
   linePixelWidth: 4
   inkColor: {r: 0, g: 0, b: 0, a: 1}
@@ -247,7 +246,6 @@ MonoBehaviour:
   <PrintStepsPerSecond>k__BackingField: 10
   startGamePrompt: {fileID: 8144368817507690649}
   coundownText: {fileID: 5691685203750615204}
-  levelManager: {fileID: 0}
 --- !u!114 &3993360812694508409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -573,10 +571,13 @@ MonoBehaviour:
   allowMinimize: 1
   <EnforceMinSize>k__BackingField: 1
   minContentSize: {x: 865.4278, y: 817.9769}
+  <LaunchWithMinSize>k__BackingField: 0
   enforceMaxSize: 0
   maxContentSize: {x: 1000, y: 1000}
+  <LaunchWithMaxSize>k__BackingField: 0
   pCanvas: {fileID: 4806255266410797106}
   pController: {fileID: 2854695897016114906}
+  pMagic: {fileID: 3993360812694508409}
   pPlayerController: {fileID: 599019550480544260}
 --- !u!222 &5702250771745752277
 CanvasRenderer:
