@@ -43,6 +43,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -100,4 +101,7 @@ InitTestScene*.unity*
 
 .DS_Store
 
+# IDEs
 .idea/
+.vscode/
+.claude/
