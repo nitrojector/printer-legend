@@ -175,12 +175,15 @@ MonoBehaviour:
   allowMinimize: 0
   <EnforceMinSize>k__BackingField: 1
   minContentSize: {x: 437.87, y: 259.73}
+  <LaunchWithMinSize>k__BackingField: 0
   enforceMaxSize: 1
   maxContentSize: {x: 635.09, y: 602.74}
+  <LaunchWithMaxSize>k__BackingField: 0
   confirmButton: {fileID: 5671973984140989639}
   confirmButtonText: {fileID: 5249310230110088642}
   cancelButton: {fileID: 2195826834409363603}
   cancelButtonText: {fileID: 5066836101164186070}
+  buttonGroupRect: {fileID: 4257604852716909286}
   messageText: {fileID: 6867116937799658415}
 --- !u!1 &2940717912750511683
 GameObject:

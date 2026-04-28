@@ -3,6 +3,7 @@ using Desktop.WindowSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utility;
 
 namespace WindowContents
 {
@@ -31,6 +32,7 @@ namespace WindowContents
 				if (messageText != null)
 				{
 					messageText.text = _message;
+					Logr.Info($"Set ConfirmationPopup message: '{value}'");
 				}
 			}
 		}
@@ -84,6 +86,7 @@ namespace WindowContents
 		[SerializeField] private TMP_Text confirmButtonText;
 		[SerializeField] private Button cancelButton;
 		[SerializeField] private TMP_Text cancelButtonText;
+		[SerializeField] private RectTransform buttonGroupRect;
 		[SerializeField] private TMP_Text messageText;
 		
 		/// <summary>
@@ -98,7 +101,7 @@ namespace WindowContents
 
 		public override void OnInitialize()
 		{
-			FitWindowToMessageSize();
+			AttachedWindow?.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 		}
 
 		public override void OnShow()
@@ -108,9 +111,11 @@ namespace WindowContents
 
 		private void FitWindowToMessageSize()
 		{
-			LayoutRebuilder.ForceRebuildLayoutImmediate(RectTransform);
-			float preferredHeight = LayoutUtility.GetPreferredHeight(RectTransform);
-			AttachedWindow?.SetSize(new Vector2(MinContentSize.x, preferredHeight));
+			var messageTextRt = messageText.rectTransform;
+			float preferredContentHeight = messageTextRt.offsetMin.y - messageTextRt.offsetMax.y;
+			float preferredTMPWidth = MinContentSize.x - (messageTextRt.offsetMin.x - messageTextRt.offsetMax.x);
+			preferredContentHeight += messageText.GetPreferredValues(_message, preferredTMPWidth, Mathf.Infinity).y;
+			AttachedWindow?.SetSize(new Vector2(MinContentSize.x, preferredContentHeight));
 		}
 
 		public override bool OnQuit()
