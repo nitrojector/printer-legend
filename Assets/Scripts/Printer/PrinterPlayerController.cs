@@ -208,13 +208,13 @@ namespace Printer
 				c.Title             = "Reset Print?";
 				c.Message           = "This will clear your current print. Are you sure?";
 				c.ConfirmButtonText = "Reset";
-				c.CancelButtonText  = "Continue";
+				c.CancelButtonText  = "Keep Printing";
 				c.OnConfirm += ExecuteReset;
 				c.OnCancel  += ResumeWithCountdown;
 			});
 		}
 
-		private void ResumeWithCountdown()
+		public void ResumeWithCountdown()
 		{
 			_paused                 = false;
 			printingCountdownActive = true;

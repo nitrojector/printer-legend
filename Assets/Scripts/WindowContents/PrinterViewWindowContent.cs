@@ -44,6 +44,7 @@ namespace WindowContents
 			if (_forceQuit) return true;
 			if (pController == null || pController.IsComplete || pController.Progress <= 0f) return true;
 
+			pPlayerController.SetPaused(true);
 			WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((w, c) =>
 			{
 				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
@@ -51,6 +52,7 @@ namespace WindowContents
 				c.Message = "Closing now will lose all progress on this print. Are you sure?";
 				c.ConfirmButtonText = "Abandon";
 				c.CancelButtonText = "Keep Printing";
+				c.OnCancel += pPlayerController.ResumeWithCountdown;
 				c.OnConfirm += () =>
 				{
 					_forceQuit = true;
