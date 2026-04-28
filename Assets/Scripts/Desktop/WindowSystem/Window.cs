@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -310,6 +309,8 @@ namespace Desktop.WindowSystem
 				ApplyLaunchSize(content.MaxContentSize);
 			else if (content.LaunchWithMinSize && content.EnforceMinSize)
 				ApplyLaunchSize(content.MinContentSize);
+			
+			SetPosition(new Vector2(0.0f, 0.0f), new Vector2(0.5f, 0.5f));
 		}
 
 		/// <summary>
@@ -394,18 +395,44 @@ namespace Desktop.WindowSystem
 
 		/// <summary>
 		/// Sets the content area to <paramref name="contentSize"/>, respecting the content's size
-		/// constraints. Keeps the window's origin (bottom-left) fixed. No-op while maximized.
+		/// constraints. The point <paramref name="windowPivot"/> (normalised on the window rect,
+		/// default centre) is kept fixed in parent local space. No-op while maximized.
 		/// </summary>
-		public void SetSize(Vector2 contentSize)
+		public void SetSize(Vector2 contentSize, Vector2? windowPivot = null)
 		{
 			if (maximized) return;
+			var parentRt = RectTransform.parent as RectTransform;
+			if (parentRt == null) return;
+
+			var pivot = windowPivot ?? new Vector2(0.5f, 0.5f);
+			var pr = parentRt.rect;
 			var chromeSize = RectTransform.rect.size - contentContainerRect.rect.size;
-			var offsetMin  = RectTransform.offsetMin;
-			var offsetMax  = offsetMin + contentSize + chromeSize;
+
+			// Clamp content size to constraints
 			if (content != null)
-				ApplyContentSizeConstraints(ref offsetMin, ref offsetMax, chromeSize, ResizeRight | ResizeTop);
-			RectTransform.offsetMin = offsetMin;
-			RectTransform.offsetMax = offsetMax;
+			{
+				var minC = content.MinContentSize;
+				var maxC = content.MaxContentSize;
+				if (minC.x > 0f) contentSize.x = Mathf.Max(contentSize.x, minC.x);
+				if (minC.y > 0f) contentSize.y = Mathf.Max(contentSize.y, minC.y);
+				if (!float.IsPositiveInfinity(maxC.x)) contentSize.x = Mathf.Min(contentSize.x, maxC.x);
+				if (!float.IsPositiveInfinity(maxC.y)) contentSize.y = Mathf.Min(contentSize.y, maxC.y);
+			}
+
+			var newWindowSize = contentSize + chromeSize;
+
+			// Anchor corner positions in parent local space
+			var anchorMinPos = new Vector2(pr.xMin + RectTransform.anchorMin.x * pr.width,
+			                               pr.yMin + RectTransform.anchorMin.y * pr.height);
+			var anchorMaxPos = new Vector2(pr.xMin + RectTransform.anchorMax.x * pr.width,
+			                               pr.yMin + RectTransform.anchorMax.y * pr.height);
+
+			// Pivot position in parent local space (invariant across the resize)
+			var pivotPos = anchorMinPos + RectTransform.offsetMin + pivot * RectTransform.rect.size;
+
+			RectTransform.offsetMin = pivotPos - anchorMinPos - pivot * newWindowSize;
+			RectTransform.offsetMax = pivotPos - anchorMaxPos + (Vector2.one - pivot) * newWindowSize;
+
 			content?.OnResize();
 		}
 
@@ -545,8 +572,10 @@ namespace Desktop.WindowSystem
 		/// <paramref name="edgeMask"/> controls which side is adjusted when a clamp fires —
 		/// set to the active resize edge during a drag, or <c>ResizeRight|ResizeTop</c> to pin the origin.
 		/// </summary>
-		private void ApplyContentSizeConstraints(ref Vector2 offsetMin, ref Vector2 offsetMax, Vector2 chromeSize, int edgeMask)
+		private void ApplyContentSizeConstraints(ref Vector2 offsetMin, ref Vector2 offsetMax, Vector2 chromeSize,
+			int edgeMask)
 		{
+
 			var minContent = content.MinContentSize;
 			var maxContent = content.MaxContentSize;
 
