@@ -34,15 +34,14 @@ namespace GameMaster.Scripts
 		{
 			if (_instance != null) return;
 
-			if (DeveloperSettings.Instance.EnableGameMaster)
+			if (!DeveloperSettings.Instance.EnableGameMaster) return;
+			
+			_instance = new GameMasterHost
 			{
-				_instance = new GameMasterHost
-				{
-					actions = Resources.Load<InputActionAsset>("GameMasterActions"),
-					gmPanelPrefab = Resources.Load<GameObject>("GameMasterView")
-				};
-				_instance.Setup();
-			}
+				actions = Resources.Load<InputActionAsset>("GameMasterActions"),
+				gmPanelPrefab = Resources.Load<GameObject>("GameMasterView")
+			};
+			_instance.Setup();
 		}
 
 		private void Setup()
