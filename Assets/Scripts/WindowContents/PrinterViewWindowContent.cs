@@ -17,20 +17,24 @@ namespace WindowContents
 		[SerializeField, FormerlySerializedAs("controller")] public PrintheadController pController;
 		[SerializeField, FormerlySerializedAs("playerController")] public PrinterPlayerController pPlayerController;
 
+		/// <summary>ID assigned by GameMgr on registration. Valid after OnInitialize.</summary>
+		public int PrintViewId { get; private set; } = -1;
+
 		private bool _isProgressionMode;
 
 		public override void OnInitialize()
 		{
-			GameMgr.Instance.RegisterPrinterView(this);
+			PrintViewId = GameMgr.Instance.RegisterPrintView(this);
 			if (pPlayerController != null)
 				pPlayerController.OnPrintComplete += HandlePrintComplete;
 		}
 
 		private void OnDestroy()
 		{
-			GameMgr.Instance.UnregisterPrinterView(this);
 			if (pPlayerController != null)
 				pPlayerController.OnPrintComplete -= HandlePrintComplete;
+			if (PrintViewId >= 0)
+				GameMgr.Instance.UnregisterPrintView(PrintViewId);
 		}
 
 		public override void OnResize()
@@ -38,15 +42,25 @@ namespace WindowContents
 			if (pController) pController.RefreshLayout();
 		}
 
+		public override string GetContentDescription()
+		{
+			return $"pView PrintID({PrintViewId}) Progression({_isProgressionMode})";
+		}
+
 		/// <summary>
-		/// Enables or disables progression mode. When true, completing a print advances
-		/// UserSave.ProgressionNextPrintIdx and opens PrintSummaryWindowContent.
+		/// Marks this view as part of the progression flow. Also notifies GameMgr.
+		/// Call from the Launch configurator.
 		/// </summary>
-		public void SetProgressionMode(bool value) => _isProgressionMode = value;
+		public void SetProgressionMode(bool value)
+		{
+			_isProgressionMode = value;
+			if (PrintViewId >= 0)
+				GameMgr.Instance.SetPrintViewProgressionMode(PrintViewId, value);
+		}
 
 		/// <summary>
 		/// Applies a level's abilities and obstacles to the PrinterMagic on this content's printhead.
-		/// Call from the Launch configurator before the window is shown.
+		/// Call from the Launch configurator.
 		/// </summary>
 		public void ApplyLevel(LevelEntry entry)
 		{
@@ -65,9 +79,7 @@ namespace WindowContents
 				magic.EnableObstacle(obstacle);
 		}
 
-		/// <summary>
-		/// Returns the reference sprite for a given level index. Null if out of range or not found.
-		/// </summary>
+		/// <summary>Returns the reference sprite for a given level index. Null if out of range.</summary>
 		public static Sprite GetReferenceSprite(int levelIndex)
 		{
 			var config = LevelSequenceConfig.Instance;
@@ -78,8 +90,16 @@ namespace WindowContents
 
 		private void HandlePrintComplete()
 		{
-			float accuracy = (float)PrintState.GetSimilarityScore();
-			string refPath = BuildReferencePath();
+			var refWc     = GameMgr.Instance.GetReference(PrintViewId);
+			var refSprite = refWc?.pReference?.ReferenceSprite;
+
+			float  accuracy = refSprite != null
+				? (float)PrintState.GetSimilarityScore(pCanvas.GetTexture(), refSprite)
+				: 0f;
+			string refPath = refSprite != null
+				? GalleryManager.MakeInternalPath("PrintRefs/" + refSprite.name)
+				: string.Empty;
+
 			var entry = GalleryManager.SaveEntry(
 				pCanvas.GetTexture(), refPath, accuracy,
 				pPlayerController.RestartCount, pPlayerController.PrintDuration);
@@ -88,7 +108,10 @@ namespace WindowContents
 			{
 				UserSave.Instance.ProgressionNextPrintIdx++;
 				UserSave.Save();
+			}
 
+			if (entry != null)
+			{
 				var captured = entry;
 				WindowManager.Instance.Launch<PrintSummaryWindowContent>((w, c) =>
 				{
@@ -97,15 +120,8 @@ namespace WindowContents
 				});
 			}
 
-			GameMgr.Instance.PrinterReferenceWC?.Close();
+			refWc?.Close();
 			AttachedWindow?.Quit();
-		}
-
-		private string BuildReferencePath()
-		{
-			var sprite = GameMgr.Instance.PrinterReferenceWC?.pReference.ReferenceSprite;
-			if (sprite == null) return string.Empty;
-			return GalleryManager.MakeInternalPath("PrintRefs/" + sprite.name);
 		}
 	}
 }

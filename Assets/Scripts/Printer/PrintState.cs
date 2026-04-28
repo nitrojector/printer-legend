@@ -5,22 +5,19 @@ namespace Printer
 {
 	public class PrintState
 	{
-		private static readonly Color32 White = new Color32(255, 255, 255, 255);
 		private const float WhiteThreshold = 0.1f;
 
-		public static double GetSimilarityScore()
+		/// <summary>
+		/// Computes a perceptual similarity score [0..1] between a canvas texture and a reference sprite.
+		/// Returns 0 if either argument is null.
+		/// </summary>
+		public static double GetSimilarityScore(Texture2D canvas, Sprite referenceSprite)
 		{
-			if (GameMgr.Instance.PrinterReferenceWC == null ||
-			    GameMgr.Instance.PrinterViewWC == null ||
-			    GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage == null ||
-			    GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite == null)
-				return 0;
-			Texture2D reference = GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite.texture;
-			Texture2D canvas = GameMgr.Instance.PrinterViewWC.pCanvas.DO_NOT_MODIFY_CanvasInternalTexture;
+			if (canvas == null || referenceSprite == null) return 0;
 
-			// Blit reference sprite rect to a readable texture
-			var sprite = GameMgr.Instance.PrinterReferenceWC.pReference.ReferenceImage.sprite;
-			var rect = sprite.textureRect;
+			var reference = referenceSprite.texture;
+			var rect = referenceSprite.textureRect;
+
 			var rt = RenderTexture.GetTemporary((int)rect.width, (int)rect.height);
 			Graphics.Blit(reference, rt);
 
@@ -35,22 +32,18 @@ namespace Printer
 			RenderTexture.ReleaseTemporary(rt);
 
 			double sim = GetSimilarity(canvas, readableRef);
-            
 			Object.Destroy(readableRef);
-
 			return sim;
 		}
-		
+
 		public static double GetSimilarity(Texture2D user, Texture2D reference)
 		{
 			var croppedUser = CropToContent(user);
-			var croppedRef = CropToContent(reference);
+			var croppedRef  = CropToContent(reference);
 
-			// DHash captures stroke gradients well, PHash captures structure
 			var dHashSim = HashFunctions.DHash(croppedUser).Similarity(HashFunctions.DHash(croppedRef));
 			var pHashSim = HashFunctions.PHash(croppedUser).Similarity(HashFunctions.PHash(croppedRef));
 
-			// blend — weight pHash higher for structural similarity
 			return dHashSim * 0.4 + pHashSim * 0.6;
 		}
 
@@ -58,7 +51,6 @@ namespace Printer
 		{
 			var pixels = tex.GetPixels32();
 			int w = tex.width, h = tex.height;
-
 			int minX = w, maxX = 0, minY = h, maxY = 0;
 
 			for (int y = 0; y < h; y++)
@@ -72,15 +64,12 @@ namespace Printer
 				if (y > maxY) maxY = y;
 			}
 
-			// no content found — return original
 			if (minX > maxX || minY > maxY) return tex;
 
 			int cw = maxX - minX + 1;
 			int ch = maxY - minY + 1;
-
-			var croppedPixels = tex.GetPixels(minX, minY, cw, ch);
 			var cropped = new Texture2D(cw, ch, tex.format, false);
-			cropped.SetPixels(croppedPixels);
+			cropped.SetPixels(tex.GetPixels(minX, minY, cw, ch));
 			cropped.Apply();
 			return cropped;
 		}

@@ -11,6 +11,8 @@ namespace Printer
         [Header("References")]
         [SerializeField] private RectTransform printheadRoot;
         [SerializeField] public RectTransform printheadMarker;
+        
+        private PrinterReference _printerReference;
 
         /// <summary>
         /// Reference to the PrintCanvas component where this printhead should draw.
@@ -18,7 +20,9 @@ namespace Printer
         private PrintCanvas canvas;
 
         public PrintCanvas Canvas => canvas;
-        
+
+        public void SetPrinterReference(PrinterReference reference) => _printerReference = reference;
+
         private bool _initialized = false;
 
         [Header("Print Settings")]
@@ -75,7 +79,7 @@ namespace Printer
             sfxInking = Resources.Load<AudioClip>("Audio/print_ink");
             sfxLine = Resources.Load<AudioClip>("Audio/print_line");
             sfxNewLine = Resources.Load<AudioClip>("Audio/print_cr");
-            canvas     ??= GetComponentInParent<PrintCanvas>();
+            canvas ??= GetComponentInParent<PrintCanvas>();
             totalLines = canvas.CanvasHeight / linePixelHeight;
             lineState  = new PrintLineState(totalLines, linePixelHeight);
             _initialized = true;
@@ -91,14 +95,21 @@ namespace Printer
         // Coroutine so the Canvas layout pass has run before we read rect dimensions.
         private IEnumerator Start()
         {
-            if (GameMgr.Instance.PrinterReferenceWC)
+            if (_printerReference == null)
             {
-                GameMgr.Instance.PrinterReferenceWC.pReference.Init(canvas.CanvasHeight, linePixelHeight);
+                var view = GetComponentInParent<WindowContents.PrinterViewWindowContent>();
+                if (view != null)
+                {
+                    Logr.Warn("PrintheadController: printerReference not set explicitly, falling back to GameMgr lookup.", this);
+                    _printerReference = GameMgr.Instance.GetReference(view.PrintViewId)?.pReference;
+                }
             }
+
+            _printerReference?.Init(canvas.CanvasHeight, linePixelHeight);
             yield return null;
             RefreshLayout();
         }
-        
+
         /// <summary>
         /// Snaps the marker width to one print pixel and repositions the indicator line.
         /// Call after any runtime canvas resize.
@@ -106,10 +117,7 @@ namespace Printer
         public void RefreshLayout()
         {
             SetMarkerSize();
-            if (GameMgr.Instance.PrinterReferenceWC)
-            {
-                GameMgr.Instance.PrinterReferenceWC.pReference.RefreshLayout();
-            }
+            _printerReference?.RefreshLayout();
             SetIndicatorLine(lineState.CurrentLine, totalLines, linePixelHeight);
             SetCanvasX(canvasX);
         }
@@ -291,10 +299,7 @@ namespace Printer
             if (printheadRoot != null)
                 printheadRoot.anchoredPosition = new Vector2(0f, localY);
 
-            if (GameMgr.Instance.PrinterReferenceWC)
-            {
-                GameMgr.Instance.PrinterReferenceWC.pReference.SetIndicatorLine(lineIndex);
-            }
+            _printerReference?.SetIndicatorLine(lineIndex);
         }
 
         public void SetPrintheadLine(int lineIndex)

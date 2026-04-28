@@ -383,6 +383,18 @@ namespace Desktop.WindowSystem
 			SetPosition(new Vector2(r.xMin + normalizedPosition.x * r.width,
 			                        r.yMin + normalizedPosition.y * r.height), pivot);
 		}
+		
+		/// <summary>
+		/// Returns a string with detailed information about the window.
+		/// </summary>
+		public string GetWindowDetailedString() {
+			var sb = new System.Text.StringBuilder();
+			var desc = content != null ? content.GetContentDescription() : $"{Title}";
+			sb.Append($"'{desc}' @ {RectTransform.anchoredPosition} size {RectTransform.rect.size}");
+			if (maximized) sb.Append(" [max]");
+			if (Minimized) sb.Append(" [min]");
+			return sb.ToString();
+		}
 
 		public void OnPointerDown(PointerEventData eventData)
 		{

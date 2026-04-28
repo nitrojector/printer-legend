@@ -47,8 +47,13 @@ namespace GameMaster.Scripts
 			view.ClearConsole();
 			
 			{
-				var similarity = PrintState.GetSimilarityScore();
-				 view.Info($"Similarity: {similarity * 100.0f:0.00}%\n");
+				foreach (var pr in GameMgr.Instance.ActiveReferences)
+				{
+					var pv = GameMgr.Instance.GetPrintView(pr.PrintViewId);
+					var similarity = PrintState.GetSimilarityScore(pv.pCanvas.DO_NOT_MODIFY_CanvasInternalTexture,
+						pr.pReference.ReferenceSprite);
+					view.Info($"Similarity[PrintID={pr.PrintViewId}]: {similarity * 100.0f:0.00}%");
+				}
 			}
 		}
 
@@ -74,10 +79,10 @@ namespace GameMaster.Scripts
 						InfoLn("Available commands:");
 						InfoLn("help - <u>Show this help message</u>");
 						InfoLn("timescale - <u>Set the game timescale</u>");
-						InfoLn("newref - <u>grab new reference image</u>");
 						InfoLn("ps - <u>list active windows</u>");
 						InfoLn("kill [id] - <u>kill window by id</u>");
 						InfoLn("killall - <u>kill all windows</u>");
+						InfoLn("btf - <u>bring to front the corresponding window id</u>");
 						InfoLn("clear - <u>clear console</u>");
 						break;
 					}
@@ -96,19 +101,11 @@ namespace GameMaster.Scripts
 						break;
 					}
 
-					case "newref":
-					{
-						GameMgr.Instance.PrinterReferenceWC.pReference.LoadRandomReference();
-						InfoLn("Loaded new reference image");
-						
-						break;
-					}
-
 					case "ps":
 					{
 						foreach (var w in WindowManager.Instance.ActiveWindows)
 						{
-							InfoLn($"{$"[{w.WindowId}]",5} (<color=yellow>{w.Content.GetType().Name}</color>) {w.Title}");
+							InfoLn($"{$"[{w.WindowId}]",5} (<color=yellow>{w.Content.GetType().Name}</color>) {w.GetWindowDetailedString()}");
 						}
 						var count = WindowManager.Instance.ActiveWindows.Count;
 						InfoLn($"{count} window{(count != 1 ? "s" : "")}");
@@ -134,6 +131,28 @@ namespace GameMaster.Scripts
 					{
 						WindowManager.Instance.KillAll();
 						InfoLn("Killed all windows");
+						
+						break;
+					}
+					
+					case "btf":
+					{
+						if (tokens.Count < 2 || !int.TryParse(tokens[1], out int id))
+						{
+							InfoLn("Usage: btf [windowId]");
+							break;
+						}
+						
+						var window = WindowManager.Instance.GetWindowById(id);
+						if (window != null)
+						{
+							WindowManager.Instance.BringToFront(window);
+							InfoLn($"Brought window with ID {id} to front");
+						}
+						else
+						{
+							ErrLn($"No window found with ID {id}");
+						}
 						
 						break;
 					}

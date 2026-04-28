@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Data;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace GameMaster.Scripts
@@ -32,13 +33,16 @@ namespace GameMaster.Scripts
 		private static void Init()
 		{
 			if (_instance != null) return;
-			
-			_instance = new GameMasterHost
+
+			if (DeveloperSettings.Instance.EnableGameMaster)
 			{
-				actions = Resources.Load<InputActionAsset>("GameMasterActions"),
-				gmPanelPrefab = Resources.Load<GameObject>("GameMasterView")
-			};
-			_instance.Setup();
+				_instance = new GameMasterHost
+				{
+					actions = Resources.Load<InputActionAsset>("GameMasterActions"),
+					gmPanelPrefab = Resources.Load<GameObject>("GameMasterView")
+				};
+				_instance.Setup();
+			}
 		}
 
 		private void Setup()

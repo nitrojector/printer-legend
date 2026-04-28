@@ -1,10 +1,10 @@
 using Config;
 using Data;
 using Desktop.WindowSystem;
-using Printer;
 using UnityEngine;
 using WindowContents;
 
+// TODO: refactor
 public class GameActions : MonoBehaviour
 {
 	public static GameActions Instance { get; private set; }
@@ -14,7 +14,6 @@ public class GameActions : MonoBehaviour
 		if (Instance == null)
 		{
 			Instance = this;
-			DontDestroyOnLoad(gameObject);
 		}
 		else if (Instance != this)
 		{
@@ -45,10 +44,23 @@ public class GameActions : MonoBehaviour
 			return;
 		}
 
+		if (GameMgr.Instance.ProgressionLinkedPrintViewCount > 0)
+		{
+			WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((w, c) =>
+			{
+				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+				c.Title = "Print In Progress";
+				c.Message = "You already have a print in progress for progression.";
+				c.ConfirmText = "OK";
+				c.SetAllowCancel(false);
+			});
+			return;
+		}
+
 		var levelEntry = LevelSequenceConfig.Instance.Levels[idx];
 		var refSprite = PrinterViewWindowContent.GetReferenceSprite(idx);
 
-		WindowManager.Instance.Launch<PrinterViewWindowContent>((w, c) =>
+		var printerView = WindowManager.Instance.Launch<PrinterViewWindowContent>((w, c) =>
 		{
 			w.SetPositionNormalized(new Vector2(0.25f, 0.5f), new Vector2(0.5f, 0.5f));
 			c.ApplyLevel(levelEntry);
@@ -58,6 +70,7 @@ public class GameActions : MonoBehaviour
 		WindowManager.Instance.Launch<PrinterReferenceWindowContent>((w, c) =>
 		{
 			w.SetPositionNormalized(new Vector2(0.75f, 0.5f), new Vector2(0.5f, 0.5f));
+			c.SetPrintViewId(printerView.PrintViewId);
 			c.SetReferenceSprite(refSprite);
 		});
 	}

@@ -68,6 +68,16 @@ namespace Desktop.WindowSystem
 		}
 
 		/// <summary>
+		/// Returns a string description of this content, used for debugging and editor display.
+		/// Defaults to the window title.
+		/// </summary>
+		/// <returns>description string</returns>
+		public virtual string GetContentDescription()
+		{
+			return WindowTitle;
+		}
+
+		/// <summary>
 		/// Convenience method to set the window title from this content and notify the parent window of the change.
 		/// </summary>
 		/// <param name="title">title to set</param>

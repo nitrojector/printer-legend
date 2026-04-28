@@ -12,14 +12,26 @@ namespace WindowContents
 		
 		[SerializeField] public PrinterReference pReference;
 
-		private void Awake()
+		public int PrintViewId => _printViewId;
+		
+		private int _printViewId = -1;
+
+		public void SetPrintViewId(int id)
 		{
-			GameMgr.Instance.RegisterPrinterReference(this);
+			_printViewId = id;
+			GameMgr.Instance.RegisterReference(id, this);
+			GameMgr.Instance.GetPrintView(id)?.pController?.SetPrinterReference(pReference);
 		}
 
 		private void OnDestroy()
 		{
-			GameMgr.Instance.UnregisterPrinterReference(this);
+			if (_printViewId >= 0)
+				GameMgr.Instance.UnregisterReference(_printViewId);
+		}
+
+		public override string GetContentDescription()
+		{
+			return $"pReference PrintID({PrintViewId})";
 		}
 
 		public void SetWindowVisible(bool visible)

@@ -155,6 +155,11 @@ namespace Desktop.WindowSystem
 		}
 
 		// ── Bulk operations ───────────────────────────────────────────────────
+		
+		public Window GetWindowById(int id)
+		{
+			return _handles.TryGetValue(id, out var handle) ? handle.target : null;
+		}
 
 		/// <summary>Destroys the window with the given ID, bypassing normal close procedures.</summary>
 		public void Kill(int id)
