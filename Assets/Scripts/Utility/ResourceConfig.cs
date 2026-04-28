@@ -58,11 +58,5 @@ namespace Utility
             JToken token = JToken.Parse(asset.text);
             instance = token.ToObject<T>() ?? new T();
         }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetInstance()
-        {
-            instance = null;
-        }
     }
 }

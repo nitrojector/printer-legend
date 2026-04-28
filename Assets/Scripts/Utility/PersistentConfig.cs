@@ -120,11 +120,5 @@ namespace Utility
             Application.quitting += Save;
             quittingHandlerAdded = true;
         }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetInstance()
-        {
-            instance = null;
-        }
     }
 }
