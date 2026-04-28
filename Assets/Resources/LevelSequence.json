@@ -11,12 +11,12 @@
       "obstacles": []
     },
     {
-      "image_path": "PrintRefs/meowconfetti_0",
+      "image_path": "PrintRefs/image2_0",
       "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast"],
       "obstacles": []
     },
     {
-      "image_path": "PrintRefs/image2_0",
+      "image_path": "PrintRefs/meowconfetti_0",
       "abilities": ["Newline", "CarriageReturn", "SpeedSlow", "SpeedNormal", "SpeedFast", "ColorRed", "ColorGreen", "ColorBlue"],
       "obstacles": []
     },
