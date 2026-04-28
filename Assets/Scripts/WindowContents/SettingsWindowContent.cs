@@ -19,6 +19,9 @@ namespace WindowContents
 		[SerializeField] private Slider masterVolumeSlider;
 		[SerializeField] private Slider musicVolumeSlider;
 		[SerializeField] private Slider sfxVolumeSlider;
+
+		[Header("Gameplay")]
+		[SerializeField] private Toggle quickResetToggle;
 		
 		[Header("Progression")]
 		[SerializeField] private TMP_Text progressionStatusText;
@@ -30,6 +33,8 @@ namespace WindowContents
 			musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
 			sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
 			
+			quickResetToggle.onValueChanged.AddListener(OnQuickResetToggled);
+			
 			resetProgressionButton.onClick.AddListener(ResetProgression);
 		}
 		
@@ -38,6 +43,8 @@ namespace WindowContents
 			masterVolumeSlider.value = UserSettings.Instance.Volumes[AudioBus.Master];
 			musicVolumeSlider.value = UserSettings.Instance.Volumes[AudioBus.Music];
 			sfxVolumeSlider.value = UserSettings.Instance.Volumes[AudioBus.SFX];
+			
+			quickResetToggle.isOn = UserSettings.Instance.QuickReset;
 			
 			UpdateProgressionStatus();
 		}
@@ -58,6 +65,11 @@ namespace WindowContents
 		{
 			UserSettings.Instance.Volumes[AudioBus.SFX] = value;
 			AudioManager.Instance.SetVolume(AudioBus.SFX, value);
+		}
+		
+		private void OnQuickResetToggled(bool isOn)
+		{
+			UserSettings.Instance.QuickReset = isOn;
 		}
 
 		private void UpdateProgressionStatus()
