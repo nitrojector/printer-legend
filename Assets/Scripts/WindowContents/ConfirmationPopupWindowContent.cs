@@ -35,15 +35,15 @@ namespace WindowContents
 			}
 		}
 		
-		public string ConfirmText 
+		public string ConfirmButtonText 
 		{
-			get => _confirmText;
+			get => _confirmButtonText;
 			set
 			{
-				_confirmText = value;
+				_confirmButtonText = value;
 				if (confirmButtonText != null)
 				{
-					confirmButtonText.text = _confirmText;
+					confirmButtonText.text = _confirmButtonText;
 				}
 			}
 		}
@@ -51,15 +51,15 @@ namespace WindowContents
 		/// <summary>
 		/// Text for the cancel button.
 		/// </summary>
-		public string CancelText
+		public string CancelButtonText
 		{
-			get => _cancelText;
+			get => _cancelButtonText;
 			set
 			{
-				_cancelText = value;
+				_cancelButtonText = value;
 				if (cancelButtonText != null)
 				{
-					cancelButtonText.text = _cancelText;
+					cancelButtonText.text = _cancelButtonText;
 				}
 			}
 		}
@@ -76,8 +76,8 @@ namespace WindowContents
 		
 		private string _title = "Confirmation";
 		private string _message = "Are you sure?";
-		private string _confirmText = "Confirm";
-		private string _cancelText = "Cancel";
+		private string _confirmButtonText = "Confirm";
+		private string _cancelButtonText = "Cancel";
 
 		[SerializeField] private Button confirmButton;
 		[SerializeField] private TMP_Text confirmButtonText;
@@ -113,8 +113,8 @@ namespace WindowContents
 		{
 			SetTitle(_title);
 			Message = _message;
-			ConfirmText = _confirmText;
-			CancelText = _cancelText;
+			ConfirmButtonText = _confirmButtonText;
+			CancelButtonText = _cancelButtonText;
 			
 			confirmButton.onClick.AddListener(() =>
 			{

@@ -72,8 +72,8 @@ namespace WindowContents
 				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 				c.Title = "Delete Entry";
 				c.Message = $"Delete \"{entryToDelete.Date.ToLocalTime():yyyy/MM/dd HH:mm}\"? This cannot be undone.";
-				c.ConfirmText = "Delete";
-				c.CancelText = "Cancel";
+				c.ConfirmButtonText = "Delete";
+				c.CancelButtonText = "Cancel";
 				c.OnConfirm += () =>
 				{
 					GalleryManager.RemoveEntry(entryToDelete);

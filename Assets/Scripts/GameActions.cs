@@ -37,7 +37,7 @@ public class GameActions : MonoBehaviour
 				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 				c.Title = "All Complete!";
 				c.Message = "You've completed all available drawings. Check the gallery to see your work!";
-				c.ConfirmText = "OK";
+				c.ConfirmButtonText = "OK";
 				c.SetAllowCancel(false);
 				c.OnConfirm += OpenGallery;
 			});
@@ -51,7 +51,7 @@ public class GameActions : MonoBehaviour
 				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 				c.Title = "Print In Progress";
 				c.Message = "You already have a print in progress for progression.";
-				c.ConfirmText = "OK";
+				c.ConfirmButtonText = "OK";
 				c.SetAllowCancel(false);
 			});
 			return;
@@ -85,12 +85,26 @@ public class GameActions : MonoBehaviour
 
 	public void OpenGallery()
 	{
+		var galleryWc = WindowManager.Instance.GetFirstWindowOfType<GalleryWindowContent>();
+		if (galleryWc != null)
+		{
+			WindowManager.Instance.BringToFront(galleryWc);
+			return;
+		}
+		
 		WindowManager.Instance.Launch<GalleryWindowContent>();
 	}
 
 	public void OpenSettings()
 	{
-		// TODO: low priority
+		var settingsWc = WindowManager.Instance.GetFirstWindowOfType<SettingsWindowContent>();
+		if (settingsWc != null)
+		{
+			WindowManager.Instance.BringToFront(settingsWc);
+			return;
+		}
+		
+		WindowManager.Instance.Launch<SettingsWindowContent>();
 	}
 
 	public void ExitGame()
@@ -100,8 +114,8 @@ public class GameActions : MonoBehaviour
 			window.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
 			content.Title = "Exit Game";
 			content.Message = "Are you sure you want to exit the game?";
-			content.ConfirmText = "Exit";
-			content.CancelText = "Cancel";
+			content.ConfirmButtonText = "Exit";
+			content.CancelButtonText = "Cancel";
 			content.OnConfirm += ExitGameForReal;
 		});
 	}

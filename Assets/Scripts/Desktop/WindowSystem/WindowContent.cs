@@ -35,7 +35,7 @@ namespace Desktop.WindowSystem
 		}
 		[SerializeField] private Vector2 maxContentSize = new Vector2(1000, 1000);
 
-		protected Window AttachedWindow;
+		public Window AttachedWindow { get; private set; }
 		
 		/// <summary>
 		/// Called when the window is initialized with this content.

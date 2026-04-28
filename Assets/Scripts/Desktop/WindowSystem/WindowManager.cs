@@ -153,6 +153,27 @@ namespace Desktop.WindowSystem
 			_focusStack.Add(window);
 			AssignSortOrders();
 		}
+		
+		/// <summary>
+		/// Moves the window with the given ID to the front of the stack and reassigns sort orders.
+		/// No-op if the window is already focused or not registered.
+		/// </summary>
+		/// <param name="id"></param>
+		public void BringToFront(int id)
+		{
+			if (_handles.TryGetValue(id, out var handle))
+				BringToFront(handle.target);
+		}
+		
+		/// <summary>
+		/// Moves the window containing <paramref name="content"/> to the front of the stack and reassigns sort orders.
+		/// </summary>
+		/// <param name="content">content for window</param>
+		public void BringToFront(WindowContent content)
+		{
+			if (content.AttachedWindow != null)
+				BringToFront(content.AttachedWindow);
+		}
 
 		// ── Bulk operations ───────────────────────────────────────────────────
 		
@@ -174,6 +195,45 @@ namespace Desktop.WindowSystem
 			var snapshot = new List<Window>(_focusStack);
 			foreach (var w in snapshot)
 				Destroy(w.gameObject);
+		}
+		
+		/// <summary>
+		/// Returns the front-most active window with content of type <typeparamref name="T"/>, or null if none.
+		/// </summary>
+		/// <returns></returns>
+		public T GetFirstWindowOfType<T>() where T : WindowContent
+		{
+			for (int i = _focusStack.Count - 1; i >= 0; i--)
+			{
+				if (_focusStack[i].Content is T content) return content;
+			}
+			return null;
+		}
+		
+		/// <summary>
+		/// Returns all active windows with content of type <typeparamref name="T"/>, ordered back-to-front.
+		/// </summary>
+		public T[] GetAllWindowsOfType<T>() where T : WindowContent
+		{
+			var list = new List<T>();
+			foreach (var w in _focusStack)
+			{
+				if (w.Content is T content) list.Add(content);
+			}
+			return list.ToArray();
+		}
+		
+		/// <summary>
+		/// Returns the number of active windows with content of type <typeparamref name="T"/>.
+		/// </summary>
+		public int GetWindowCountOfType<T>() where T : WindowContent
+		{
+			int count = 0;
+			foreach (var w in _focusStack)
+			{
+				if (w.Content is T) count++;
+			}
+			return count;
 		}
 
 		// ── Internals ─────────────────────────────────────────────────────────
