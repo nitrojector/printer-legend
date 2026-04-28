@@ -96,6 +96,23 @@ namespace WindowContents
 			cancelButton.gameObject.SetActive(allowCancel);
 		}
 
+		public override void OnInitialize()
+		{
+			FitWindowToMessageSize();
+		}
+
+		public override void OnShow()
+		{
+			FitWindowToMessageSize();
+		}
+
+		private void FitWindowToMessageSize()
+		{
+			LayoutRebuilder.ForceRebuildLayoutImmediate(RectTransform);
+			float preferredHeight = LayoutUtility.GetPreferredHeight(RectTransform);
+			AttachedWindow?.SetSize(new Vector2(MinContentSize.x, preferredHeight));
+		}
+
 		public override bool OnQuit()
 		{
 			if (!_decided)
