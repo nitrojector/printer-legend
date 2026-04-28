@@ -24,6 +24,7 @@ namespace UI
 			{
 				onAction.Invoke();
 				_lastClickTime = -1f;
+				EventSystem.current.SetSelectedGameObject(null);
 				return;
 			}
 
@@ -33,6 +34,7 @@ namespace UI
 		public void OnSubmit(BaseEventData eventData)
 		{
 			onAction.Invoke();
+			EventSystem.current.SetSelectedGameObject(null);
 		}
 	}
 }
