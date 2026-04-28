@@ -19,5 +19,12 @@ namespace Data
 			[AudioBus.Music] = 1.0f,
 			[AudioBus.SFX] = 1.0f,
 		};
+		
+		/// <summary>
+		/// If true, printer view resets immediately when user clicks
+		/// restart instead of asking for confirmation.
+		/// </summary>
+		[JsonProperty("quick_reset")]
+		public bool QuickReset = false;
 	}
 }

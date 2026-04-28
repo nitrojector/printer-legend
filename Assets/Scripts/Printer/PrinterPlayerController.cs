@@ -1,8 +1,11 @@
 using System;
+using Data;
+using Desktop.WindowSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using WindowContents;
 
 namespace Printer
 {
@@ -18,7 +21,7 @@ namespace Printer
 		[SerializeField] private GameObject startGamePrompt;
 		[SerializeField] private TMP_Text coundownText;
 
-		private bool _isPlayerPaused = false;
+		private bool _paused;
 		private bool printingStarted = false;
 		private bool completionTriggered = false;
 		private bool printingCountdownActive = false;
@@ -133,7 +136,7 @@ namespace Printer
 
 		private void Update()
 		{
-			if (_isPlayerPaused) return;
+			if (_paused) return;
 
 			if (!printingStarted && printAction.IsPressed())
 			{
@@ -193,9 +196,40 @@ namespace Printer
 
 		private void OnReset(InputAction.CallbackContext ctx)
 		{
+			if (UserSettings.Instance.QuickReset)
+			{
+				ExecuteReset();
+				return;
+			}
+
+			SetPaused(true);
+			WindowManager.Instance.Launch<ConfirmationPopupWindowContent>((w, c) =>
+			{
+				w.SetPositionNormalized(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+				c.Title             = "Reset Print?";
+				c.Message           = "This will clear your current print. Are you sure?";
+				c.ConfirmButtonText = "Reset";
+				c.CancelButtonText  = "Continue";
+				c.OnConfirm += ExecuteReset;
+				c.OnCancel  += ResumeWithCountdown;
+			});
+		}
+
+		private void ResumeWithCountdown()
+		{
+			_paused                 = false;
+			printingCountdownActive = true;
+			startTimer              = StartTimeDelay;
+			coundownText.SetText($"{Mathf.CeilToInt(startTimer)}");
+			coundownText.gameObject.SetActive(true);
+		}
+
+		private void ExecuteReset()
+		{
+			_paused             = false;
 			RestartCount++;
 			completionTriggered = false;
-			printingStarted = false;
+			printingStarted     = false;
 			printhead.ResetCanvasAndPrinthead();
 			coundownText.gameObject.SetActive(false);
 			startGamePrompt.SetActive(true);
@@ -288,10 +322,10 @@ namespace Printer
 
 		public bool SetPaused(bool paused)
 		{
-			if (paused == _isPlayerPaused) return false;
+			if (paused == _paused) return false;
 			if (!enabled) return false;
-			_isPlayerPaused = paused;
-			if (_isPlayerPaused) UnregisterInput();
+			_paused = paused;
+			if (_paused) UnregisterInput();
 			else RegisterInput();
 			return true;
 		}
