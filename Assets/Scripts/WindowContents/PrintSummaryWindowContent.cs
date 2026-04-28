@@ -27,6 +27,9 @@ namespace WindowContents
 		[SerializeField] private Button nextPrintButton;
 
 		private GalleryEntry _entry;
+		private Texture2D _ownedCreationTex;
+		private Texture2D _ownedRefTex;
+		private bool _ownsRefTex;
 
 		private void Awake()
 		{
@@ -35,16 +38,22 @@ namespace WindowContents
 
 		public void SetEntry(GalleryEntry entry, bool isProgression = false)
 		{
+			ReleaseOwnedTextures();
 			_entry = entry;
 
 			creationContainer?.SetActive(true);
 			referenceContainer?.SetActive(entry.HasRef);
 			nextPrintButton?.gameObject.SetActive(isProgression);
 
+			_ownedCreationTex = GalleryManager.LoadImageOwned(entry);
 			if (creationDisplay != null)
-				creationDisplay.texture = GalleryManager.LoadImage(entry);
+				creationDisplay.texture = _ownedCreationTex;
+
+			_ownsRefTex = entry.HasRef && !GalleryManager.IsInternalReference(entry.ReferenceImagePath);
+			_ownedRefTex = entry.HasRef ? GalleryManager.LoadReferenceImageOwned(entry) : null;
 			if (referenceDisplay != null)
-				referenceDisplay.texture = entry.HasRef ? GalleryManager.LoadReferenceImage(entry) : null;
+				referenceDisplay.texture = _ownedRefTex;
+
 			if (detailsText != null)
 				detailsText.text = BuildDetailsText(entry);
 		}
@@ -53,6 +62,16 @@ namespace WindowContents
 		{
 			_entry = null;
 			return true;
+		}
+
+		private void OnDestroy() => ReleaseOwnedTextures();
+
+		private void ReleaseOwnedTextures()
+		{
+			if (_ownedCreationTex != null) { Destroy(_ownedCreationTex); _ownedCreationTex = null; }
+			if (_ownsRefTex && _ownedRefTex != null) { Destroy(_ownedRefTex); _ownedRefTex = null; }
+			_ownedRefTex = null;
+			_ownsRefTex = false;
 		}
 
 		private void OnNextPrint()

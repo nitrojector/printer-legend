@@ -187,6 +187,26 @@ namespace Gallery
 			return RefImageBuffer.Get(fullPath) ?? LoadAndCache(fullPath, RefImageBuffer);
 		}
 
+		/// <summary>
+		/// Loads the reference image for <paramref name="entry"/> directly from disk without touching the cache.
+		/// For internal (Resources) references the resource texture is returned — the caller must NOT destroy it.
+		/// For external references the caller owns the returned texture and must destroy it when done.
+		/// Returns null if missing or unreadable.
+		/// </summary>
+		public static Texture2D LoadReferenceImageOwned(GalleryEntry entry)
+		{
+			var path = entry.ReferenceImagePath;
+			if (string.IsNullOrEmpty(path)) return null;
+
+			if (IsInternalReference(path))
+			{
+				var spriteName = System.IO.Path.GetFileName(path.Substring(InternalPrefix.Length));
+				return Printer.PrintRefManager.Instance.GetByName(spriteName)?.texture;
+			}
+
+			return LoadFromDisk(ToFullPath(path));
+		}
+
 		/// <summary>Drops the creation image for this entry from the in-memory buffer.</summary>
 		public static void UnloadImage(GalleryEntry entry)
 		{
